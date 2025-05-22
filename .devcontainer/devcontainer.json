@@ -1,0 +1,25 @@
+{
+    "name": "MineLib Development Container",
+    "build" : {
+        "dockerfile": "../docker/Dockerfile",
+        "context" : "../"
+    },
+    "runArgs": ["--privileged", "--cap-add=all"],
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "terminal.integrated.defaultProfile.linux": "bash"
+            },
+            "extensions": [
+                "ms-vscode.cpptools",
+                "ms-vscode.cpptools-themes",
+                "ms-vscode.cpptools-extension-pack",
+                "ms-vscode.cmake-tools",
+                "gruntfuggly.todo-tree",
+                "redhat.vscode-yaml",
+                "github.vscode-github-actions",
+                "mhutchie.git-graph"
+            ]
+        }
+    }
+}
