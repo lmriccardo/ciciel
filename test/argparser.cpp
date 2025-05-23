@@ -1,4 +1,4 @@
-#include <cli/argparse/argument_parser.hpp>
+#include <cli/argparse.hpp>
 
 namespace argparse = ccl::cli::argparse;
 
