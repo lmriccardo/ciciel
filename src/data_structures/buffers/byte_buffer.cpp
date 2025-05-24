@@ -1,6 +1,6 @@
 #include "byte_buffer.hpp"
 
-using namespace ccl::ds;
+using namespace ccl::ds::buffers;
 
 ByteBuffer::ByteBuffer(const size_t capacity)
     : m_position(0), m_size(0), m_order(ByteOrder::LittleEndian)

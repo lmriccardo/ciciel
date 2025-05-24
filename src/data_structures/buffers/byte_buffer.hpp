@@ -7,7 +7,7 @@
 #include <cstdlib>
 #include <iostream>
 
-namespace ccl::ds
+namespace ccl::ds::buffers
 {
     class ByteBuffer
     {
@@ -95,4 +95,4 @@ namespace ccl::ds
 
     typedef std::shared_ptr<ByteBuffer> ByteBuffer_ptr;
     typedef std::unique_ptr<ByteBuffer> ByteBuffer_uptr;
-};
+}

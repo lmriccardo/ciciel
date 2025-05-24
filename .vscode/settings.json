@@ -50,6 +50,7 @@
         "ctime": "cpp",
         "regex": "cpp",
         "iomanip": "cpp",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "cstring": "cpp"
     }
 }
