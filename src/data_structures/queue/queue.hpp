@@ -6,7 +6,7 @@
 #include <ostream>
 #include "queue_interface.hpp"
 
-namespace ccl::ds
+namespace ccl::ds::queue
 {
     /**
      * Classical Queue FIFO implementation with some additional
@@ -49,10 +49,11 @@ namespace ccl::ds
          */
         void capacity(size_t value);
 
-        void push(T&&)         override;
         void push(const T&)    override;
-        bool tryPush(T&&)      override;
+        void push(T&&)         override;
         bool tryPush(const T&) override;
+        bool tryPush(T&&)      override;
+
         T    pop()             override;
         void pop(T&)           override;
         bool tryPop(T&)        override;

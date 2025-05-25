@@ -15,6 +15,8 @@ namespace ccl::ds::buffers
      * written over the actual capacity of the underline container overwrite oldest
      * values (those pointed by the read index).
      * 
+     * It also inherits from IterableContainer which expose iterator operations.
+     * 
      * @tparam T Base type for all elements in the buffer
      */
     template <typename T>
@@ -25,8 +27,8 @@ namespace ccl::ds::buffers
         size_t         m_capacity;
         
         size_t m_size      = 0;
-        size_t m_read_idx  = 0;
-        size_t m_write_idx = 0;
+        size_t m_front_idx = 0;
+        size_t m_back_idx  = 0;
 
         constexpr void boundCheck( size_t ) const;
 
@@ -47,11 +49,11 @@ namespace ccl::ds::buffers
         constexpr size_t size    () const override;
         constexpr size_t capacity() const;
 
-        constexpr const T& at(size_t) const;
-        constexpr const T& operator[](size_t) const override;
+        virtual constexpr const T& at(size_t) const override;
+        virtual constexpr const T& operator[](size_t) const override;
 
-        constexpr T& at(size_t);
-        constexpr T& operator[](size_t) override;
+        virtual constexpr T& at(size_t) override;
+        virtual constexpr T& operator[](size_t) override;
         
         constexpr const T& front() const;
         constexpr const T& back () const;
@@ -61,6 +63,12 @@ namespace ccl::ds::buffers
         constexpr bool tryBack (T&)         const;
 
         template <typename U> constexpr void put(U&&);
+        
+        constexpr T    popFront   ();
+        constexpr T    popBack    ();
+        constexpr bool tryPopFront(T&);
+        constexpr bool tryPopBack (T&);
+
         constexpr void clear();
     };
 
@@ -112,7 +120,7 @@ namespace ccl::ds::buffers
     inline constexpr const T &RingBuffer<T>::at(size_t pos) const
     {
         boundCheck( pos ); // Perform bounds checking
-        return m_buffer[(m_read_idx + pos) % m_capacity];
+        return m_buffer[(m_front_idx + pos) % m_capacity];
     }
 
     template <typename T>
@@ -122,7 +130,7 @@ namespace ccl::ds::buffers
     inline constexpr T &RingBuffer<T>::at(size_t pos)
     {
         boundCheck( pos ); // Perform bounds checking
-        return m_buffer[(m_read_idx + pos) % m_capacity];
+        return m_buffer[(m_front_idx + pos) % m_capacity];
     }
 
     template <typename T>
@@ -132,10 +140,10 @@ namespace ccl::ds::buffers
     template <typename U>
     inline constexpr void RingBuffer<T>::put(U &&value)
     {
-        if ( m_size == m_capacity ) m_read_idx = (m_read_idx + 1) % m_capacity;
+        if ( m_size == m_capacity ) m_front_idx = (m_front_idx + 1) % m_capacity;
 
-        m_buffer[m_write_idx] = std::forward<U>(value);
-        m_write_idx = (m_write_idx + 1) % m_capacity;
+        m_buffer[m_back_idx] = std::forward<U>(value);
+        m_back_idx = (m_back_idx + 1) % m_capacity;
         
         if ( m_size < m_capacity ) m_size++;
     }
@@ -176,11 +184,53 @@ namespace ccl::ds::buffers
     }
 
     template <typename T>
+    inline constexpr T RingBuffer<T>::popFront()
+    {
+        if ( empty() ) throw std::runtime_error( "RingBuffer is empty!" );
+        T value = std::move( m_buffer[m_front_idx] );
+        m_front_idx = (m_front_idx + 1) % m_capacity;
+        --m_size;
+        return value;
+    }
+
+    template <typename T>
+    inline constexpr T RingBuffer<T>::popBack()
+    {
+        if ( empty() ) throw std::runtime_error( "RingBuffer is empty!" );
+        T value = std::move( m_buffer[m_back_idx] );
+        m_back_idx = (m_back_idx + m_capacity - 1) % m_capacity;
+        --m_size;
+        return value;
+    }
+
+    template <typename T>
+    inline constexpr bool RingBuffer<T>::tryPopFront(T &dst)
+    {
+        try {
+            dst = popFront();
+            return true;
+        } catch ( std::exception& e ) {
+            return false;
+        }
+    }
+
+    template <typename T>
+    inline constexpr bool RingBuffer<T>::tryPopBack(T &dst)
+    {
+        try {
+            dst = popBack();
+            return true;
+        } catch ( std::exception& e ) {
+            return false;
+        }
+    }
+
+    template <typename T>
     inline constexpr void RingBuffer<T>::clear()
     {
         m_size = 0;
-        m_write_idx = 0;
-        m_read_idx = 0;
+        m_back_idx = 0;
+        m_front_idx = 0;
 
         m_buffer.clear();
         m_buffer.resize(m_capacity);
