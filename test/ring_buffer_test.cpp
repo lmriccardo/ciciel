@@ -11,7 +11,7 @@ int main()
     std::cout << "RingBuffer size: " << rb.size() << std::endl;
     std::cout << "RingBuffer capacity: " << rb.capacity() << std::endl;
 
-    int front;
+    int front, back;
     std::cout << "RingBuffer tryFront result: " << std::boolalpha << rb.tryFront(front) << std::endl;
 
     try {
@@ -39,7 +39,6 @@ int main()
               << rb.tryFront(front) << " -> " 
               << front << std::endl;
 
-    int back;
     std::cout << "RingBuffer tryBack result: " << std::boolalpha 
               << rb.tryBack(back) << " -> " 
               << back << std::endl;
@@ -51,6 +50,17 @@ int main()
     std::cout << "New front: " << rb.front() << std::endl;
     std::cout << "New back: " << rb.back() << std::endl;
     std::cout << "RingBuffer size: " << rb.size() << std::endl;
+
+    int pop_back;
+    std::cout << "RingBuffer tryPopBack result: " << std::boolalpha << rb.tryPopBack(pop_back) << std::endl;
+
+    std::cout << "\n";
+    for ( size_t idx = 0; idx < rb.size(); ++idx )
+    {
+        std::cout << "Reading element at position: " << idx << " -> "
+                  << rb[idx]
+                  << std::endl;
+    }
 
     rb.clear();
     std::cout << "RingBuffer cleared" << std::endl;

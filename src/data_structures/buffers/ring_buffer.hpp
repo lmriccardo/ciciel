@@ -35,10 +35,10 @@ namespace ccl::ds::buffers
     public:
         RingBuffer() = default;
         RingBuffer( size_t );
-        RingBuffer( const std::vector<T>& );
-        RingBuffer( std::vector<T>&& );
         RingBuffer( const RingBuffer& ) = default;
         RingBuffer( RingBuffer&& ) = default;
+        explicit RingBuffer( const std::vector<T>& );
+        explicit RingBuffer( std::vector<T>&& );
 
         virtual ~RingBuffer() = default;
 
@@ -140,7 +140,7 @@ namespace ccl::ds::buffers
     template <typename U>
     inline constexpr void RingBuffer<T>::put(U &&value)
     {
-        if ( m_size == m_capacity ) m_front_idx = (m_front_idx + 1) % m_capacity;
+        if ( m_size >= m_capacity ) m_front_idx = (m_front_idx + 1) % m_capacity;
 
         m_buffer[m_back_idx] = std::forward<U>(value);
         m_back_idx = (m_back_idx + 1) % m_capacity;
