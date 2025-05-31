@@ -147,7 +147,7 @@ void ByteBuffer::setByteOrder(const ByteOrder &order)
     m_order = order;
 }
 
-const ByteBuffer::ByteOrder &ByteBuffer::getByteOrder() const
+const ccl::ds::ByteOrder &ByteBuffer::getByteOrder() const
 {
     return m_order;
 }

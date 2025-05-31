@@ -124,7 +124,8 @@ namespace ccl::sys::concurrent
 
     template <typename _Callable, typename... _Args>
     inline ThreadImpl<_Callable, _Args...>::ThreadImpl(_Callable &&fun, _Args &&...args)
-        : m_fun( std::forward<_Callable>(fun) ), m_args( std::forward<_Args>(args)... )
+        : Thread(), m_fun( std::forward<_Callable>(fun) ), 
+          m_args( std::forward<_Args>(args)... )
     {}
 
     template <typename _Callable, typename... _Args>
@@ -139,6 +140,6 @@ namespace ccl::sys::concurrent
 
         if ( daemon ) curr_thread->detach();
 
-        return std::move(curr_thread);
+        return curr_thread;
     }
 }

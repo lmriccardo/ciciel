@@ -2,17 +2,11 @@
 
 #include <type_traits>
 #include <data_structures/buffers/ring_buffer.hpp>
+#include <data_structures/base/enum.hpp>
 #include "queue_interface.hpp"
 
 namespace ccl::ds::queue
 {
-    enum class LossPolicy
-    {
-        OVERWRITE_OLDEST,
-        ERROR,
-        BLOCK
-    };
-
     /**
      * CircularQueue implementation. It uses a RingBuffer as storage option
      * and a LossPolicy value for pushing operations. In particular, when

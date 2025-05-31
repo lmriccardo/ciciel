@@ -7,6 +7,8 @@
 #include <cstdlib>
 #include <iostream>
 
+#include <data_structures/base/enum.hpp>
+
 namespace ccl::ds::buffers
 {
     class ByteBuffer
@@ -17,14 +19,8 @@ namespace ccl::ds::buffers
         const static size_t INT_SIZE = 4;
         const static size_t INT_SIZE_64 = 8;
 
-        // The two possible byte order
-        enum class ByteOrder
-        {
-            BigEndian = __BIG_ENDIAN,
-            LittleEndian = __LITTLE_ENDIAN
-        };
-
-        ByteBuffer() : m_buffer(nullptr), m_capacity(0), m_position(0), m_size(0), m_order(ByteOrder::LittleEndian) {}
+        ByteBuffer() : m_buffer(nullptr), m_capacity(0), m_position(0), 
+            m_size(0), m_order(ByteOrder::LittleEndian) {}
 
         ByteBuffer(const size_t capacity);
         ByteBuffer(const unsigned char *buffer, const size_t size);

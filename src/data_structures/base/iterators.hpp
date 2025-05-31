@@ -41,6 +41,8 @@ namespace ccl::ds::base
         virtual Derived&  operator++();
         virtual Derived   operator++(int);
 
+        size_t pos() const;
+
         bool operator==(const abstract_iterator& other) const;
         bool operator!=(const abstract_iterator& other) const;
     };
@@ -64,6 +66,12 @@ namespace ccl::ds::base
         Derived tmp = static_cast<Derived&>(*this);
         ++(*this);
         return tmp;
+    }
+
+    template <typename T, typename Pointer, typename Reference, typename U, typename Derived>
+    inline size_t abstract_iterator<T, Pointer, Reference, U, Derived>::pos() const
+    {
+        return m_pos;
     }
 
     template <typename T, typename Pointer, typename Reference, typename U, typename Derived>
