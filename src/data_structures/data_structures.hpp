@@ -5,3 +5,4 @@
 #include "queue/queue.hpp"
 #include "queue/circular_queue.hpp"
 #include "grids/array2d.hpp"
+#include "grids/dynamic_array2d.hpp"
