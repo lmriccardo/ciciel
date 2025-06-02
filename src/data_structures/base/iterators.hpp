@@ -28,7 +28,7 @@ namespace ccl::ds::base
         size_t m_pos;
 
     public:
-        using iterator_category = std::forward_iterator_tag;
+        using iterator_category = std::random_access_iterator_tag;
         using value_type        = T;
         using difference_type   = std::ptrdiff_t;
         using pointer           = Pointer;
@@ -41,10 +41,20 @@ namespace ccl::ds::base
         virtual Derived&  operator++();
         virtual Derived   operator++(int);
 
-        size_t pos() const;
+        Derived operator+( difference_type n ) const;
+        Derived operator-( difference_type n ) const;
 
+        difference_type operator-( const abstract_iterator& other ) const;
+        reference operator[]( difference_type n ) const;
+
+        bool operator<( const abstract_iterator& other ) const;
+        bool operator>( const abstract_iterator& other ) const;
+        bool operator<=( const abstract_iterator& other ) const;
+        bool operator>=( const abstract_iterator& other ) const;
         bool operator==(const abstract_iterator& other) const;
         bool operator!=(const abstract_iterator& other) const;
+
+        size_t pos() const;
     };
 
     template <typename T, typename Pointer, typename Reference, typename U, typename Derived>
@@ -66,6 +76,56 @@ namespace ccl::ds::base
         Derived tmp = static_cast<Derived&>(*this);
         ++(*this);
         return tmp;
+    }
+
+    template <typename T, typename Pointer, typename Reference, typename U, typename Derived>
+    inline Derived abstract_iterator<T, Pointer, Reference,U, Derived>::operator+( difference_type n ) const
+    {
+        return Derived( m_iterable, m_pos + n );
+    }
+
+    template <typename T, typename Pointer, typename Reference, typename U, typename Derived>
+    inline Derived abstract_iterator<T, Pointer, Reference,U, Derived>::operator-( difference_type n ) const
+    {
+        return Derived( m_iterable, m_pos - n );
+    }
+
+    template <typename T, typename Pointer, typename Reference, typename U, typename Derived>
+    inline abstract_iterator<T, Pointer, Reference, U, Derived>::difference_type 
+        abstract_iterator<T, Pointer, Reference, U, Derived>::operator-(const abstract_iterator &other) const
+    {
+        return static_cast<difference_type>( m_pos ) - static_cast<difference_type>(other.m_pos);
+    }
+
+    template <typename T, typename Pointer, typename Reference, typename U, typename Derived>
+    inline abstract_iterator<T, Pointer, Reference, U, Derived>::reference
+        abstract_iterator<T, Pointer, Reference, U, Derived>::operator[]( difference_type n ) const
+    {
+        return *(*this + n);
+    }
+
+    template <typename T, typename Pointer, typename Reference, typename U, typename Derived>
+    inline bool abstract_iterator<T, Pointer, Reference, U, Derived>::operator<(const abstract_iterator &other) const
+    {
+        return m_pos < other.m_pos;
+    }
+
+    template <typename T, typename Pointer, typename Reference, typename U, typename Derived>
+    inline bool abstract_iterator<T, Pointer, Reference, U, Derived>::operator>(const abstract_iterator &other) const
+    {
+        return m_pos > other.m_pos;
+    }
+
+    template <typename T, typename Pointer, typename Reference, typename U, typename Derived>
+    inline bool abstract_iterator<T, Pointer, Reference, U, Derived>::operator<=(const abstract_iterator &other) const
+    {
+        return m_pos <= other.m_pos;
+    }
+
+    template <typename T, typename Pointer, typename Reference, typename U, typename Derived>
+    inline bool abstract_iterator<T, Pointer, Reference, U, Derived>::operator>=(const abstract_iterator &other) const
+    {
+        return m_pos >= other.m_pos;
     }
 
     template <typename T, typename Pointer, typename Reference, typename U, typename Derived>

@@ -1,6 +1,6 @@
 #include "terminal.hpp"
 
-using namespace ccl::cli::ui::screen;
+using namespace ccl::cli::ui;
 
 Terminal::Terminal()
 {
@@ -18,6 +18,12 @@ Terminal::Terminal()
 Terminal::~Terminal()
 {
     disableRawMode();
+}
+
+Terminal &ccl::cli::ui::Terminal::getInstance()
+{
+    static std::unique_ptr<Terminal> ptr{ new Terminal() };
+    return *ptr;
 }
 
 void Terminal::enableRawMode()
@@ -53,7 +59,7 @@ void Terminal::disableRawMode()
     }
 }
 
-void Terminal::put(char c)
+void Terminal::put(char32_t c)
 {
     write( STDOUT_FILENO, &c, 1);
 }
@@ -61,4 +67,12 @@ void Terminal::put(char c)
 void Terminal::put(const std::string &str)
 {
     write( STDOUT_FILENO, str.c_str(), str.size() );
+}
+
+void Terminal::reset() const
+{
+    if (callCap(Terminal::RESET_STR) < 0)
+    {
+        std::cerr << "Unable to reset the terminal." << std::endl;
+    }
 }

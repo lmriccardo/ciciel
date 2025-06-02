@@ -57,6 +57,7 @@ namespace ccl::ds::base
         constexpr void set(const T &, size_t );
 
         void transpose();
+        size_t flatten( size_t, size_t ) const;
     };
 
     template <typename T, typename Container>
@@ -198,5 +199,16 @@ namespace ccl::ds::base
         m_policy = m_policy == Ordering2DPolicy::ROW_MAJOR ? 
               Ordering2DPolicy::COLUMN_MAJOR
             : Ordering2DPolicy::ROW_MAJOR;
+    }
+
+    /**
+     * Given row and column indexes it returns the flatted index
+     * according to transposition logic or not.
+     */
+    template <typename T, typename Container>
+    inline size_t AbstractGridContainer<T, Container>::flatten(size_t r_idx, size_t c_idx) const
+    {
+        if (m_policy == Ordering2DPolicy::COLUMN_MAJOR) std::swap( r_idx, c_idx );
+        return r_idx * size( static_cast<size_t>( Selector2D::COLUMNS ) + c_idx );
     }
 }

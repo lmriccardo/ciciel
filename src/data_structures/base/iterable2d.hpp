@@ -17,8 +17,8 @@ namespace ccl::ds::base
     class Iterable2DContainer : public Indexable2DInterface<T>
     {
     public:
-        typedef ds::base::iterator_base<T, T*, T&> iterator;
-        typedef ds::base::iterator_base<T, const T*, const T&> const_iterator;
+        using iterator = ds::base::iterator_base<T, T*, T&>;
+        using const_iterator = ds::base::iterator_base<T, const T*, const T&>;
 
         virtual ~Iterable2DContainer() = default;
         virtual constexpr size_t size() const = 0;
