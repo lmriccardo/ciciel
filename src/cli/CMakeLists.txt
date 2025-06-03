@@ -6,6 +6,7 @@ add_library(ccl_Cli
 
     # UI CLI SOURCE FILES
     ui/style/colors.cpp
+    ui/style/style.cpp
     ui/screen/terminal.cpp
     ui/screen/screen_buffer.cpp
     ui/screen/screen.cpp

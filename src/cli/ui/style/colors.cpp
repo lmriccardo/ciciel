@@ -29,7 +29,7 @@ unsigned int Color::hex() const
 
 std::ostream &ccl::cli::ui::operator<<(std::ostream &os, const Color &color)
 {
-    auto vec = static_cast<const Vec3<u_int16_t>&>(color);
+    const Vec3<u_int16_t>& vec = color;
     os << "Color" << vec << "#0x" << std::hex << color.hex()
        << "#XTERM-IDX{" << color.m_xterm_number << "}";
     

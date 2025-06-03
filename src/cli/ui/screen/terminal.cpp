@@ -13,6 +13,7 @@ Terminal::Terminal()
 
     // Enables UTF-8 and correct locale settings
     setlocale( LC_ALL, "" );
+    enableRawMode();
 }
 
 Terminal::~Terminal()
@@ -59,20 +60,30 @@ void Terminal::disableRawMode()
     }
 }
 
-void Terminal::put(char32_t c)
+void Terminal::put(char32_t c, const Style& style)
 {
     write( STDOUT_FILENO, &c, 1);
 }
 
-void Terminal::put(const std::string &str)
+void Terminal::put(const std::string &str, const Style& style)
 {
-    write( STDOUT_FILENO, str.c_str(), str.size() );
+    for (const auto& elem: str)
+    {
+        put( elem, style );
+    }
 }
 
 void Terminal::reset() const
 {
-    if (callCap(Terminal::RESET_STR) < 0)
+    if (callCap(TCapabilities::RESET) < 0)
     {
         std::cerr << "Unable to reset the terminal." << std::endl;
     }
+}
+
+std::pair<int, int> ccl::cli::ui::Terminal::getWindowSize()
+{
+    struct winsize ws;
+    ioctl( STDOUT_FILENO, TIOCGWINSZ, &ws );
+    return { ws.ws_row, ws.ws_col };
 }

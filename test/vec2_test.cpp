@@ -10,5 +10,9 @@ int main()
     v.set(3, 1);
     std::cout << v << std::endl;
 
+    Vec2<int> v2;
+    v2 = v;
+    std::cout << v2 << std::endl;
+
     return 0;
 }

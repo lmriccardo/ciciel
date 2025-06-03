@@ -10,6 +10,11 @@
 #include <memory>
 #include <cstdlib>
 #include <cstring>
+#include <sys/ioctl.h>
+#include <unordered_map>
+#include <cli/ui/style/style.hpp>
+
+#include "term_cap.hpp"
 
 namespace ccl::cli::ui
 {
@@ -22,8 +27,6 @@ namespace ccl::cli::ui
         Terminal();
 
     public:
-        constexpr static const char* RESET_STR = "sgr0";
-        
         ~Terminal();
 
         Terminal( const Terminal& ) = delete;
@@ -33,13 +36,16 @@ namespace ccl::cli::ui
 
         void enableRawMode();  // Set the terminal to Raw mode for interactive UI
         void disableRawMode(); // Reset the terminal to its original state
-        void put( char32_t );      // Put a char into the terminal
-        void put( const std::string& ); // Put a UTF-8 string into the terminal
+        
+        void put( char32_t, const Style& );           // Put a char into the terminal
+        void put( const std::string&, const Style& ); // Put a UTF-8 string into the terminal
 
         template <typename... _Args>
         int callCap(const char* capname, _Args&&... args) const;
 
         void reset() const;
+
+        static std::pair<int, int> getWindowSize();
     };
 
     template <typename... _Args>
