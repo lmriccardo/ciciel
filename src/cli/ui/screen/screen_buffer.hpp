@@ -10,8 +10,9 @@ namespace ccl::cli::ui
 {
     struct CellChar
     {
-        char32_t m_char;  // The character inside the cell
-        Style    m_style; // The style of the character
+        char  m_char;   // The character inside the cell
+        Style m_style;  // The style of the character
+        bool  m_redraw; // Forse redraw the current cell
     };
 
     class ScreenBuffer : public ccl::ds::grids::DynamicArray2D<struct CellChar>
@@ -41,12 +42,13 @@ namespace ccl::cli::ui
          * does not fit into space, then a warning is raised and only a portion
          * of the string will be copied into the buffer.
          */
-        void set( const std::string&, size_t, size_t, const Style& );
-        void set( const char32_t&, size_t, size_t, const Style& );
+        void set( const std::string&, size_t, size_t, const Style&, bool );
+        void set( char, size_t, size_t, const Style&, bool );
+        void set( char, size_t, const Style&, bool );
 
         /**
          * Flush the content to the terminal. Only differences are written.
          */
-        void flush( Terminal& t_out ) const;
+        void flush( Terminal& t_out );
     };
 }

@@ -28,8 +28,12 @@ void ScreenBuffer::resize(size_t new_h, size_t new_w)
     extend( new_h, new_w );
 }
 
-void ScreenBuffer::set(const std::string &content, size_t s_row, size_t s_col, const Style& style)
-{
+void ScreenBuffer::set(const std::string &content, 
+                       size_t s_row, 
+                       size_t s_col, 
+                       const Style& style, 
+                       bool redraw
+) {
     size_t flatten_idx = flatten( s_row, s_col );
     size_t remaining_size = content.size();
 
@@ -50,29 +54,48 @@ void ScreenBuffer::set(const std::string &content, size_t s_row, size_t s_col, c
     for ( ; content_it != content_end; ++content_it )
     {
         char32_t curr_char = *content_it;
-        set({ curr_char, style }, current_idx);
-        m_lastUpdate[current_idx] = m_updateCounter + 1;
+        set(curr_char, current_idx, style, redraw);
         current_idx++;
     }
 }
 
-void ScreenBuffer::set(const char32_t& content, size_t s_row, size_t s_col, const Style& style)
+void ScreenBuffer::set(char content, size_t s_row, size_t s_col, const Style& style, bool redraw)
 {
     size_t flatten_idx = flatten( s_row, s_col );
-    set( { content, style }, flatten_idx );
-    m_lastUpdate[ flatten_idx ] = m_updateCounter + 1;
+    set( content, flatten_idx, style, redraw );
 }
 
-void ScreenBuffer::flush(Terminal &t_out) const
+void ScreenBuffer::set(char content, size_t pos, const Style &style, bool redraw)
 {
-    for ( const auto& pair: m_lastUpdate )
+    const auto& cell = at( pos );
+
+    // Check that the current cell is different from the new content
+    if ( (cell.m_char != content && cell.m_style != style) || redraw )
     {
-        size_t pos  = pair.first;
-        int counter = pair.second;
-
-        if ( counter <= m_updateCounter ) continue;
-
-        struct CellChar buffer_element = at( pos );
-        t_out.put( buffer_element.m_char, buffer_element.m_style );
+        set( { content, style, false }, pos );
+        m_lastUpdate[ pos ] = m_updateCounter + 1;
     }
+}
+
+void ScreenBuffer::flush(Terminal &t_out)
+{
+    auto this_it = begin();
+
+    for ( ; this_it != end(); ++this_it )
+    {
+        size_t current_pos = this_it.pos();
+        int curr_element_counter = m_lastUpdate[current_pos];
+
+        // Put the element only if it has been changed from the
+        // previous state of the screen buffer.
+        if ( curr_element_counter > m_updateCounter )
+        {
+            const struct CellChar& elem = *this_it;
+            size_t row_idx, col_idx;
+            getRowCol( row_idx, col_idx, current_pos );
+            t_out.put( elem.m_char, row_idx, col_idx, elem.m_style );
+        }
+    }
+
+    m_updateCounter++;
 }

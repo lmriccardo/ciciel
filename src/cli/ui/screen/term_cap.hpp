@@ -24,5 +24,7 @@ namespace ccl::cli::ui
         constexpr static const char* MOUSE_PROTO      = "kmous";            // Mouse protocol
         constexpr static const char* ENTER_ALT_SCREEN = "smcup";            // Enter alternate screen
         constexpr static const char* EXIT_ALT_SCREEN  = "rmcup";            // Exit alternate screen
+        constexpr static const char* START_ITALIC     = "sitm";             // Enter Italic mode
+        constexpr static const char* STOP_ITALIC      = "ritm";             // Exit Italic mode
     };
 }

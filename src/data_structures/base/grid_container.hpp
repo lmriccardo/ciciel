@@ -209,6 +209,6 @@ namespace ccl::ds::base
     inline size_t AbstractGridContainer<T, Container>::flatten(size_t r_idx, size_t c_idx) const
     {
         if (m_policy == Ordering2DPolicy::COLUMN_MAJOR) std::swap( r_idx, c_idx );
-        return r_idx * size( static_cast<size_t>( Selector2D::COLUMNS ) + c_idx );
+        return r_idx * size( static_cast<size_t>( Selector2D::COLUMNS ) ) + c_idx;
     }
 }

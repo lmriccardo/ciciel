@@ -39,3 +39,26 @@ Style &Style::Blink(bool value)
     m_blink = value;
     return *this;
 }
+
+bool Style::operator==(const Style &other) const
+{
+    if (
+           (m_has_background != other.m_has_background)
+        || (m_has_foreground != other.m_has_foreground)
+        || (m_background.hex() != other.m_background.hex())
+        || (m_foreground.hex() != other.m_foreground.hex())
+        || (m_italic != other.m_italic)
+        || (m_bold != other.m_bold)
+        || (m_underlined != other.m_underlined)
+        || (m_blink != other.m_blink)
+    ) {
+        return false;
+    }
+
+    return true;
+}
+
+bool Style::operator!=(const Style &other) const
+{
+    return !( *this == other );
+}

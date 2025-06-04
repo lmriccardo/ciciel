@@ -60,17 +60,18 @@ void Terminal::disableRawMode()
     }
 }
 
-void Terminal::put(char32_t c, const Style& style)
+void Terminal::put(char c, size_t x, size_t y, const Style& style)
 {
-    write( STDOUT_FILENO, &c, 1);
-}
-
-void Terminal::put(const std::string &str, const Style& style)
-{
-    for (const auto& elem: str)
+    if ( style != m_prev_style )
     {
-        put( elem, style );
+        reset();           // Reset the style
+        setStyle( style ); // First set the style
+        
+        m_prev_style = style;
     }
+
+    setCursorPosition( x, y );    // 2. Set the cursor position
+    write( STDOUT_FILENO, &c, 1); // 3. Write the content
 }
 
 void Terminal::reset() const
@@ -81,9 +82,36 @@ void Terminal::reset() const
     }
 }
 
-std::pair<int, int> ccl::cli::ui::Terminal::getWindowSize()
+void Terminal::setStyle(const Style& style) const
 {
-    struct winsize ws;
-    ioctl( STDOUT_FILENO, TIOCGWINSZ, &ws );
-    return { ws.ws_row, ws.ws_col };
+    if ( style.m_bold )       callCap( TCapabilities::BOLD_TEXT );
+    if ( style.m_blink )      callCap( TCapabilities::BLINK_TEXT );
+    if ( style.m_underlined ) callCap( TCapabilities::START_UNDERLINE );
+    if ( style.m_italic )     callCap( TCapabilities::START_ITALIC );
+
+    if ( style.m_has_background )
+    {
+        callCap( TCapabilities::BACKGROUND_C, style.m_background.m_xterm_number );
+    }
+
+    if ( style.m_has_foreground )
+    {
+        callCap( TCapabilities::FOREGROUND_C, style.m_foreground.m_xterm_number );
+    }
+}
+
+void Terminal::setCursorPosition(size_t x_pos, size_t y_pos) const
+{
+    if ( callCap( TCapabilities::MOVE_CURSOR, x_pos, y_pos ) < 0 )
+    {
+        std::cerr << "Unable to set cursor position" << std::endl;
+    }
+}
+
+void Terminal::getWindowSize(struct winsize* ws)
+{
+    if ( ioctl( STDOUT_FILENO, TIOCGWINSZ, ws ) == -1 )
+    {
+        throw std::runtime_error( "Failed to get window size" );
+    }
 }

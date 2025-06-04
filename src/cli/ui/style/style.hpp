@@ -25,6 +25,9 @@ namespace ccl::cli::ui
         Style& Bold      ( bool );
         Style& Underlined( bool );
         Style& Blink     ( bool );
+
+        bool operator==( const Style& ) const;
+        bool operator!=( const Style& ) const;
     };
 
     // Defines a Default style 
@@ -33,4 +36,14 @@ namespace ccl::cli::ui
         static Style style;
         return style;
     }
+
+    enum class CursorStyle
+    {
+        BlinkBlock      = 1,
+        SteadyBlock     = 2,
+        BlinkUnderline  = 3,
+        SteadyUnderline = 4,
+        BlinkBar   	    = 5,
+        SteadyBar       = 6
+    };
 };

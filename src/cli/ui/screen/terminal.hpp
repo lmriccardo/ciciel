@@ -21,6 +21,7 @@ namespace ccl::cli::ui
     class Terminal
     {
     private:
+        Style   m_prev_style;    // Previous style used when writing to stdout
         termios m_original_p;    // Original setting before rawing
         bool    m_isRaw = false; // If the current terminal setting is raw
 
@@ -37,31 +38,32 @@ namespace ccl::cli::ui
         void enableRawMode();  // Set the terminal to Raw mode for interactive UI
         void disableRawMode(); // Reset the terminal to its original state
         
-        void put( char32_t, const Style& );           // Put a char into the terminal
-        void put( const std::string&, const Style& ); // Put a UTF-8 string into the terminal
+        void put( char, size_t, size_t, const Style& ); // Put a char into the terminal
 
         template <typename... _Args>
         int callCap(const char* capname, _Args&&... args) const;
 
         void reset() const;
+        void setStyle(const Style&) const;
+        void setCursorPosition( size_t, size_t ) const;
 
-        static std::pair<int, int> getWindowSize();
+        static void getWindowSize(struct winsize*);
     };
 
     template <typename... _Args>
     inline int Terminal::callCap(const char *capname, _Args &&...args) const
     {
         const char* str = tigetstr(capname);
-        if ( str && str == (char*)-1 ) return -1;
+        if ( !str || str == (char*)-1 ) return -1;
 
         if constexpr (sizeof...(_Args) > 0)
         {
             char* expanded = tparm( (char*)str, std::forward<_Args>(args)... );
-            putp( expanded );
+            write( STDOUT_FILENO, expanded, strlen(expanded) );
             return 0;
         }
 
-        putp( str );
+        write( STDOUT_FILENO, str, strlen(str) );
         return 0;
     }
 }
