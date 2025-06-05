@@ -14,4 +14,5 @@ add_library(ccl_Cli
 
 target_link_libraries( ccl_Cli PRIVATE ccl_DataStructures ${CURSES_TARGET_LIBRARIES} )
 target_include_directories( ccl_Cli PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/.. 
-    PRIVATE ${CURSES_INCLUDE_DIR} )
+    PRIVATE ${CURSES_INCLUDE_DIR}
+    PUBLIC ${UTF8CPP_INCLUDE_DIR} )

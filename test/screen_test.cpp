@@ -1,5 +1,6 @@
 #include <cli/ui/screen/screen.hpp>
 #include <iostream>
+#include <utf8.h>
 
 using namespace ccl::cli::ui;
 
