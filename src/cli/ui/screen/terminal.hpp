@@ -14,6 +14,7 @@
 #include <unordered_map>
 #include <cli/ui/style/style.hpp>
 
+#include "u32string.hpp"
 #include "term_cap.hpp"
 
 namespace ccl::cli::ui
@@ -38,7 +39,7 @@ namespace ccl::cli::ui
         void enableRawMode();  // Set the terminal to Raw mode for interactive UI
         void disableRawMode(); // Reset the terminal to its original state
         
-        void put( char, size_t, size_t, const Style& ); // Put a char into the terminal
+        void put( char32_t, size_t, size_t, const Style& ); // Put a char into the terminal
 
         template <typename... _Args>
         int callCap(const char* capname, _Args&&... args) const;

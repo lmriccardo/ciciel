@@ -12,8 +12,8 @@ Terminal::Terminal()
     }
 
     // Enables UTF-8 and correct locale settings
-    setlocale( LC_ALL, "" );
     enableRawMode();
+    setlocale( LC_ALL, "" );
 }
 
 Terminal::~Terminal()
@@ -21,7 +21,7 @@ Terminal::~Terminal()
     disableRawMode();
 }
 
-Terminal &ccl::cli::ui::Terminal::getInstance()
+Terminal &Terminal::getInstance()
 {
     static std::unique_ptr<Terminal> ptr{ new Terminal() };
     return *ptr;
@@ -60,7 +60,7 @@ void Terminal::disableRawMode()
     }
 }
 
-void Terminal::put(char c, size_t x, size_t y, const Style& style)
+void Terminal::put(char32_t c, size_t x, size_t y, const Style& style)
 {
     if ( style != m_prev_style )
     {
@@ -71,7 +71,10 @@ void Terminal::put(char c, size_t x, size_t y, const Style& style)
     }
 
     setCursorPosition( x, y );    // 2. Set the cursor position
-    write( STDOUT_FILENO, &c, 1); // 3. Write the content
+    
+    ssize_t len;
+    char u8c[4]; if ( (len = utf32to8c( &c, u8c )) < 0 ) return;
+    write( STDOUT_FILENO, u8c, len ); // 3. Write the content
 }
 
 void Terminal::reset() const

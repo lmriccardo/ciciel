@@ -59,6 +59,8 @@
         "semaphore": "cpp",
         "stop_token": "cpp",
         "thread": "cpp",
-        "locale": "cpp"
+        "locale": "cpp",
+        "fstream": "cpp",
+        "cinttypes": "cpp"
     }
 }

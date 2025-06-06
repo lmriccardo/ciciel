@@ -28,45 +28,32 @@ void ScreenBuffer::resize(size_t new_h, size_t new_w)
     extend( new_h, new_w );
 }
 
-void ScreenBuffer::set(const std::string &content, 
-                       size_t s_row, 
-                       size_t s_col, 
-                       const Style& style, 
-                       bool redraw
-) {
-    size_t flatten_idx = flatten( s_row, s_col );
-    size_t remaining_size = content.size();
-
-    // Check if the content fit into the remaining space
-    if ( (size() - flatten_idx) < content.size() )
-    {
-        std::cerr << "[Warning] "
-                  << "Content does not fit into remaining screen space " 
-                  << std::endl;
-
-        remaining_size = size() - flatten_idx;
-    }
-
-    auto content_it = content.begin();
-    auto content_end = content_it + remaining_size;
-    size_t current_idx = flatten_idx;
-
-    for ( ; content_it != content_end; ++content_it )
-    {
-        char32_t curr_char = *content_it;
-        set(curr_char, current_idx, style, redraw);
-        current_idx++;
-    }
+size_t ScreenBuffer::set(const std::string &content, size_t s_row, size_t s_col, 
+    const Style& style, bool redraw) 
+{
+    std::u32string u32_content;
+    if ( utf8to32( content, u32_content ) < 0 ) return 0;
+    return set( u32_content, s_row, s_col, style, redraw );
 }
 
-void ScreenBuffer::set(char content, size_t s_row, size_t s_col, const Style& style, bool redraw)
+size_t ScreenBuffer::set(char32_t content, size_t s_row, size_t s_col, const Style& style, bool redraw)
 {
     size_t flatten_idx = flatten( s_row, s_col );
-    set( content, flatten_idx, style, redraw );
+    return set( content, flatten_idx, style, redraw );
 }
 
-void ScreenBuffer::set(char content, size_t pos, const Style &style, bool redraw)
+size_t ScreenBuffer::set(char32_t content, size_t pos, const Style &style, bool redraw)
 {
+    int content_wc;
+
+    if ( (content_wc = wcwidth( static_cast<wchar_t>(content) )) == 0 )
+    {
+        return 0;
+    }
+
+    // Check that the content is inside buffer bound
+    if ( pos + content_wc - 1 >= size() ) return 0;
+
     const auto& cell = at( pos );
 
     // Check that the current cell is different from the new content
@@ -74,7 +61,53 @@ void ScreenBuffer::set(char content, size_t pos, const Style &style, bool redraw
     {
         set( { content, style, false }, pos );
         m_lastUpdate[ pos ] = m_updateCounter + 1;
+
+        for ( size_t off_i = 1; off_i < (size_t)content_wc; ++off_i )
+        {
+            set( { U'\000', style, false }, pos + off_i );
+        }
     }
+
+    return content_wc;
+}
+
+size_t ScreenBuffer::set(const std::u32string &content, size_t s_row, size_t s_col, 
+    const Style & style, bool redraw)
+{
+    size_t content_size_cols = u32swidth( content );
+
+    // Check that emojis and other type of UTF8 encoded are supported
+    if (content_size_cols < 1)
+    {
+        std::cerr << "Detected some unicode characters that are not supported. "
+                  << "Consider running `setlocale(LC_ALL, '')`"
+                  << std::endl;
+        
+        return 0;
+    }
+
+    size_t flatten_idx = flatten( s_row, s_col );
+
+    if ( (size() - flatten_idx) < content_size_cols )
+    {
+        std::cerr << "[Warning] "
+                  << "Content does not fit into remaining screen space " 
+                  << std::endl;
+    }
+
+    auto content_it = content.begin();
+    size_t current_idx = flatten_idx;
+
+    for ( ; content_it != content.end(); ++content_it )
+    {
+        // Check if exceeds the maximum buffer dimension
+        if ( current_idx > size() ) break;
+
+        char32_t curr_char = *content_it;
+        current_idx += set( curr_char, current_idx, style, redraw );
+    }
+
+    return current_idx;
 }
 
 void ScreenBuffer::flush(Terminal &t_out)

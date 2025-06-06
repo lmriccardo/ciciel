@@ -5,14 +5,15 @@
 #include <data_structures/grids/dynamic_array2d.hpp>
 #include <cli/ui/style/style.hpp>
 #include "terminal.hpp"
+#include "u32string.hpp"
 
 namespace ccl::cli::ui
 {
     struct CellChar
     {
-        char  m_char;   // The character inside the cell
-        Style m_style;  // The style of the character
-        bool  m_redraw; // Forse redraw the current cell
+        char32_t m_char;   // The character inside the cell
+        Style    m_style;  // The style of the character
+        bool     m_redraw; // Forse redraw the current cell
     };
 
     class ScreenBuffer : public ccl::ds::grids::DynamicArray2D<struct CellChar>
@@ -42,9 +43,10 @@ namespace ccl::cli::ui
          * does not fit into space, then a warning is raised and only a portion
          * of the string will be copied into the buffer.
          */
-        void set( const std::string&, size_t, size_t, const Style&, bool );
-        void set( char, size_t, size_t, const Style&, bool );
-        void set( char, size_t, const Style&, bool );
+        size_t set( const std::string&, size_t, size_t, const Style&, bool );
+        size_t set( char32_t, size_t, size_t, const Style&, bool );
+        size_t set( char32_t, size_t, const Style&, bool );
+        size_t set( const std::u32string&, size_t, size_t, const Style&, bool );
 
         /**
          * Flush the content to the terminal. Only differences are written.
