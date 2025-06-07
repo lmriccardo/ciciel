@@ -13,7 +13,7 @@ namespace ccl::cli::ui
     {
         char32_t m_char;   // The character inside the cell
         Style    m_style;  // The style of the character
-        bool     m_redraw; // Forse redraw the current cell
+        bool     m_redraw; // Force redraw the current cell
     };
 
     class ScreenBuffer : public ccl::ds::grids::DynamicArray2D<struct CellChar>

@@ -46,4 +46,34 @@ namespace ccl::cli::ui
         BlinkBar   	    = 5,
         SteadyBar       = 6
     };
+
+    enum class BorderLine
+    {
+        Smooth,
+        Segmented
+    };
+
+    enum class BorderSize
+    {
+        Unit,
+        Double
+    };
+
+    struct BorderStyle
+    {
+        Color      m_color = Colors::White;
+        bool       m_show  = true;
+        BorderLine m_line  = BorderLine::Smooth;
+        BorderSize m_size  = BorderSize::Unit;
+
+        Style toStyle() const;
+
+        BorderStyle& Foreground( const Color& );
+        BorderStyle& Show      ( bool );
+        BorderStyle& Line      ( BorderLine );
+        BorderStyle& Size      ( BorderSize );
+
+        bool operator==( const BorderStyle& ) const;
+        bool operator!=( const BorderStyle& ) const;
+    };
 };

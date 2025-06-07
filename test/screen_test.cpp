@@ -6,8 +6,17 @@ using namespace ccl::cli::ui;
 
 int main()
 {
-    Screen screen;
-    screen.clear();
+    try
+    {
+        Screen window;
+        window.clear();
+    }
+    catch(const std::exception& e)
+    {
+        Terminal::getInstance().disableRawMode();
+        Terminal::getInstance().reset();
+        throw std::runtime_error( e.what() );
+    }
 
     struct winsize ws;
     Terminal::getWindowSize( &ws );

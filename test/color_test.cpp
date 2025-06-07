@@ -8,7 +8,17 @@ int main()
 {
     std::cout << Colors::Black << std::endl;
 
-    Screen window;
+    try
+    {
+        Screen window;
+    }
+    catch(const std::exception& e)
+    {
+        Terminal::getInstance().disableRawMode();
+        Terminal::getInstance().reset();
+        throw std::runtime_error( e.what() );
+    }
+    
 
     Style s = Style().Background(Colors::Aqua).Foreground(Colors::Black).Italic(true);
 

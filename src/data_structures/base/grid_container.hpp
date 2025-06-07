@@ -23,13 +23,13 @@ namespace ccl::ds::base
      * of .size method which is left to the derived classes. Therefore, it is abstract.
      * 
      * @tparam T The type of data stored into the container
-     * @tparam Container The type of indexable container used to store data
+     * @tparam ContainerT The type of indexable container used to store data
      */
-    template <typename T, typename Container = std::vector<T>>
+    template <typename T, typename ContainerT = std::vector<T>>
     class AbstractGridContainer : public Iterable2DContainer<T>
     {
     protected:
-        Container        m_grid;
+        ContainerT        m_grid;
         Ordering2DPolicy m_policy;
 
         constexpr void boundCheck( size_t, size_t ) const;
@@ -60,8 +60,8 @@ namespace ccl::ds::base
         size_t flatten( size_t, size_t ) const;
     };
 
-    template <typename T, typename Container>
-    inline constexpr void AbstractGridContainer<T, Container>::boundCheck(size_t row, size_t col) const
+    template <typename T, typename ContainerT>
+    inline constexpr void AbstractGridContainer<T, ContainerT>::boundCheck(size_t row, size_t col) const
     {
         // Perform Boundary checks
         if (m_policy == Ordering2DPolicy::COLUMN_MAJOR) std::swap(row, col);
@@ -72,8 +72,8 @@ namespace ccl::ds::base
         }
     }
 
-    template <typename T, typename Container>
-    inline constexpr void AbstractGridContainer<T, Container>::boundCheck(size_t pos) const
+    template <typename T, typename ContainerT>
+    inline constexpr void AbstractGridContainer<T, ContainerT>::boundCheck(size_t pos) const
     {
         if ( pos >= size() )
         {
@@ -81,8 +81,8 @@ namespace ccl::ds::base
         }
     }
 
-    template <typename T, typename Container>
-    inline constexpr void AbstractGridContainer<T, Container>::getRowCol(size_t &row, size_t &col, size_t pos) const
+    template <typename T, typename ContainerT>
+    inline constexpr void AbstractGridContainer<T, ContainerT>::getRowCol(size_t &row, size_t &col, size_t pos) const
     {
         size_t _size = size((size_t)Selector2D::COLUMNS);
         size_t logical_row = pos / _size;
@@ -92,9 +92,9 @@ namespace ccl::ds::base
         col = logical_col;
     }
 
-    template <typename T, typename Container>
+    template <typename T, typename ContainerT>
     template <typename U, typename ContainerU>
-    inline void AbstractGridContainer<T, Container>::transposeRaw(AbstractGridContainer<U, ContainerU> *dst)
+    inline void AbstractGridContainer<T, ContainerT>::transposeRaw(AbstractGridContainer<U, ContainerU> *dst)
     {
         bool tranposed = false;
 
@@ -116,22 +116,22 @@ namespace ccl::ds::base
         if ( m_policy != Ordering2DPolicy::ROW_MAJOR && tranposed ) transpose();
     }
 
-    template <typename T, typename Container>
-    inline AbstractGridContainer<T, Container>::AbstractGridContainer(Ordering2DPolicy policy)
+    template <typename T, typename ContainerT>
+    inline AbstractGridContainer<T, ContainerT>::AbstractGridContainer(Ordering2DPolicy policy)
         : m_policy( policy )
     {
     }
 
-    template <typename T, typename Container>
-    inline constexpr const T& AbstractGridContainer<T, Container>::at( size_t row, size_t col ) const
+    template <typename T, typename ContainerT>
+    inline constexpr const T& AbstractGridContainer<T, ContainerT>::at( size_t row, size_t col ) const
     {
         if (m_policy == Ordering2DPolicy::COLUMN_MAJOR) std::swap(row, col);
         boundCheck(row, col);
         return m_grid[row * size((size_t)Selector2D::COLUMNS) + col];
     }
 
-    template <typename T, typename Container>
-    inline constexpr T &AbstractGridContainer<T, Container>::at(size_t row, size_t col)
+    template <typename T, typename ContainerT>
+    inline constexpr T &AbstractGridContainer<T, ContainerT>::at(size_t row, size_t col)
     {
         size_t _size = size((size_t)Selector2D::COLUMNS);
 
@@ -145,42 +145,42 @@ namespace ccl::ds::base
         return m_grid[row * _size + col];
     }
 
-    template <typename T, typename Container>
-    inline constexpr T &AbstractGridContainer<T, Container>::at(size_t pos)
+    template <typename T, typename ContainerT>
+    inline constexpr T &AbstractGridContainer<T, ContainerT>::at(size_t pos)
     {
         size_t row, col; getRowCol( row, col, pos );
         return at(row, col);
     }
 
-    template <typename T, typename Container>
-    inline constexpr const T &AbstractGridContainer<T, Container>::at(size_t pos) const
+    template <typename T, typename ContainerT>
+    inline constexpr const T &AbstractGridContainer<T, ContainerT>::at(size_t pos) const
     {
         size_t row, col; getRowCol( row, col, pos );
         return at(row, col);
     }
 
-    template <typename T, typename Container>
-    inline constexpr T &AbstractGridContainer<T, Container>::operator[](size_t pos)
+    template <typename T, typename ContainerT>
+    inline constexpr T &AbstractGridContainer<T, ContainerT>::operator[](size_t pos)
     {
         return at(pos);
     }
 
-    template <typename T, typename Container>
-    inline constexpr const T &AbstractGridContainer<T, Container>::operator[](size_t pos) const
+    template <typename T, typename ContainerT>
+    inline constexpr const T &AbstractGridContainer<T, ContainerT>::operator[](size_t pos) const
     {
         return at(pos);
     }
 
-    template <typename T, typename Container>
-    inline constexpr void AbstractGridContainer<T, Container>::set(const T& val, size_t row, size_t col)
+    template <typename T, typename ContainerT>
+    inline constexpr void AbstractGridContainer<T, ContainerT>::set(const T& val, size_t row, size_t col)
     {
         if (m_policy == Ordering2DPolicy::COLUMN_MAJOR) std::swap(row, col);
         boundCheck(row, col);
         m_grid[row * size((size_t)Selector2D::COLUMNS) + col] = val;
     }
 
-    template <typename T, typename Container>
-    inline constexpr void AbstractGridContainer<T, Container>::set(const T &val, size_t pos)
+    template <typename T, typename ContainerT>
+    inline constexpr void AbstractGridContainer<T, ContainerT>::set(const T &val, size_t pos)
     {
         size_t row, col; getRowCol( row, col, pos );
         set(val, row, col);
@@ -193,8 +193,8 @@ namespace ccl::ds::base
      * set and .at or operator[] will appear to be transposed, as well as iterating
      * through out the entire container.
      */
-    template <typename T, typename Container>
-    inline void AbstractGridContainer<T, Container>::transpose()
+    template <typename T, typename ContainerT>
+    inline void AbstractGridContainer<T, ContainerT>::transpose()
     {
         m_policy = m_policy == Ordering2DPolicy::ROW_MAJOR ? 
               Ordering2DPolicy::COLUMN_MAJOR
@@ -205,8 +205,8 @@ namespace ccl::ds::base
      * Given row and column indexes it returns the flatted index
      * according to transposition logic or not.
      */
-    template <typename T, typename Container>
-    inline size_t AbstractGridContainer<T, Container>::flatten(size_t r_idx, size_t c_idx) const
+    template <typename T, typename ContainerT>
+    inline size_t AbstractGridContainer<T, ContainerT>::flatten(size_t r_idx, size_t c_idx) const
     {
         if (m_policy == Ordering2DPolicy::COLUMN_MAJOR) std::swap( r_idx, c_idx );
         return r_idx * size( static_cast<size_t>( Selector2D::COLUMNS ) ) + c_idx;

@@ -1,3 +1,4 @@
 #pragma once
 
 #include "ui/screen/screen.hpp"
+#include "ui/elements/widgets/panels/panel.hpp"

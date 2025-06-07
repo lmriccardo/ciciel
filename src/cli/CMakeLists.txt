@@ -11,6 +11,11 @@ add_library(ccl_Cli
     ui/screen/terminal.cpp
     ui/screen/screen_buffer.cpp
     ui/screen/screen.cpp
+    ui/elements/ui_element.cpp
+    ui/elements/containers/container.cpp
+    ui/elements/containers/hbox_container.cpp
+    ui/elements/widgets/widget.cpp
+
 )
 
 target_link_libraries( ccl_Cli PRIVATE 

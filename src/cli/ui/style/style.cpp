@@ -62,3 +62,52 @@ bool Style::operator!=(const Style &other) const
 {
     return !( *this == other );
 }
+
+BorderStyle& BorderStyle::Foreground( const Color& color )
+{
+    m_color = color;
+    return *this;
+}
+
+BorderStyle &BorderStyle::Show(bool value)
+{
+    m_show = value;
+    return *this;
+}
+
+BorderStyle &BorderStyle::Line(BorderLine line)
+{
+    m_line = line;
+    return *this;
+}
+
+BorderStyle &BorderStyle::Size(BorderSize size)
+{
+    m_size = size;
+    return *this;
+}
+
+Style BorderStyle::toStyle() const
+{
+    return Style().Foreground(m_color)
+                  .Bold( m_size == BorderSize::Double );
+}
+
+bool BorderStyle::operator==(const BorderStyle & other) const
+{
+    if (
+           (m_color.hex() == other.m_color.hex())
+        && (m_line == other.m_line)
+        && (m_show == other.m_show)
+        && (m_size == other.m_size)
+    ) {
+        return true;
+    }
+
+    return false;
+}
+
+bool BorderStyle::operator!=(const BorderStyle &other) const
+{
+    return !( *this == other );
+}

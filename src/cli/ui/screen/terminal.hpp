@@ -3,7 +3,6 @@
 #include <termios.h>
 #include <unistd.h>
 #include <term.h>
-#include <wchar.h>
 #include <stdexcept>
 #include <iostream>
 #include <locale>
@@ -11,7 +10,6 @@
 #include <cstdlib>
 #include <cstring>
 #include <sys/ioctl.h>
-#include <unordered_map>
 #include <cli/ui/style/style.hpp>
 
 #include "u32string.hpp"
