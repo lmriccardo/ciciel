@@ -22,7 +22,7 @@ ssize_t ccl::cli::ui::utf8to32( const std::string& content, std::u32string& dest
 
         if ( (len = utf8to32c( c_content, &c32 )) < 0 )
         {
-            break;
+            return -1;
         }
 
         dest.push_back( c32 );
@@ -31,6 +31,18 @@ ssize_t ccl::cli::ui::utf8to32( const std::string& content, std::u32string& dest
     }
 
     return total_len;
+}
+
+std::u32string ccl::cli::ui::utf8to32( const std::string& content )
+{
+    std::u32string result;
+
+    if ( utf8to32(content, result) < 0 )
+    {
+        throw std::runtime_error( "Unable to perform conversion" );
+    }
+
+    return result;
 }
 
 ssize_t ccl::cli::ui::utf32to8c(const char32_t *c32_in, char *dst) noexcept

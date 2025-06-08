@@ -3,6 +3,7 @@
 #include <string>
 #include <utf8proc.h>
 #include <algorithm>
+#include <stdexcept>
 
 namespace ccl::cli::ui
 {
@@ -26,6 +27,13 @@ namespace ccl::cli::ui
      * @return The total dimension of whats read (nof bytes consumed for conversion)
      */
     ssize_t utf8to32( const std::string&, std::u32string& ) noexcept;
+
+    /**
+     * Converts an input UTF8-encoded string into a u32string. If error throws.
+     * @param content The input UTF8 encoded string
+     * @return The converted string
+     */
+    std::u32string utf8to32( const std::string& );
 
     /**
      * Converts a char32_t into a UTF8 encoded char and returns the number

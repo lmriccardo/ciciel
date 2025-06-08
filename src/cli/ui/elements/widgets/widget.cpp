@@ -35,6 +35,28 @@ void Widget::setVisibility(bool visibility)
     m_hidden = !visibility;
 }
 
+void Widget::setPadding(const std::array<size_t, 4> &padding)
+{
+    m_padding = padding;
+}
+
+void Widget::setPadding(size_t value, Direction direction)
+{
+    int direction_i = static_cast<int>(direction);
+    m_padding[direction_i] = value;
+}
+
+void Widget::setMargin(const std::array<size_t, 4> &margin)
+{
+    m_margin = margin;
+}
+
+void Widget::setMargin(size_t value, Direction direction)
+{
+    int direction_i = static_cast<int>(direction);
+    m_margin[direction_i] = value;
+}
+
 bool Widget::isVisible() const
 {
     return !m_hidden;
@@ -59,4 +81,17 @@ std::string Widget::getAbsoluteId() const
 {
     if ( m_parent == nullptr ) return m_name;
     return m_parent->getAbsoluteId() + "." + m_name;
+}
+
+bool Widget::hasContent() const
+{
+    return false;
+}
+
+bool Widget::isColliding( size_t x, size_t y ) const
+{
+    auto [ x_e, y_s ] = getVertexCoord( Vertex::TR );
+    auto [ x_s, y_e ] = getVertexCoord( Vertex::BL );
+ 
+    return (( x >= x_s && x <= x_e ) && ( y >= y_s && y <= y_e ));
 }

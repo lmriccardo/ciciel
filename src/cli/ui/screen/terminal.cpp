@@ -4,6 +4,11 @@ using namespace ccl::cli::ui;
 
 Terminal::Terminal()
 {
+    if (isatty( STDOUT_FILENO ) != 1)
+    {
+        throw std::runtime_error( "Current STDOUT is not a tty!" );
+    }
+
     int err;
 
     if ( setupterm( nullptr, STDOUT_FILENO, &err ) != F_OK )

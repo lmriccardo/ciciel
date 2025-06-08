@@ -26,6 +26,12 @@ namespace ccl::cli::ui
         Widget* getChild( size_t );
         size_t getNofChildren() const;
 
+        template <typename WidgetT>
+        std::vector<WidgetT*> getChildrenByType() const;
+
+        const std::vector<Widget*>& getAllChildren() const;
+        std::vector<Widget*>& getAllChildren();
+
         /**
          * Apply the given layout to all children. This operation
          * might modify start and stop position, as well as
@@ -33,6 +39,25 @@ namespace ccl::cli::ui
          */
         virtual void layout() = 0;
     };
+
+    template <typename WidgetT>
+    inline std::vector<WidgetT *> Container::getChildrenByType() const
+    {
+        static_assert( std::is_base_of_v<Widget, WidgetT>, 
+            "WidgetT must derive from Widget" );
+
+        std::vector<WidgetT*> result;
+
+        for ( Widget* child: m_children )
+        {
+            if (auto casted = dynamic_cast<WidgetT*>(child))
+            {
+                result.push_back( casted );
+            }
+        }
+
+        return result;
+    }
 
     template <typename T, typename = void>
     struct is_ui_container : std::false_type {};

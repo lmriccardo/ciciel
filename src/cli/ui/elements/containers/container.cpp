@@ -29,3 +29,13 @@ size_t Container::getNofChildren() const
 {
     return m_children.size();
 }
+
+const std::vector<Widget *> &Container::getAllChildren() const
+{
+    return m_children;
+}
+
+std::vector<Widget *> &Container::getAllChildren()
+{
+    return m_children;
+}
