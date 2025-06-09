@@ -1,10 +1,19 @@
 #pragma once
 
 #include <string>
+#include <cli/ui/utils/ascii.hpp>
+#include <cli/ui/utils/string.hpp>
 #include "colors.hpp"
 
 namespace ccl::cli::ui
 {
+    enum class TextAlignment
+    {
+        Rigth,
+        Left,
+        Center
+    };
+
     struct Style
     {
         Color m_foreground;
@@ -14,6 +23,9 @@ namespace ccl::cli::ui
         bool m_bold       = false;
         bool m_underlined = false;
         bool m_blink      = false;
+        bool m_reverse    = false;
+
+        TextAlignment m_alignment = TextAlignment::Rigth;
 
         bool m_has_foreground = false;
         bool m_has_background = false;
@@ -25,6 +37,8 @@ namespace ccl::cli::ui
         Style& Bold      ( bool );
         Style& Underlined( bool );
         Style& Blink     ( bool );
+        Style& Reverse   ( bool );
+        Style& Alignment ( TextAlignment );
 
         bool operator==( const Style& ) const;
         bool operator!=( const Style& ) const;
@@ -34,6 +48,7 @@ namespace ccl::cli::ui
     inline const Style& DefaultStyle()
     {
         static Style style;
+        style.Foreground( Colors::White );
         return style;
     }
 
@@ -72,6 +87,8 @@ namespace ccl::cli::ui
         BorderStyle& Show      ( bool );
         BorderStyle& Line      ( BorderLine );
         BorderStyle& Size      ( BorderSize );
+
+        int getBorderWcwidth() const;
 
         bool operator==( const BorderStyle& ) const;
         bool operator!=( const BorderStyle& ) const;

@@ -2,8 +2,13 @@
 
 using namespace ccl::cli::ui;
 
+void Label::drawBorder(ScreenBuffer &buffer) const
+{
+
+}
+
 Label::Label(const std::string &id, const std::u32string &text, size_t x, size_t y)
-    : ContentWidget( id, text.size(), 3, x, y, false )
+    : ContentWidget(id, (size_t)u32swidth(text), 3, x, y, false)
 {
     setContent( text );
 }
@@ -42,5 +47,9 @@ void Label::setContent(const std::u32string &content)
 
 void Label::draw( ScreenBuffer& buffer ) const
 {
-    buffer.set( m_content, m_pos_x, m_pos_y, m_content_style, false );
+    if (!isVisible()) return; // Draw only if the current widget is visible
+
+    auto [ _, w ] = getWinsize();
+    std::u32string content = u32align( m_content, m_content_style.m_alignment, w);
+    buffer.set( content, m_pos_x, m_pos_y, m_content_style, false );
 }

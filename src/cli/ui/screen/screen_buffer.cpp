@@ -2,7 +2,7 @@
 
 using namespace ccl::cli::ui;
 
-ScreenBuffer::ScreenBuffer(size_t height, size_t width )
+ScreenBuffer::ScreenBuffer( size_t width, size_t height )
     : DynamicArray2D( height, width ), m_updateCounter( 0 )
 {
     for ( size_t i = 0; i < size(); ++i )
@@ -46,7 +46,7 @@ size_t ScreenBuffer::set(char32_t content, size_t pos, const Style &style, bool 
 {
     int content_wc;
 
-    if ( (content_wc = wcwidth( static_cast<wchar_t>(content) )) == 0 )
+    if ( (content_wc = charwidth( &content )) == 0 )
     {
         return 0;
     }

@@ -4,6 +4,7 @@
 #include <utf8proc.h>
 #include <algorithm>
 #include <stdexcept>
+#include <cli/ui/style/style.hpp>
 
 namespace ccl::cli::ui
 {
@@ -46,7 +47,29 @@ namespace ccl::cli::ui
      */
     ssize_t utf32to8c( const char32_t*, char* ) noexcept;
 
-    int charwidth( const char32_t* ) noexcept;
+    /**
+     * Computes the actual dimension in columns of the input wide char.
+     * @param c32_in The input wide char
+     * @return The number of occupied columns in the terminal
+     */
+    int charwidth( const char32_t* );
     
-    int u32swidth( const std::u32string& ) noexcept;
+    /**
+     * Computes the actual dimension in columns of the input u32 string.
+     * @param content The u32 string
+     * @return The number of occupied columns in the terminal by the string
+     */
+    int u32swidth( const std::u32string& );
+
+    /**
+     * Create a new string with the input content aligned according to the
+     * TextAlignment parameter on total size.
+     * 
+     * @param content The string to align
+     * @param alignment Text alignment type
+     * @param total_len Total dimension of the aligned string
+     * 
+     * @return A u32 string aligned wrt input parameters
+     */
+    std::u32string u32align( const std::u32string&, TextAlignment, size_t ) noexcept;
 }

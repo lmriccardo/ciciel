@@ -39,7 +39,7 @@ namespace ccl::cli::ui
         std::pair<size_t,size_t> getWinsize() const;
         std::pair<size_t, size_t> getVertexCoord( Vertex ) const;
 
-        void setWinsize( size_t, size_t );
+        void setWinsize( size_t cols, size_t rows );
         void setStartPosition( size_t, size_t );
     };
 }

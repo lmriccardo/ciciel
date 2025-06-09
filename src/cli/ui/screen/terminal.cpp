@@ -96,6 +96,7 @@ void Terminal::setStyle(const Style& style) const
     if ( style.m_blink )      callCap( TCapabilities::BLINK_TEXT );
     if ( style.m_underlined ) callCap( TCapabilities::START_UNDERLINE );
     if ( style.m_italic )     callCap( TCapabilities::START_ITALIC );
+    if ( style.m_reverse )    callCap( TCapabilities::REVERSE_VIDEO );
 
     if ( style.m_has_background )
     {

@@ -40,6 +40,18 @@ Style &Style::Blink(bool value)
     return *this;
 }
 
+Style &Style::Reverse(bool value)
+{
+    m_reverse = value;
+    return *this;
+}
+
+Style &Style::Alignment(TextAlignment alignment)
+{
+    m_alignment = alignment;
+    return *this;
+}
+
 bool Style::operator==(const Style &other) const
 {
     if (
@@ -51,6 +63,8 @@ bool Style::operator==(const Style &other) const
         || (m_bold != other.m_bold)
         || (m_underlined != other.m_underlined)
         || (m_blink != other.m_blink)
+        || (m_reverse != other.m_reverse)
+        || (m_alignment != other.m_alignment)
     ) {
         return false;
     }
@@ -87,10 +101,18 @@ BorderStyle &BorderStyle::Size(BorderSize size)
     return *this;
 }
 
+int BorderStyle::getBorderWcwidth() const
+{
+    const char32_t b_char = ( m_size == BorderSize::Double ) ?
+          ASCII::DOUBLE_HORIZONTAL
+        : ASCII::LIGHT_HORIZONTAL;
+
+    return charwidth( &b_char );
+}
+
 Style BorderStyle::toStyle() const
 {
-    return Style().Foreground(m_color)
-                  .Bold( m_size == BorderSize::Double );
+    return Style().Foreground(m_color).Bold( m_size == BorderSize::Double );
 }
 
 bool BorderStyle::operator==(const BorderStyle & other) const

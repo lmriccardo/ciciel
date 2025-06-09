@@ -4,8 +4,8 @@
 #include <unordered_map>
 #include <data_structures/grids/dynamic_array2d.hpp>
 #include <cli/ui/style/style.hpp>
+#include <cli/ui/utils/string.hpp>
 #include "terminal.hpp"
-#include "u32string.hpp"
 
 namespace ccl::cli::ui
 {
@@ -23,7 +23,7 @@ namespace ccl::cli::ui
         int m_updateCounter; // The current update iterator
 
     public:
-        ScreenBuffer( size_t, size_t );
+        ScreenBuffer( size_t width, size_t height );
         virtual ~ScreenBuffer() = default;
 
         size_t getWidth() const;

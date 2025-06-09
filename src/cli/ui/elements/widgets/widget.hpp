@@ -23,7 +23,7 @@ namespace ccl::cli::ui
         std::array<size_t, 4> m_padding; // Internal space between content and border
         std::array<size_t, 4> m_margin;  // External space between widget and other objects
 
-        virtual void drawBorder() const = 0;
+        virtual void drawBorder( ScreenBuffer& ) const = 0;
     
     public:
         Widget( const std::string&, size_t, size_t, size_t, size_t, bool );

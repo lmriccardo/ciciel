@@ -4,11 +4,14 @@ using namespace ccl::cli::ui;
 
 Widget::Widget(const std::string &id, size_t w, size_t h, 
                size_t x, size_t y, bool leaf
-) : UIElement( w, h, x, y ), 
+) : UIElement( w, h, x, y ),
     m_name( id ), 
     m_leaf( leaf ), 
     m_parent( nullptr )
 {
+    // Reset the window size considering also the border
+    size_t b_size = static_cast<size_t>(m_border.getBorderWcwidth());
+    setWinsize( w + b_size, h + b_size );
 }
 
 void Widget::setParent(Widget &parent)

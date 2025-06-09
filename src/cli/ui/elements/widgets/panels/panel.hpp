@@ -15,7 +15,7 @@ namespace ccl::cli::ui
     protected:
         std::unique_ptr<ContainerT> m_container;
 
-        void drawBorder() const override;
+        void drawBorder( ScreenBuffer& ) const override;
 
     public:
         PanelWidget( const std::string&, size_t, size_t, size_t, size_t );
@@ -33,7 +33,7 @@ namespace ccl::cli::ui
     };
 
     template <typename ContainerT, typename C>
-    inline void PanelWidget<ContainerT, C>::drawBorder() const
+    inline void PanelWidget<ContainerT, C>::drawBorder( ScreenBuffer& ) const
     {
     }
 
@@ -78,9 +78,9 @@ namespace ccl::cli::ui
     }
 
     template <typename ContainerT, typename C>
-    inline void PanelWidget<ContainerT, C>::draw(ScreenBuffer &) const
+    inline void PanelWidget<ContainerT, C>::draw(ScreenBuffer &buffer) const
     {
-        drawBorder();
+        drawBorder(buffer);
     }
 
     using HBoxPanel = PanelWidget<HBoxContainer>;

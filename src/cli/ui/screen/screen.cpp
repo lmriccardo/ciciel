@@ -39,8 +39,8 @@ Screen::Screen(Layout layout)
     }
 
     Terminal::getWindowSize(&m_winsize);
-    m_buffer = std::make_unique<ScreenBuffer>((size_t)m_winsize.ws_row, 
-        (size_t)m_winsize.ws_col);
+    m_buffer = std::make_unique<ScreenBuffer>((size_t)m_winsize.ws_col, 
+        (size_t)m_winsize.ws_row);
 
     layoutSelection( layout );
 

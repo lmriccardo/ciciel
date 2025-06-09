@@ -1,6 +1,6 @@
 #pragma once
 
-#include <cli/ui/screen/u32string.hpp>
+#include <cli/ui/utils/string.hpp>
 #include <cli/ui/style/style.hpp>
 #include "../widget.hpp"
 
@@ -9,7 +9,9 @@ namespace ccl::cli::ui
     class Label : public ContentWidget<std::u32string>
     {
     private:
-        Style m_content_style; // The content style    
+        Style m_content_style; // The content style
+
+        void drawBorder( ScreenBuffer& ) const override;
 
     public:
         Label( const std::string&, const std::u32string&, size_t, size_t );

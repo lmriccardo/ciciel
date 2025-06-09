@@ -11,8 +11,7 @@
 #include <cstring>
 #include <sys/ioctl.h>
 #include <cli/ui/style/style.hpp>
-
-#include "u32string.hpp"
+#include <cli/ui/utils/string.hpp>
 #include "term_cap.hpp"
 
 namespace ccl::cli::ui

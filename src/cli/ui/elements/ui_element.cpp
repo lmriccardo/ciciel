@@ -32,7 +32,7 @@ std::pair<size_t, size_t> UIElement::getVertexCoord(Vertex v) const
     }
 }
 
-void UIElement::setWinsize(size_t rows, size_t cols)
+void UIElement::setWinsize(size_t cols, size_t rows)
 {
     m_winsize.ws_col = cols;
     m_winsize.ws_row = rows;
