@@ -1,4 +1,5 @@
 #include "string.hpp"
+#include <cli/ui/style/style.hpp>
 
 ssize_t ccl::cli::ui::utf8to32c(const char *utf8_c, char32_t *utf32_dest) noexcept
 {
@@ -72,6 +73,12 @@ int ccl::cli::ui::u32swidth(const std::u32string &content)
     return total_len;
 }
 
+bool ccl::cli::ui::is_codepoint_valid(const char32_t *c32_in) noexcept
+{
+    auto codepoint = reinterpret_cast<const utf8proc_int32_t*>(c32_in);
+    return utf8proc_codepoint_valid( *codepoint );
+}
+
 std::u32string ccl::cli::ui::u32align(const std::u32string &content, 
     TextAlignment alignment, size_t total_len) noexcept
 {
@@ -80,12 +87,19 @@ std::u32string ccl::cli::ui::u32align(const std::u32string &content,
     // Compute the actual dimension of the string
     int actual_size = u32swidth( content );
 
-    // Compute the padding at each side
-    int left_padding  = ( total_len - 1 ) / 2 - (actual_size / 2);
-    int rigth_padding = total_len - actual_size - left_padding;
+    if ( alignment == TextAlignment::Center )
+    {
+        // Compute the padding at each side
+        int left_padding  = ( total_len - 1 ) / 2 - (actual_size / 2);
+        int rigth_padding = total_len - actual_size - left_padding;
 
-    // Build the final string
-    return   std::u32string(left_padding, ' ') 
-           + content 
-           + std::u32string(rigth_padding, ' ');
+        // Build the final string
+        return   std::u32string(left_padding, ' ') 
+               + content 
+               + std::u32string(rigth_padding, ' ');
+    }
+
+    std::u32string padding( total_len - actual_size, ' ' );
+    if ( alignment == TextAlignment::Left ) return content + padding;
+    return padding + content;
 }

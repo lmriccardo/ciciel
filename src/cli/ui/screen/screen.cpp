@@ -8,7 +8,6 @@ void Screen::fallBack()
 {
     setCursorStyle( m_cinfo.m_default_style );
     Terminal::getInstance().reset();
-    Terminal::getInstance().disableRawMode();
 }
 
 void Screen::layoutSelection(Layout layout)

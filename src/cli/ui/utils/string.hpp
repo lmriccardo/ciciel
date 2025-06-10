@@ -4,10 +4,11 @@
 #include <utf8proc.h>
 #include <algorithm>
 #include <stdexcept>
-#include <cli/ui/style/style.hpp>
 
 namespace ccl::cli::ui
 {
+    enum class TextAlignment;
+
     /**
      * Converts an input UTF8 char into a char32_t type.
      * 
@@ -60,6 +61,13 @@ namespace ccl::cli::ui
      * @return The number of occupied columns in the terminal by the string
      */
     int u32swidth( const std::u32string& );
+
+    /**
+     * Check if the input char32_t character is a valid codepoint.
+     * @param c32_in The codepoint to check
+     * @return True if valid, False otherwise
+     */
+    bool is_codepoint_valid( const char32_t* ) noexcept;
 
     /**
      * Create a new string with the input content aligned according to the

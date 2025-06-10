@@ -60,7 +60,13 @@ void Terminal::disableRawMode()
 {
     if ( m_isRaw )
     {
-        tcsetattr( STDIN_FILENO, TCSAFLUSH, &m_original_p );
+        if ( tcsetattr( STDIN_FILENO, TCSAFLUSH, &m_original_p ) == -1 )
+        {
+            // It's generally not good to throw from a destructor,
+            // but for debugging this might be useful.
+            // In a real application, you might just log this error.
+            perror( "[Terminal::disableRawMode] tcsetattr() failed" );
+        }
         m_isRaw = false;
     }
 }

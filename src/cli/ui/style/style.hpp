@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <array>
 #include <cli/ui/utils/ascii.hpp>
 #include <cli/ui/utils/string.hpp>
 #include "colors.hpp"
@@ -25,7 +26,7 @@ namespace ccl::cli::ui
         bool m_blink      = false;
         bool m_reverse    = false;
 
-        TextAlignment m_alignment = TextAlignment::Rigth;
+        TextAlignment m_alignment = TextAlignment::Left;
 
         bool m_has_foreground = false;
         bool m_has_background = false;
@@ -89,6 +90,7 @@ namespace ccl::cli::ui
         BorderStyle& Size      ( BorderSize );
 
         int getBorderWcwidth() const;
+        const std::array<char32_t, 6> getCharset() const;
 
         bool operator==( const BorderStyle& ) const;
         bool operator!=( const BorderStyle& ) const;

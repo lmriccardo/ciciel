@@ -19,11 +19,11 @@ std::pair<size_t, size_t> UIElement::getVertexCoord(Vertex v) const
     switch (v)
     {
         case Vertex::TL: return { m_pos_x, m_pos_y };
-        case Vertex::TR: return { m_pos_x + m_winsize.ws_col, m_pos_y };
-        case Vertex::BL: return { m_pos_x, m_pos_y + m_winsize.ws_row };
+        case Vertex::TR: return { m_pos_x + m_winsize.ws_col - 1, m_pos_y };
+        case Vertex::BL: return { m_pos_x, m_pos_y + m_winsize.ws_row - 1 };
         case Vertex::BR: return {
-            m_pos_x + m_winsize.ws_col,
-            m_pos_y + m_winsize.ws_row
+            m_pos_x + m_winsize.ws_col - 1,
+            m_pos_y + m_winsize.ws_row - 1
         };
         
         default:

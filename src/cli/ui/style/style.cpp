@@ -110,6 +110,24 @@ int BorderStyle::getBorderWcwidth() const
     return charwidth( &b_char );
 }
 
+const std::array<char32_t, 6> ccl::cli::ui::BorderStyle::getCharset() const
+{
+    if ( m_size == BorderSize::Unit )
+    {
+        return { 
+            ASCII::DOUBLE_DOWN_RIGHT, ASCII::DOUBLE_HORIZONTAL,
+            ASCII::DOUBLE_DOWN_LEFT,  ASCII::DOUBLE_VERTICAL,
+            ASCII::DOUBLE_UP_RIGHT,   ASCII::DOUBLE_UP_LEFT };
+    }
+    else
+    {
+        return { 
+            ASCII::LIGHT_DOWN_RIGHT, ASCII::LIGHT_HORIZONTAL,
+            ASCII::LIGHT_DOWN_LEFT,  ASCII::LIGHT_VERTICAL,
+            ASCII::LIGHT_UP_RIGHT,   ASCII::LIGHT_UP_LEFT };
+    }
+}
+
 Style BorderStyle::toStyle() const
 {
     return Style().Foreground(m_color).Bold( m_size == BorderSize::Double );

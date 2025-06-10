@@ -11,8 +11,6 @@ namespace ccl::cli::ui
     private:
         Style m_content_style; // The content style
 
-        void drawBorder( ScreenBuffer& ) const override;
-
     public:
         Label( const std::string&, const std::u32string&, size_t, size_t );
         Label( const std::string&, const std::string&, size_t, size_t );

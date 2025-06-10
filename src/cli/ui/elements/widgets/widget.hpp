@@ -23,7 +23,8 @@ namespace ccl::cli::ui
         std::array<size_t, 4> m_padding; // Internal space between content and border
         std::array<size_t, 4> m_margin;  // External space between widget and other objects
 
-        virtual void drawBorder( ScreenBuffer& ) const = 0;
+        virtual void drawBorder( ScreenBuffer& ) const;
+        void drawRect( ScreenBuffer&, const char32_t*, size_t, size_t, const Style&) const;
     
     public:
         Widget( const std::string&, size_t, size_t, size_t, size_t, bool );
@@ -66,7 +67,7 @@ namespace ccl::cli::ui
         /**
          * Write the widget into the Screen Buffer
          */
-        virtual void draw( ScreenBuffer& ) const = 0;
+        virtual void draw( ScreenBuffer& ) const;
     };
 
     template <typename T>
@@ -74,6 +75,8 @@ namespace ccl::cli::ui
     {
     protected:
         T m_content; // The content of the widget
+
+        using Widget::drawBorder;
     
     public:
         using Widget::Widget;
@@ -81,6 +84,8 @@ namespace ccl::cli::ui
 
         const T& getContent() const; // Returns the content
         bool hasContent() const override;
+        
+        using Widget::draw;
     };
 
     template <typename T>
