@@ -8,7 +8,7 @@ namespace ccl::cli::ui
     class HBoxContainer : public Container
     {
     public:
-        HBoxContainer( size_t, size_t, size_t, size_t );
+        using Container::Container;
         virtual ~HBoxContainer() = default;
 
         void layout() override;

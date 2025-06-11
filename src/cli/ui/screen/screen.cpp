@@ -98,3 +98,15 @@ void Screen::clear()
     m_terminal.callCap( TCapabilities::CLEAR_SCREEN );
     setCursorPosition( 0, 0 );
 }
+
+void Screen::addWidget(Widget & widget)
+{
+    m_panel->addChild( widget );
+}
+
+void Screen::draw()
+{
+    m_panel->pack();                // 1. Pack if necessary
+    m_panel->draw( *m_buffer );     // 2. Draw into the buffer
+    m_buffer->flush( m_terminal );  // 3. Flush to the terminal
+}

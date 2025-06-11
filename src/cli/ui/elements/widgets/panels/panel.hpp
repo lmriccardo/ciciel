@@ -22,6 +22,7 @@ namespace ccl::cli::ui
         virtual ~PanelWidget() = default;
 
         void addChild( Widget& ) override;
+        void removeChild( const std::string& ) override;
 
         /**
          * Apply the layout from the container to all children of
@@ -29,6 +30,11 @@ namespace ccl::cli::ui
          * every draw.
          */
         void pack() override;
+
+        /**
+         * Draw the content of the panel and its children into the buffer
+         * @param buffer The screen buffer
+         */
         void draw( ScreenBuffer& ) const override;
     };
 
@@ -42,7 +48,7 @@ namespace ccl::cli::ui
         const std::string &id, size_t w, size_t h, size_t x, size_t y
     ) : PanelBase(id, w, h, x, y, false)
     {
-        m_container = std::make_unique<ContainerT>(w, h, x, y);
+        m_container = std::make_unique<ContainerT>(this);
     }
 
     template <typename ContainerT, typename C>
@@ -65,8 +71,19 @@ namespace ccl::cli::ui
     }
 
     template <typename ContainerT, typename C>
+    inline void PanelWidget<ContainerT, C>::removeChild(const std::string &id)
+    {
+        if ( m_container->removeChildById( id ) > 0 )
+        {
+            this->PanelBase::setRepacking( true );
+        }
+    }
+
+    template <typename ContainerT, typename C>
     inline void PanelWidget<ContainerT, C>::pack()
     {
+        if ( !m_needs_repacking ) return;
+
         // Apply the layout to all its children
         m_container->layout();
 
@@ -75,6 +92,8 @@ namespace ccl::cli::ui
         {
             panel->pack();
         }
+
+        m_needs_repacking = false;
     }
 
     template <typename ContainerT, typename C>

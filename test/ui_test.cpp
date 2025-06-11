@@ -14,15 +14,13 @@ int main()
     // This ensures a clean canvas for your label.
     screen.clear();
 
-    // Create your local ScreenBuffer.
-    ScreenBuffer sb( 40, 11 );
-
-    // Create and draw your Label to the local ScreenBuffer.
-    Label l( "Label1", U"Ciao 👋", 3, 1 ); // Positioned at row 5, column 5
+    // Create and draw your Label
+    Label l( "Label1", U"Ciao 👋", 3, 1 );
     l.setContentStyle( DefaultStyle() );
     l.setPadding( { 3, 2, 3, 3 } );
-    l.draw( sb );
-    sb.flush( Terminal::getInstance() );
+    
+    // Add the label to the screen main panel
+    screen.addWidget( l );
 
     std::this_thread::sleep_for( std::chrono::seconds(1) );
 
@@ -32,9 +30,9 @@ int main()
                .Bold( true )
                .Italic( true ) );
     
-    l.draw( sb );
-    sb.flush( Terminal::getInstance() );
     Terminal::getInstance().setCursorPosition( 12, 0 );
+
+    std::cerr << "Absolute ID: " << l.getAbsoluteId() << std::endl;
 
     return 0;
 }

@@ -89,13 +89,25 @@ namespace ccl::cli::ui
          * Clear the screen.
          */
         void clear();
+
+        /**
+         * Adds a widget to the main panel of the screen
+         * @param widget The widget lvalue reference
+         */
+        void addWidget( Widget& );
+
+        /**
+         * Draws the content of all widgets previously added to the
+         * screen main panel widget.
+         */
+        void draw();
     };
 
     template <typename PanelT>
     inline std::unique_ptr<PanelBase> Screen::createPanel() const
     {
         auto panel_ptr = std::make_unique<PanelT>( "MainPanel",
-            m_winsize.ws_col, m_winsize.ws_row, 0,0 );
+            m_winsize.ws_col, m_winsize.ws_row, 0, 0 );
 
         return panel_ptr;
     }

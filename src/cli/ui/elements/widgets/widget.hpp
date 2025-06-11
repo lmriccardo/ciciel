@@ -5,13 +5,20 @@
 #include <array>
 #include <cli/ui/style/style.hpp>
 #include <cli/ui/screen/screen_buffer.hpp>
-#include "../ui_element.hpp"
 
 namespace ccl::cli::ui
 {
     enum class Direction { Top, Left, Rigth, Bottom };
 
-    class Widget: public UIElement
+    enum class Vertex
+    {
+        TL, // Top-Left coordinate 
+        TR, // Top-Right coordinate
+        BL, // Bottom-Left coordinate
+        BR  // Bottom-Right coordinate
+    };
+
+    class Widget
     {
     protected:
         std::string m_name;    // The unique name identifier in the subtree
@@ -20,11 +27,22 @@ namespace ccl::cli::ui
         bool        m_leaf;    // If the widget is a leaf in the tree or not
         Widget*     m_parent;  // The widget parent in the UI tree
 
+        size_t         m_pos_x;   // Top-left X position
+        size_t         m_pos_y;   // Top-left Y position
+        struct winsize m_winsize; // The size of the object
+
         std::array<size_t, 4> m_padding; // Internal space between content and border
         std::array<size_t, 4> m_margin;  // External space between widget and other objects
 
+        int m_flexGrow   = 0; // Flex grow factor ( 0 = can not grow )
+        int m_flexShrink = 0; // Flex shrink factor ( 0 = can not shrink )
+
+        std::pair<size_t, size_t> m_preferred_size; // Widget preferred size when no layout applied
+        std::pair<size_t, size_t> m_min_size;       // Widget minimum size when shrinking
+
         virtual void drawBorder( ScreenBuffer& ) const;
         void drawRect( ScreenBuffer&, const char32_t*, size_t, size_t, const Style&) const;
+        void forceParentRepack();
     
     public:
         Widget( const std::string&, size_t, size_t, size_t, size_t, bool );
@@ -33,6 +51,8 @@ namespace ccl::cli::ui
         void setParent     ( Widget& );
         void setBorderStyle( const BorderStyle& );
         void setVisibility ( bool );
+
+        void setStartPosition( size_t, size_t );
 
         /**
          * Set the new winsize by overwriting the existing method from
@@ -78,9 +98,37 @@ namespace ccl::cli::ui
          */
         void setMargin( size_t, Direction );
 
+        /**
+         * Set the preferred size for the current widget. The preferred size
+         * is the size the layout manager tries to use as a baseline for
+         * ordering all its children widget.
+         * 
+         * @param w The preferred width ( nof columns )
+         * @param h The preferred height ( nof rows )
+         */
+        void setPreferredSize( size_t, size_t );
+
+        /**
+         * Sets the minimum size for the current widget. The minimum size
+         * is the size the layout manager must respect if there is no enough
+         * space to contain all the children.
+         * 
+         * @param w The minimum width ( nof columns )
+         * @param h The minimum height ( nof rows )
+         */
+        void setMinimumSize( size_t, size_t );
+
+        void setGrowFactor( int );
+        void setShrinkFactor( int );
+
         bool isVisible  () const;
         bool isLeaf     () const;
         bool hasChildren() const;
+        bool canGrow    () const;
+        bool canShrink  () const;
+
+        std::pair<size_t,size_t> getWinsize() const;
+        std::pair<size_t, size_t> getVertexCoord( Vertex ) const;
         
         const std::string& getId() const;
 
@@ -115,6 +163,12 @@ namespace ccl::cli::ui
          * @return < cols, rows >
          */
         std::pair<size_t,size_t> getWinsizeNoPadding( ) const;
+
+        int getShrinkFactor() const;
+        int getGrowFactor() const;
+
+        const std::pair<size_t, size_t>& getPreferredSize() const;
+        const std::pair<size_t, size_t>& getMinimumSize() const;
 
         /**
          * Check whether the input coordinates collides with the current object. 

@@ -2,8 +2,8 @@
 
 using namespace ccl::cli::ui;
 
-Container::Container(size_t w, size_t h, size_t x, size_t y)
-    : UIElement( w, h, x, y )
+Container::Container( PanelBase* panelptr )
+    : m_panel( panelptr )
 {
 }
 
@@ -17,6 +17,21 @@ int Container::removeChild(size_t idx)
     if ( idx >= getNofChildren() ) return 0;
     m_children.erase(m_children.begin() + idx);
     return 1;
+}
+
+int Container::removeChildById(const std::string &id)
+{
+    auto it_children = m_children.begin();
+    for ( ; it_children != m_children.end(); ++it_children )
+    {
+        if ( (*it_children)->getId() == id ) break;
+    }
+
+    // If the requested element does not exists in the subtree
+    if ( it_children == m_children.end() ) return 0;
+
+    m_children.erase( it_children );
+    return 0;
 }
 
 Widget* Container::getChild(size_t idx)

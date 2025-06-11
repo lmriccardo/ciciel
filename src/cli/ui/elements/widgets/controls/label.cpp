@@ -40,6 +40,10 @@ Label::Label(const std::string &id, const std::u32string &text, size_t x, size_t
     : ContentWidget(id, (size_t)u32swidth(text), 1, x, y, true)
 {
     setContent( text );
+
+    // Sets preferred size and minimum size
+    setPreferredSize( m_winsize.ws_col, m_winsize.ws_row );
+    setMinimumSize( m_winsize.ws_col, m_winsize.ws_row );
 }
 
 Label::Label(const std::string &id, const std::string &text, size_t x, size_t y)
@@ -54,10 +58,9 @@ void Label::setContentStyle(const Style &style)
 
 void Label::setContent(const std::string &content, const Style &style)
 {
-    m_content.clear();
-    utf8to32( content, m_content );
-    m_content_style = style;
-    setWinsize( (size_t)u32swidth( m_content ), 1 );
+    std::u32string u32content;
+    utf8to32( content, u32content );
+    setContent( u32content, style );
 }
 
 void Label::setContent(const std::u32string &content, const Style &style)
@@ -65,6 +68,14 @@ void Label::setContent(const std::u32string &content, const Style &style)
     m_content = content;
     m_content_style = style;
     setWinsize( (size_t)u32swidth( m_content ), 1 );
+    
+    // Sets preferred size and minimum size
+    setPreferredSize( m_winsize.ws_col, m_winsize.ws_row );
+    setMinimumSize( m_winsize.ws_col, m_winsize.ws_row );
+
+    // We need to force the parent repacking because the
+    // size of the current label has changed
+    forceParentRepack();
 }
 
 void Label::setContent(const std::string &content)

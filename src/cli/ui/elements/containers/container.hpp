@@ -4,6 +4,7 @@
 #include <memory>
 #include <type_traits>
 #include <cli/ui/elements/widgets/widget.hpp>
+#include <cli/ui/elements/widgets/panels/panel_base.hpp>
 
 namespace ccl::cli::ui
 {
@@ -12,17 +13,19 @@ namespace ccl::cli::ui
      * but it cannot be part of the UI tree and it is only used
      * to organize elements in a panel using a certain order.
      */
-    class Container : public UIElement
+    class Container
     {
     protected:
         std::vector<Widget*> m_children;
+        PanelBase* m_panel;
 
     public:
-        Container( size_t, size_t, size_t, size_t );
+        Container( PanelBase* panelptr );
         virtual ~Container() = default;
 
         void addChild(Widget*);
         int removeChild( size_t );
+        int removeChildById( const std::string& );
         Widget* getChild( size_t );
         size_t getNofChildren() const;
 

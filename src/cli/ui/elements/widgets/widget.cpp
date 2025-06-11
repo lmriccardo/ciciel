@@ -1,4 +1,5 @@
 #include "widget.hpp"
+#include <cli/ui/elements/widgets/panels/panel_base.hpp>
 
 using namespace ccl::cli::ui;
 
@@ -45,13 +46,17 @@ void Widget::drawRect(ScreenBuffer &buffer, const char32_t *charset,
     buffer.set( *(charset + 5), y_pos + r - 1, x_pos + c - 1, style, false );
 }
 
-Widget::Widget(const std::string &id, size_t w, size_t h,
-               size_t x, size_t y, bool leaf) 
-    : UIElement(w, h, x, y),
-      m_name(id),
-      m_hidden(false),
-      m_leaf(leaf),
-      m_parent(nullptr)
+void Widget::forceParentRepack()
+{
+    if ( m_parent != nullptr )
+    {
+        reinterpret_cast<PanelBase*>(m_parent)->setRepacking( true );
+    }
+}
+
+Widget::Widget(const std::string &id, size_t w, size_t h, size_t x, size_t y, bool leaf) 
+    : m_name(id), m_hidden(false), m_leaf(leaf),
+      m_parent(nullptr), m_pos_x( x ), m_pos_y( y )
 {
     // Reset the window size considering also the border
     size_t b_size = static_cast<size_t>(m_border.getBorderWcwidth());
@@ -63,6 +68,12 @@ Widget::Widget(const std::string &id, size_t w, size_t h,
 
 void Widget::setParent(Widget &parent)
 {
+    // Check that the parent is convertible to ParentBase class
+    if ( !(dynamic_cast<PanelBase*>(&parent)) )
+    {
+        throw std::invalid_argument( "Input parent must be a panel!!" );
+    }
+
     if ( m_parent != nullptr )
     {
         std::cerr << "[Widget:setParent] WARNING!! Overriding "
@@ -70,6 +81,10 @@ void Widget::setParent(Widget &parent)
                   << "with Id: " << getId() << " and Parent ID: "
                   << m_parent->getId()
                   << std::endl;
+
+        // When changing the parent of the current widget
+        // we also need to remove it from the previous subtree
+        reinterpret_cast<PanelBase*>(m_parent)->removeChild( getId() );
     }
 
     m_parent = &parent;
@@ -83,6 +98,12 @@ void Widget::setBorderStyle(const BorderStyle &style)
 void Widget::setVisibility(bool visibility)
 {
     m_hidden = !visibility;
+    
+    // When changing the visibility of the widget, it also changes
+    // the way in which children of the widget parent are organized
+    // by the layout manager (container), therefore we need to
+    // force the repack.
+    forceParentRepack();
 }
 
 void Widget::setWinsize( size_t cols, size_t rows )
@@ -91,7 +112,14 @@ void Widget::setWinsize( size_t cols, size_t rows )
     size_t w_size = cols + 2 * b_size + m_padding[1] + m_padding[2];
     size_t h_size = rows + 2 + m_padding[0] + m_padding[3];
 
-    this->UIElement::setWinsize( w_size, h_size );
+    m_winsize.ws_row = h_size;
+    m_winsize.ws_col = w_size;
+}
+
+void Widget::setStartPosition(size_t s_x, size_t s_y)
+{
+    m_pos_x = s_x;
+    m_pos_y = s_y;
 }
 
 void Widget::setPadding(const std::array<size_t, 4> &padding)
@@ -114,17 +142,71 @@ void Widget::setPadding(size_t value, Direction direction)
     }
 
     m_winsize.ws_col = m_winsize.ws_col + value;
+
+    // We need to force the parent repacking because the
+    // size of the current label has changed
+    forceParentRepack();
 }
 
 void Widget::setMargin(const std::array<size_t, 4> &margin)
 {
-    m_margin = margin;
+    setMargin( margin.at(0), Direction::Top    );
+    setMargin( margin.at(1), Direction::Left   );
+    setMargin( margin.at(2), Direction::Rigth  );
+    setMargin( margin.at(3), Direction::Bottom );
 }
 
 void Widget::setMargin(size_t value, Direction direction)
 {
     int direction_i = static_cast<int>(direction);
     m_margin[direction_i] = value;
+
+    // We need to force the parent repacking because the
+    // size of the current label has changed
+    forceParentRepack();
+}
+
+void Widget::setPreferredSize(size_t w, size_t h)
+{
+    m_preferred_size = { w, h };
+}
+
+void Widget::setMinimumSize(size_t w, size_t h)
+{
+    m_min_size = { w, h };
+}
+
+void Widget::setGrowFactor(int factor)
+{
+    m_flexGrow = factor;
+}
+
+std::pair<size_t, size_t> Widget::getWinsize() const
+{
+    return { m_winsize.ws_row, m_winsize.ws_col };
+}
+
+std::pair<size_t, size_t> Widget::getVertexCoord(Vertex v) const
+{
+    switch (v)
+    {
+        case Vertex::TL: return { m_pos_x, m_pos_y };
+        case Vertex::TR: return { m_pos_x + m_winsize.ws_col - 1, m_pos_y };
+        case Vertex::BL: return { m_pos_x, m_pos_y + m_winsize.ws_row - 1 };
+        case Vertex::BR: return {
+            m_pos_x + m_winsize.ws_col - 1,
+            m_pos_y + m_winsize.ws_row - 1
+        };
+        
+        default:
+            throw std::invalid_argument("Unknow vertex direction");
+            return {};
+    }
+}
+
+void Widget::setShrinkFactor(int factor)
+{
+    m_flexShrink = factor;
 }
 
 bool Widget::isVisible() const
@@ -140,6 +222,16 @@ bool Widget::isLeaf() const
 bool Widget::hasChildren() const
 {
     return !isLeaf();
+}
+
+bool Widget::canGrow() const
+{
+    return m_flexGrow > 0;
+}
+
+bool Widget::canShrink() const
+{
+    return m_flexShrink > 0;
 }
 
 const std::string& Widget::getId() const
@@ -174,6 +266,26 @@ std::pair<size_t, size_t> Widget::getWinsizeNoPadding() const
     size_t row_size = m_winsize.ws_row - 2 - tpad - bpad;
 
     return { col_size, row_size };
+}
+
+int Widget::getShrinkFactor() const
+{
+    return m_flexShrink;
+}
+
+int Widget::getGrowFactor() const
+{
+    return m_flexGrow;
+}
+
+const std::pair<size_t, size_t> &Widget::getPreferredSize() const
+{
+    return m_preferred_size;
+}
+
+const std::pair<size_t, size_t> &Widget::getMinimumSize() const
+{
+    return m_min_size;
 }
 
 bool Widget::hasContent() const
