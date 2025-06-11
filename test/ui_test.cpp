@@ -22,6 +22,9 @@ int main()
     // Add the label to the screen main panel
     screen.addWidget( l );
 
+    // Draw the UI
+    screen.draw();
+
     std::this_thread::sleep_for( std::chrono::seconds(1) );
 
     l.setContent( "Io mi chiamo Riccardo.", 

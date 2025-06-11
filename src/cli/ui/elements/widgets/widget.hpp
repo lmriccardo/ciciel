@@ -37,8 +37,7 @@ namespace ccl::cli::ui
         int m_flexGrow   = 0; // Flex grow factor ( 0 = can not grow )
         int m_flexShrink = 0; // Flex shrink factor ( 0 = can not shrink )
 
-        std::pair<size_t, size_t> m_preferred_size; // Widget preferred size when no layout applied
-        std::pair<size_t, size_t> m_min_size;       // Widget minimum size when shrinking
+        std::pair<size_t, size_t> m_min_size; // Widget minimum size when shrinking
 
         virtual void drawBorder( ScreenBuffer& ) const;
         void drawRect( ScreenBuffer&, const char32_t*, size_t, size_t, const Style&) const;
@@ -55,8 +54,7 @@ namespace ccl::cli::ui
         void setStartPosition( size_t, size_t );
 
         /**
-         * Set the new winsize by overwriting the existing method from
-         * UIElement, by considering also padding.
+         * Set the new winsize considering also padding.
          * 
          * @param cols The new number of columns
          * @param rows The new number of rows
@@ -97,16 +95,6 @@ namespace ccl::cli::ui
          * @param direction The direction to which apply the margin
          */
         void setMargin( size_t, Direction );
-
-        /**
-         * Set the preferred size for the current widget. The preferred size
-         * is the size the layout manager tries to use as a baseline for
-         * ordering all its children widget.
-         * 
-         * @param w The preferred width ( nof columns )
-         * @param h The preferred height ( nof rows )
-         */
-        void setPreferredSize( size_t, size_t );
 
         /**
          * Sets the minimum size for the current widget. The minimum size
@@ -167,8 +155,21 @@ namespace ccl::cli::ui
         int getShrinkFactor() const;
         int getGrowFactor() const;
 
-        const std::pair<size_t, size_t>& getPreferredSize() const;
+        /**
+         * Returns the minimum size for this widget
+         * @return ( width, height )
+         */
         const std::pair<size_t, size_t>& getMinimumSize() const;
+
+        /**
+         * Returns widget window dimension accounting also top, left,
+         * rigth and bottom margin.
+         * 
+         * @return ( width + margin, height + margin )
+         */
+        std::pair<size_t, size_t> getWinsizeWithMargin() const;
+
+        const BorderStyle& getBorderStyle() const;
 
         /**
          * Check whether the input coordinates collides with the current object. 

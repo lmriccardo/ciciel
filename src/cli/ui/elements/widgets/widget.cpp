@@ -166,11 +166,6 @@ void Widget::setMargin(size_t value, Direction direction)
     forceParentRepack();
 }
 
-void Widget::setPreferredSize(size_t w, size_t h)
-{
-    m_preferred_size = { w, h };
-}
-
 void Widget::setMinimumSize(size_t w, size_t h)
 {
     m_min_size = { w, h };
@@ -278,14 +273,24 @@ int Widget::getGrowFactor() const
     return m_flexGrow;
 }
 
-const std::pair<size_t, size_t> &Widget::getPreferredSize() const
-{
-    return m_preferred_size;
-}
-
 const std::pair<size_t, size_t> &Widget::getMinimumSize() const
 {
     return m_min_size;
+}
+
+std::pair<size_t, size_t> Widget::getWinsizeWithMargin() const
+{
+    size_t tmarg = getMargin( Direction::Top    );
+    size_t lmarg = getMargin( Direction::Left   );
+    size_t rmarg = getMargin( Direction::Rigth  );
+    size_t bmarg = getMargin( Direction::Bottom );
+
+    return { m_winsize.ws_col + lmarg + rmarg, m_winsize.ws_row + tmarg + bmarg };
+}
+
+const BorderStyle &Widget::getBorderStyle() const
+{
+    return m_border;
 }
 
 bool Widget::hasContent() const

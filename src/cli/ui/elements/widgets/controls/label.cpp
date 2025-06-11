@@ -42,7 +42,6 @@ Label::Label(const std::string &id, const std::u32string &text, size_t x, size_t
     setContent( text );
 
     // Sets preferred size and minimum size
-    setPreferredSize( m_winsize.ws_col, m_winsize.ws_row );
     setMinimumSize( m_winsize.ws_col, m_winsize.ws_row );
 }
 
@@ -70,7 +69,6 @@ void Label::setContent(const std::u32string &content, const Style &style)
     setWinsize( (size_t)u32swidth( m_content ), 1 );
     
     // Sets preferred size and minimum size
-    setPreferredSize( m_winsize.ws_col, m_winsize.ws_row );
     setMinimumSize( m_winsize.ws_col, m_winsize.ws_row );
 
     // We need to force the parent repacking because the
