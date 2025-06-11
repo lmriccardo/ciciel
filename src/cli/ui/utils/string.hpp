@@ -70,6 +70,18 @@ namespace ccl::cli::ui
     bool is_codepoint_valid( const char32_t* ) noexcept;
 
     /**
+     * Add horizontal (left and rigth) padding to the input content and
+     * returns the padded string.
+     * 
+     * @param content The string to which padding must be added
+     * @param rpad The rigth padding size
+     * @param lpad The left padding size
+     * 
+     * @return The padded string
+     */
+    std::u32string u32pad( const std::u32string&, size_t, size_t ) noexcept;
+
+    /**
      * Create a new string with the input content aligned according to the
      * TextAlignment parameter on total size.
      * 

@@ -79,13 +79,19 @@ bool ccl::cli::ui::is_codepoint_valid(const char32_t *c32_in) noexcept
     return utf8proc_codepoint_valid( *codepoint );
 }
 
+std::u32string ccl::cli::ui::u32pad(
+    const std::u32string &content, size_t rpad, size_t lpad
+) noexcept {
+    return std::u32string( lpad, ' ' ) + content + std::u32string( rpad, ' ' );
+}
+
 std::u32string ccl::cli::ui::u32align(const std::u32string &content, 
     TextAlignment alignment, size_t total_len) noexcept
 {
-    if ( total_len <=1 ) return content;
-
     // Compute the actual dimension of the string
     int actual_size = u32swidth( content );
+
+    if ( total_len <=1 || total_len < actual_size ) return content;
 
     if ( alignment == TextAlignment::Center )
     {
@@ -94,12 +100,10 @@ std::u32string ccl::cli::ui::u32align(const std::u32string &content,
         int rigth_padding = total_len - actual_size - left_padding;
 
         // Build the final string
-        return   std::u32string(left_padding, ' ') 
-               + content 
-               + std::u32string(rigth_padding, ' ');
+        return u32pad( content, rigth_padding, left_padding );
     }
 
-    std::u32string padding( total_len - actual_size, ' ' );
-    if ( alignment == TextAlignment::Left ) return content + padding;
-    return padding + content;
+    size_t padsize = static_cast<size_t>(total_len - actual_size);
+    if ( alignment == TextAlignment::Left ) return u32pad( content, padsize, 0 );
+    return u32pad( content, 0, padsize );
 }

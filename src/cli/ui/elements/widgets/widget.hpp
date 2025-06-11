@@ -33,10 +33,50 @@ namespace ccl::cli::ui
         void setParent     ( Widget& );
         void setBorderStyle( const BorderStyle& );
         void setVisibility ( bool );
-        void setPadding    ( const std::array<size_t, 4>& );
-        void setMargin     ( const std::array<size_t, 4>& );
-        void setPadding    ( size_t, Direction );
-        void setMargin     ( size_t, Direction );
+
+        /**
+         * Set the new winsize by overwriting the existing method from
+         * UIElement, by considering also padding.
+         * 
+         * @param cols The new number of columns
+         * @param rows The new number of rows
+         */
+        void setWinsize( size_t, size_t );
+
+        /**
+         * Set the padding for all directions. In particular the input array
+         * should be organized as follow: ( Top, Left, Rigth, Bottom ) padding.
+         * Setting padding operation also increases the width and the height.
+         * 
+         * @param padding The actual padding to apply
+         */
+        void setPadding( const std::array<size_t, 4>& );
+
+        /**
+         * Set the padding in the given direction.
+         * 
+         * @param padding The padding size to set
+         * @param direction The direction to which apply the padding
+         */
+        void setPadding( size_t, Direction );
+
+        /**
+         * Just like padding, it set the margin for all directions. The array
+         * should be organized in the same way, therefore: (Top, Left, Rigth, Bottom).
+         * Since the margin does not concern the internal content of the widget, its
+         * size will remain the same at the end of the operation.
+         * 
+         * @param margin The margin to apply
+         */
+        void setMargin( const std::array<size_t, 4>& );
+
+        /**
+         * Set the margin in the given direction.
+         * 
+         * @param margin The margin size to apply
+         * @param direction The direction to which apply the margin
+         */
+        void setMargin( size_t, Direction );
 
         bool isVisible  () const;
         bool isLeaf     () const;
@@ -52,6 +92,29 @@ namespace ccl::cli::ui
          * @return The absolute ID from the root node.
          */
         std::string getAbsoluteId() const;
+
+        /**
+         * Returns the padding size of the given direction.
+         * @param direction The direction requested
+         * @return The padding size
+         */
+        size_t getPadding( Direction ) const;
+
+        /**
+         * Returns the margin size of the given direction
+         * @param direction The direction requested
+         * @return The margin size
+         */
+        size_t getMargin( Direction ) const;
+
+        /**
+         * Returns a pair (columns, rows) representing respectively
+         * the number of columns and rows without any horizontal or
+         * vertical padding and border.
+         * 
+         * @return < cols, rows >
+         */
+        std::pair<size_t,size_t> getWinsizeNoPadding( ) const;
 
         /**
          * Check whether the input coordinates collides with the current object. 

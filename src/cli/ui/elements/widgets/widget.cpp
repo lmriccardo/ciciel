@@ -55,7 +55,10 @@ Widget::Widget(const std::string &id, size_t w, size_t h,
 {
     // Reset the window size considering also the border
     size_t b_size = static_cast<size_t>(m_border.getBorderWcwidth());
-    setWinsize( w + 2*b_size, h );
+    setWinsize( w + 2*b_size, h + 2 ); // +2 on heigth to consider the border
+
+    m_padding.fill( 0 );
+    m_margin.fill( 0 );
 }
 
 void Widget::setParent(Widget &parent)
@@ -82,15 +85,35 @@ void Widget::setVisibility(bool visibility)
     m_hidden = !visibility;
 }
 
+void Widget::setWinsize( size_t cols, size_t rows )
+{
+    size_t b_size = static_cast<size_t>(m_border.getBorderWcwidth());
+    size_t w_size = cols + 2 * b_size + m_padding[1] + m_padding[2];
+    size_t h_size = rows + 2 + m_padding[0] + m_padding[3];
+
+    this->UIElement::setWinsize( w_size, h_size );
+}
+
 void Widget::setPadding(const std::array<size_t, 4> &padding)
 {
-    m_padding = padding;
+    setPadding( padding.at(0), Direction::Top    );
+    setPadding( padding.at(1), Direction::Left   );
+    setPadding( padding.at(2), Direction::Rigth  );
+    setPadding( padding.at(3), Direction::Bottom );
 }
 
 void Widget::setPadding(size_t value, Direction direction)
 {
     int direction_i = static_cast<int>(direction);
     m_padding[direction_i] = value;
+
+    if (direction == Direction::Top || direction == Direction::Bottom)
+    {
+        m_winsize.ws_row = m_winsize.ws_row + value;
+        return;
+    }
+
+    m_winsize.ws_col = m_winsize.ws_col + value;
 }
 
 void Widget::setMargin(const std::array<size_t, 4> &margin)
@@ -128,6 +151,29 @@ std::string Widget::getAbsoluteId() const
 {
     if ( m_parent == nullptr ) return m_name;
     return m_parent->getAbsoluteId() + "." + m_name;
+}
+
+size_t Widget::getPadding(Direction direction) const
+{
+    int di = static_cast<int>( direction );
+    return m_padding[ di ];
+}
+
+size_t Widget::getMargin(Direction direction) const
+{
+    int di = static_cast<int>( direction );
+    return m_margin[ di ];
+}
+
+std::pair<size_t, size_t> Widget::getWinsizeNoPadding() const
+{
+    size_t rpad = m_padding[2], lpad = m_padding[1];
+    size_t tpad = m_padding[0], bpad = m_padding[3];
+    size_t b_size = (size_t)m_border.getBorderWcwidth();
+    size_t col_size = m_winsize.ws_col - 2 * b_size - rpad - lpad;
+    size_t row_size = m_winsize.ws_row - 2 - tpad - bpad;
+
+    return { col_size, row_size };
 }
 
 bool Widget::hasContent() const

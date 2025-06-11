@@ -112,7 +112,7 @@ int BorderStyle::getBorderWcwidth() const
 
 const std::array<char32_t, 6> ccl::cli::ui::BorderStyle::getCharset() const
 {
-    if ( m_size == BorderSize::Unit )
+    if ( m_size == BorderSize::Double )
     {
         return { 
             ASCII::DOUBLE_DOWN_RIGHT, ASCII::DOUBLE_HORIZONTAL,

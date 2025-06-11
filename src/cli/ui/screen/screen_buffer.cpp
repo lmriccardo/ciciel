@@ -57,7 +57,7 @@ size_t ScreenBuffer::set(char32_t content, size_t pos, const Style &style, bool 
 
     const auto& cell = at( pos );
 
-    std::wcerr << "DEBUG: " << (wchar_t)cell.m_char << " " << (wchar_t)content << std::endl;
+    // std::wcerr << "DEBUG: " << (wchar_t)cell.m_char << " " << (wchar_t)content << std::endl;
 
     // Check that the current cell is different from the new content
     if ( redraw || (cell.m_char != content) || (cell.m_style != style) )
@@ -124,13 +124,13 @@ void ScreenBuffer::flush(Terminal &t_out)
 
         // Put the element only if it has been changed from the
         // previous state of the screen buffer.
-        // if ( curr_element_counter > m_updateCounter )
-        // {
+        if ( curr_element_counter > m_updateCounter )
+        {
             const struct CellChar& elem = *this_it;
             size_t row_idx, col_idx;
             getRowCol( row_idx, col_idx, current_pos );
             t_out.put( elem.m_char, row_idx, col_idx, elem.m_style );
-        // }
+        }
     }
 
     m_updateCounter++;

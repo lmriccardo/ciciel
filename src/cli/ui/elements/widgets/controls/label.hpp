@@ -11,6 +11,8 @@ namespace ccl::cli::ui
     private:
         Style m_content_style; // The content style
 
+        void drawPadding( ScreenBuffer& ) const;
+
     public:
         Label( const std::string&, const std::u32string&, size_t, size_t );
         Label( const std::string&, const std::string&, size_t, size_t );
