@@ -23,16 +23,58 @@ namespace ccl::cli::ui
         Container( PanelBase* panelptr );
         virtual ~Container() = default;
 
-        void addChild(Widget*);
-        int removeChild( size_t );
-        int removeChildById( const std::string& );
-        Widget* getChild( size_t );
+        /**
+         * Add a child into the container. Children are pushed
+         * into a vector, so that order in maintained.
+         * 
+         * @param child The child widget
+         */
+        void addChild( Widget* child );
+
+        /**
+         * Remove a child at given position in the vector.
+         * 
+         * @param idx The index of the child in the vector
+         * @return 0 if the child does not exists, 1 otherwise
+         */
+        int removeChild( size_t idx );
+        
+        /**
+         * Removes a child given its unique name identifier.
+         * 
+         * @param id The unique identifier of the child
+         * @return 0 if the child does not exists, 1 otherwise
+         */
+        int removeChildById( const std::string& id );
+
+        /**
+         * Returns the pointer to the child at given position.
+         * @param idx The position of the child
+         * @return nullptr if the child does not exists, the pointer otherwise. 
+         */
+        Widget* getChild( size_t idx );
+
+        /**
+         * Returns the total number of children.
+         * @return Number of children
+         */
         size_t getNofChildren() const;
 
+        /**
+         * Returns a vector of children that corresponds to the given type.
+         * @return A vector of children
+         */
         template <typename WidgetT>
         std::vector<WidgetT*> getChildrenByType() const;
 
+        /**
+         * Returns a const reference to the children vector
+         */
         const std::vector<Widget*>& getAllChildren() const;
+
+        /**
+         * Returns a modifiable reference to the children vector
+         */
         std::vector<Widget*>& getAllChildren();
 
         /**

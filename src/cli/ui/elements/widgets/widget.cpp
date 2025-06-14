@@ -58,9 +58,10 @@ Widget::Widget(const std::string &id, size_t w, size_t h, size_t x, size_t y, bo
     : m_name(id), m_hidden(false), m_leaf(leaf),
       m_parent(nullptr), m_pos_x( x ), m_pos_y( y )
 {
-    // Reset the window size considering also the border
-    size_t b_size = static_cast<size_t>(m_border.getBorderWcwidth());
-    setWinsize( w + 2*b_size, h + 2 ); // +2 on heigth to consider the border
+    w = std::max( static_cast<int>(w), 2 * m_border.getBorderWcwidth() );
+    h = std::max( static_cast<int>(h), 2 );
+
+    setWinsize( w, h );
 
     m_padding.fill( 0 );
     m_margin.fill( 0 );
@@ -76,12 +77,6 @@ void Widget::setParent(Widget &parent)
 
     if ( m_parent != nullptr )
     {
-        std::cerr << "[Widget:setParent] WARNING!! Overriding "
-                  << "the existing parent of the current widget "
-                  << "with Id: " << getId() << " and Parent ID: "
-                  << m_parent->getId()
-                  << std::endl;
-
         // When changing the parent of the current widget
         // we also need to remove it from the previous subtree
         reinterpret_cast<PanelBase*>(m_parent)->removeChild( getId() );
@@ -106,11 +101,17 @@ void Widget::setVisibility(bool visibility)
     forceParentRepack();
 }
 
-void Widget::setWinsize( size_t cols, size_t rows )
+void Widget::setWinsize( size_t width, size_t height )
+{
+    m_winsize.ws_row = height;
+    m_winsize.ws_col = width;
+}
+
+void Widget::setContentWinsize(size_t width, size_t height)
 {
     size_t b_size = static_cast<size_t>(m_border.getBorderWcwidth());
-    size_t w_size = cols + 2 * b_size + m_padding[1] + m_padding[2];
-    size_t h_size = rows + 2 + m_padding[0] + m_padding[3];
+    size_t w_size = width + 2 * b_size + m_padding[1] + m_padding[2];
+    size_t h_size = height + 2 + m_padding[0] + m_padding[3];
 
     m_winsize.ws_row = h_size;
     m_winsize.ws_col = w_size;
@@ -121,6 +122,7 @@ void Widget::setStartPosition(size_t s_x, size_t s_y)
     m_pos_x = s_x;
     m_pos_y = s_y;
 }
+
 
 void Widget::setPadding(const std::array<size_t, 4> &padding)
 {
@@ -173,7 +175,22 @@ void Widget::setMinimumSize(size_t w, size_t h)
 
 void Widget::setGrowFactor(int factor)
 {
+    if ( factor < 0 )
+    {
+        throw std::invalid_argument( "Grow factor cannot be negative" );
+    }
+
     m_flexGrow = factor;
+}
+
+void Widget::setShrinkFactor(int factor)
+{
+    if ( factor < 0 )
+    {
+        throw std::invalid_argument( "Shrink factor cannot be negative" );
+    }
+
+    m_flexShrink = factor;
 }
 
 std::pair<size_t, size_t> Widget::getWinsize() const
@@ -197,11 +214,6 @@ std::pair<size_t, size_t> Widget::getVertexCoord(Vertex v) const
             throw std::invalid_argument("Unknow vertex direction");
             return {};
     }
-}
-
-void Widget::setShrinkFactor(int factor)
-{
-    m_flexShrink = factor;
 }
 
 bool Widget::isVisible() const
@@ -252,7 +264,7 @@ size_t Widget::getMargin(Direction direction) const
     return m_margin[ di ];
 }
 
-std::pair<size_t, size_t> Widget::getWinsizeNoPadding() const
+std::pair<size_t, size_t> Widget::getContentWinsize() const
 {
     size_t rpad = m_padding[2], lpad = m_padding[1];
     size_t tpad = m_padding[0], bpad = m_padding[3];
@@ -291,6 +303,16 @@ std::pair<size_t, size_t> Widget::getWinsizeWithMargin() const
 const BorderStyle &Widget::getBorderStyle() const
 {
     return m_border;
+}
+
+size_t Widget::getX() const
+{
+    return m_pos_x + getPadding( Direction::Left ) + m_border.getBorderWcwidth();
+}
+
+size_t Widget::getY() const
+{
+    return m_pos_y + getPadding( Direction::Top ) + m_border.getBorderWcwidth();
 }
 
 bool Widget::hasContent() const

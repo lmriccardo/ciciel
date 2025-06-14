@@ -6,6 +6,13 @@
 
 namespace ccl::cli::ui
 {
+    /**
+     * A Label is a particular content widget that shows a static
+     * text that cannot be changed at runtime by the user using
+     * user input. It can change as side effects of other operations
+     * but does not accept user input. Its width and heigth are
+     * decided based on the current text content of the widget. 
+     */
     class Label : public ContentWidget<std::u32string>
     {
     private:
@@ -14,16 +21,18 @@ namespace ccl::cli::ui
         void drawPadding( ScreenBuffer& ) const;
 
     public:
-        Label( const std::string&, const std::u32string&, size_t, size_t );
-        Label( const std::string&, const std::string&, size_t, size_t );
+        Label( const std::string& id, const std::u32string& content, size_t x, size_t y );
+        Label( const std::string& id, const std::string& content, size_t x, size_t y );
         virtual ~Label() = default;
 
-        void setContentStyle( const Style& );
-        void setContent     ( const std::string&, const Style& );
-        void setContent     ( const std::u32string&, const Style& );
-        void setContent     ( const std::string& );
-        void setContent     ( const std::u32string& );
+        void setContentStyle( const Style& style );
+        void setContent     ( const std::string& content, const Style& style );
+        void setContent     ( const std::u32string& content, const Style& style );
+        void setContent     ( const std::string& content );
+        void setContent     ( const std::u32string& content );
 
-        void draw( ScreenBuffer& ) const override;
+        Style& getContentStyle();
+
+        void draw( ScreenBuffer& buffer ) const override;
     };
 }

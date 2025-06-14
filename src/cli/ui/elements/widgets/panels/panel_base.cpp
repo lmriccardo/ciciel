@@ -19,3 +19,23 @@ void PanelBase::setRepacking( bool value )
         reinterpret_cast<PanelBase*>(m_parent)->setRepacking( value );
     }
 }
+
+void PanelBase::setVerticalAlignment(VerticalAlignment value)
+{
+    m_v_align = value;
+}
+
+void PanelBase::setHorizontalAlignment(HorizontalAlignment value)
+{
+    m_h_align = value;
+}
+
+VerticalAlignment ccl::cli::ui::PanelBase::getVerticalAlignment() const
+{
+    return m_v_align;
+}
+
+HorizontalAlignment ccl::cli::ui::PanelBase::getHorizontalAlignment() const
+{
+    return m_h_align;
+}

@@ -30,6 +30,17 @@ namespace ccl::cli::ui
         AbsoluteLayout    // Where elements are placed is left to the user
     };
 
+    /**
+     * The Screen is the main object of the entire UI. It holds a pointer to the
+     * ScreenBuffer, the low-level Terminal wrapper and the main panel, i.e., the
+     * root node of the entire UI tree. It expose the draw methods which: (1)
+     * apply the layout recursively to the entire UI tree; (2) calls the draw
+     * method for each children and subchildren so to fill the buffer; (3) flush
+     * the screen buffer into the terminal. 
+     * 
+     * It is not a singleton, but acts like one i.e., there cannot exists two
+     * different Screen objects.
+     */
     class Screen
     {
     private:
@@ -59,7 +70,7 @@ namespace ccl::cli::ui
          * Sets the cursor style for the application. 
          * @param style The cursor style identifier
          */
-        void setCursorStyle( CursorStyle );
+        void setCursorStyle( CursorStyle style );
 
         /**
          * Move the cursor to the given position, if valid, i.e., inside
@@ -68,14 +79,17 @@ namespace ccl::cli::ui
          * @param x_pos Position on the X axis
          * @param y_pos Position on the Y axis
          */
-        void setCursorPosition( int, int );
+        void setCursorPosition( int x_pos, int y_pos );
 
         /**
          * Set the layout of the main panel of the screen.
          * @param layout The chosen layout
          */
-        void setLayout( Layout );
+        void setLayout( Layout layout );
         const Layout& getLayout() const;
+
+        void setVerticalAlignment( VerticalAlignment value );
+        void setHorizontalAlignment( HorizontalAlignment value );
         
         /**
          * Move the cursor of the given offset.
@@ -83,7 +97,7 @@ namespace ccl::cli::ui
          * @param x_off X axis Offset
          * @param y_off Y axis Offset
          */
-        void moveCursor( int, int );
+        void moveCursor( int x_off, int y_off );
 
         /**
          * Clear the screen.
@@ -94,7 +108,7 @@ namespace ccl::cli::ui
          * Adds a widget to the main panel of the screen
          * @param widget The widget lvalue reference
          */
-        void addWidget( Widget& );
+        void addWidget( Widget& widget );
 
         /**
          * Draws the content of all widgets previously added to the

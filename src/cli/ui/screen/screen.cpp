@@ -83,6 +83,16 @@ void Screen::setLayout(Layout layout)
     layoutSelection(layout);
 }
 
+void Screen::setVerticalAlignment( VerticalAlignment value )
+{
+    m_panel->setVerticalAlignment( value );
+}
+
+void Screen::setHorizontalAlignment( HorizontalAlignment value )
+{
+    m_panel->setHorizontalAlignment( value );
+}
+
 const Layout &Screen::getLayout() const
 {
     return m_layout;

@@ -16,6 +16,18 @@ namespace ccl::cli::ui
         bool     m_redraw; // Force redraw the current cell
     };
 
+    /**
+     * A Screen Buffer is a dynamic two dimensional array which is used to holds essentially 
+     * char32 elements, along with their style and redrawability. It represents a 1:1 map of 
+     * the low level terminal buffer. It stores element as 4 bytes char in order to handle also
+     * wide chars correctly ( UTF-8 encoded chars and extended ASCII ). In order to maintain 
+     * the correct low-level mapping, for every char that takes up more than 1 terminal column, 
+     * it put a '\000' element in the next position.
+     * 
+     * Internally, it also implements double buffering by flushing to the terminal only those
+     * cells that have changed with respect to the previous flush operation. This reduce
+     * flickering which is bad for UI CLI applications.
+     */
     class ScreenBuffer : public ccl::ds::grids::DynamicArray2D<struct CellChar>
     {
     private:
@@ -34,7 +46,7 @@ namespace ccl::cli::ui
          * the input size. That is, the first one is for rows ( height ) and
          * the second one for columns ( width ).
          */
-        void resize( size_t, size_t );
+        void resize( size_t new_h, size_t new_w );
 
         using ccl::ds::grids::DynamicArray2D<struct CellChar>::set;
 
@@ -43,10 +55,10 @@ namespace ccl::cli::ui
          * does not fit into space, then a warning is raised and only a portion
          * of the string will be copied into the buffer.
          */
-        size_t set( const std::string&, size_t, size_t, const Style&, bool );
-        size_t set( char32_t, size_t, size_t, const Style&, bool );
-        size_t set( char32_t, size_t, const Style&, bool );
-        size_t set( const std::u32string&, size_t, size_t, const Style&, bool );
+        size_t set( const std::string& content, size_t x, size_t y, const Style& style, bool redraw );
+        size_t set( char32_t content, size_t x, size_t y, const Style& style, bool redraw );
+        size_t set( char32_t content, size_t pos, const Style& style, bool redraw );
+        size_t set( const std::u32string& content, size_t x, size_t y, const Style& style, bool redraw );
 
         /**
          * Flush the content to the terminal. Only differences are written.

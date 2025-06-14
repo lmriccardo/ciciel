@@ -16,6 +16,11 @@
 
 namespace ccl::cli::ui
 {
+    /**
+     * Low-level wrapper to the actual STDOUT and STDIN. It is a singleton.
+     * It setups the terminal by enabling and disabling raw mode, set styles
+     * using ANSI escape sequence and write content directly into the STDOUT.
+     */
     class Terminal
     {
     private:
@@ -36,16 +41,19 @@ namespace ccl::cli::ui
         void enableRawMode();  // Set the terminal to Raw mode for interactive UI
         void disableRawMode(); // Reset the terminal to its original state
         
-        void put( char32_t, size_t, size_t, const Style& ); // Put a char into the terminal
+        /**
+         * Put a char into the terminal at given position with given style.
+         */
+        void put( char32_t c, size_t x, size_t y, const Style& style );
 
         template <typename... _Args>
         int callCap(const char* capname, _Args&&... args) const;
 
         void reset() const;
-        void setStyle(const Style&) const;
-        void setCursorPosition( size_t, size_t ) const;
+        void setStyle(const Style& style) const;
+        void setCursorPosition( size_t x, size_t y ) const;
 
-        static void getWindowSize(struct winsize*);
+        static void getWindowSize(struct winsize* ws);
     };
 
     template <typename... _Args>

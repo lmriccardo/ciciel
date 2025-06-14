@@ -48,7 +48,6 @@ size_t ScreenBuffer::set(char32_t content, size_t pos, const Style &style, bool 
 
     if ( (content_wc = charwidth( &content )) == 0 )
     {
-        std::cerr << "Problem here ... " << std::endl;
         return 0;
     }
 
@@ -56,8 +55,6 @@ size_t ScreenBuffer::set(char32_t content, size_t pos, const Style &style, bool 
     if ( pos + content_wc - 1 >= size() ) return 0;
 
     const auto& cell = at( pos );
-
-    // std::wcerr << "DEBUG: " << (wchar_t)cell.m_char << " " << (wchar_t)content << std::endl;
 
     // Check that the current cell is different from the new content
     if ( redraw || (cell.m_char != content) || (cell.m_style != style) )
@@ -80,7 +77,7 @@ size_t ScreenBuffer::set(const std::u32string &content, size_t s_row, size_t s_c
     size_t content_size_cols = u32swidth( content );
 
     // Check that emojis and other type of UTF8 encoded are supported
-    if (content_size_cols < 1)
+    if (content_size_cols < 1 && content.size() > 0)
     {
         std::cerr << "Detected some unicode characters that are not supported. "
                   << "Consider running `setlocale(LC_ALL, '')`"

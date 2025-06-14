@@ -5,6 +5,12 @@
 
 namespace ccl::cli::ui
 {
+    // Vertical component alignment in a panel that uses HBox Layout management
+    enum class VerticalAlignment { Top, Center, Bottom, Stretch };
+
+    // Horizontal component alignment in a panel that uses VBox Layout management
+    enum class HorizontalAlignment { Left, Center, Right, Stretch };
+
     /**
      * Base class for all panels. It is used only for pointer
      * casting and downcasting.
@@ -13,6 +19,10 @@ namespace ccl::cli::ui
     {
     protected:
         std::unordered_map<std::string, Widget*> m_childIds;
+
+        VerticalAlignment   m_v_align = VerticalAlignment::Top;
+        HorizontalAlignment m_h_align = HorizontalAlignment::Left;
+
         bool m_needs_repacking = true;
 
     public:
@@ -30,5 +40,12 @@ namespace ccl::cli::ui
          * @param value True if needs repacking, False otherwise
          */
         void setRepacking( bool );
+        void setVerticalAlignment( VerticalAlignment );
+        void setHorizontalAlignment( HorizontalAlignment );
+
+        VerticalAlignment getVerticalAlignment() const;
+        HorizontalAlignment getHorizontalAlignment() const;
+
+        using Widget::draw;
     };
 };

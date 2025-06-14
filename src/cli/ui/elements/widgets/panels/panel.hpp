@@ -9,20 +9,24 @@
 
 namespace ccl::cli::ui
 {
+    /**
+     * A Panel Widget is a Container widget which is used to holds other
+     * widgets ( control / container ) and organize them in a given layout.
+     * Its layout manager is specified as its template parameter. There
+     * are 4 possible layouts: Horizontal, Vertical, Grid and Absolute.
+     */
     template <typename ContainerT, typename C = enable_if_container_t<ContainerT>>
     class PanelWidget : public PanelBase
     {
     protected:
         std::unique_ptr<ContainerT> m_container;
 
-        void drawBorder( ScreenBuffer& ) const override;
-
     public:
-        PanelWidget( const std::string&, size_t, size_t, size_t, size_t );
+        PanelWidget( const std::string& id, size_t w, size_t h, size_t x, size_t y );
         virtual ~PanelWidget() = default;
 
-        void addChild( Widget& ) override;
-        void removeChild( const std::string& ) override;
+        void addChild( Widget& child ) override;
+        void removeChild( const std::string& id ) override;
 
         /**
          * Apply the layout from the container to all children of
@@ -35,13 +39,8 @@ namespace ccl::cli::ui
          * Draw the content of the panel and its children into the buffer
          * @param buffer The screen buffer
          */
-        void draw( ScreenBuffer& ) const override;
+        void draw( ScreenBuffer& buffer ) const override;
     };
-
-    template <typename ContainerT, typename C>
-    inline void PanelWidget<ContainerT, C>::drawBorder( ScreenBuffer& ) const
-    {
-    }
 
     template <typename ContainerT, typename C>
     inline PanelWidget<ContainerT, C>::PanelWidget(
@@ -99,8 +98,18 @@ namespace ccl::cli::ui
     template <typename ContainerT, typename C>
     inline void PanelWidget<ContainerT, C>::draw(ScreenBuffer &buffer) const
     {
-        drawBorder(buffer);
+        if (!isVisible()) return;
+        this->PanelBase::draw( buffer );
+
+        // Draw all the children
+        for ( size_t idx = 0; idx < m_container->getNofChildren(); ++idx )
+        {
+            m_container->getChild(idx)->draw( buffer );
+        }
     }
 
+    /**
+     * A Panel with HBox layout manager
+     */
     using HBoxPanel = PanelWidget<HBoxContainer>;
 }

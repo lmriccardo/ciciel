@@ -8,7 +8,7 @@ void ccl::cli::ui::Label::drawPadding(ScreenBuffer & buffer) const
     size_t tpad = m_padding[0], bpad = m_padding[3];
     size_t maxvpad = ( tpad > bpad ) ? tpad : bpad;
 
-    auto [ cols, rows ] = getWinsizeNoPadding();
+    auto [ cols, rows ] = getContentWinsize();
     std::u32string v_pad_content( cols, U' ' );
     v_pad_content = u32pad( v_pad_content, rpad, lpad );
 
@@ -66,7 +66,7 @@ void Label::setContent(const std::u32string &content, const Style &style)
 {
     m_content = content;
     m_content_style = style;
-    setWinsize( (size_t)u32swidth( m_content ), 1 );
+    setContentWinsize( (size_t)u32swidth( m_content ), 1 );
     
     // Sets preferred size and minimum size
     setMinimumSize( m_winsize.ws_col, m_winsize.ws_row );
@@ -84,6 +84,11 @@ void Label::setContent(const std::string &content)
 void Label::setContent(const std::u32string &content)
 {
     setContent( content, DefaultStyle() );
+}
+
+Style &Label::getContentStyle()
+{
+    return m_content_style;
 }
 
 void Label::draw( ScreenBuffer& buffer ) const
