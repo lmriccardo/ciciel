@@ -91,7 +91,7 @@ std::u32string ccl::cli::ui::u32align(const std::u32string &content,
     // Compute the actual dimension of the string
     int actual_size = u32swidth( content );
 
-    if ( total_len <=1 || total_len < actual_size ) return content;
+    if ( total_len <=1 || total_len < (size_t)actual_size ) return content;
 
     if ( alignment == TextAlignment::Center )
     {

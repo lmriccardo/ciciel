@@ -18,6 +18,8 @@ void HBoxContainer::layout()
     // First we need to compute the total size given by all children
     for ( const auto& child: m_children )
     {
+        if ( !child->isVisible() ) continue;
+
         // First we need to add to the baseline width the actual width
         // of the current widget child, which the entire child plus
         // left and right margin
@@ -67,6 +69,8 @@ void HBoxContainer::layout()
         return new_child_width;
     };
 
+    size_t total_occupied_space = 0;
+
     if ( (space_to_distribute > 0 && total_flex_grow_factor > 0) || space_to_distribute < 0 )
     {
         if ( space_to_distribute < 0 && total_flex_shrink_factor == 0 )
@@ -77,9 +81,11 @@ void HBoxContainer::layout()
 
         for ( auto& child: m_children )
         {
+            if ( !child->isVisible() ) continue;
+
             // Here we need to take the width of the content, since the padding
             // must remain the same even if the widget grows
-            auto [width_no_pad, height_no_pad] = child->getContentWinsize();
+            auto [height, width] = child->getWinsize();
 
             // If the child is not flex in the case we are currently focused on
             // then we need to skip this widget and jumpt to the next one
@@ -87,7 +93,8 @@ void HBoxContainer::layout()
                    (space_to_distribute < 0 && child->getShrinkFactor() == 0)
                 || (space_to_distribute > 0 && child->getGrowFactor() == 0)
             ) {
-                continue;  
+                total_occupied_space += child->getWinsizeWithMargin().first;
+                continue;
             }
             
             // Get the current total factor ( either grow or shrink ) and the child one.
@@ -105,7 +112,7 @@ void HBoxContainer::layout()
             // Compute the new child width and set it
             size_t new_child_width = ComputeNewWidth( child_factor, 
                                                       curr_total_factor, 
-                                                      width_no_pad, 
+                                                      width, 
                                                       space_to_distribute );
 
             // Ensure that, in case of shrink scenario the minimum width for each
@@ -114,8 +121,16 @@ void HBoxContainer::layout()
             {
                 new_child_width = std::max( new_child_width, child->getMinimumSize().first );
             }
+
+            // Ensure that rigth-side margin is maintained
+            size_t r_margin = child->getMargin(Direction::Rigth);
+            if ( total_occupied_space + new_child_width + r_margin > panel_available_w - r_margin )
+            {
+                new_child_width = new_child_width - r_margin;
+            }
             
-            child->setContentWinsize( new_child_width, height_no_pad );
+            child->setWinsize( new_child_width, height );
+            total_occupied_space += child->getWinsizeWithMargin().first;
         }
     }
 
@@ -124,6 +139,8 @@ void HBoxContainer::layout()
     // account the margin of every child and the padding of the panel widget itself.
     for ( auto& child: m_children )
     {
+        if ( !child->isVisible() ) continue;
+
         auto [ child_w, child_h ] = child->getWinsizeWithMargin();
 
         // Compute Y position according to the vertical alignment

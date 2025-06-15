@@ -45,12 +45,22 @@ namespace ccl::cli::ui
         bool operator!=( const Style& ) const;
     };
 
-    // Defines a Default style 
+    // Defines a Default content style 
     inline const Style& DefaultStyle()
     {
         static Style style;
         style.Foreground( Colors::White );
         return style;
+    }
+
+    // Defines a default title style
+    inline const Style& DefaultTitleStyle()
+    {
+        static Style title_style;
+        title_style.Underlined( true ).Italic( true )
+                   .Foreground( Colors::White );
+
+        return title_style;
     }
 
     enum class CursorStyle

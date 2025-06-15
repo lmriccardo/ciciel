@@ -61,6 +61,7 @@
         "thread": "cpp",
         "locale": "cpp",
         "fstream": "cpp",
-        "cinttypes": "cpp"
+        "cinttypes": "cpp",
+        "map": "cpp"
     }
 }

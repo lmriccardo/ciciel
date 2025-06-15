@@ -54,6 +54,41 @@ void Widget::forceParentRepack()
     }
 }
 
+void Widget::drawMargin(ScreenBuffer & buffer) const
+{
+    auto draw = [&buffer]( size_t w, size_t h, size_t x, size_t y )
+    {
+        Style m_style = DefaultStyle();
+        std::u32string margin = std::u32string( w, U' ' );
+        for ( size_t m_idx = 0; m_idx < h; ++m_idx )
+        {
+            buffer.set( margin, y + m_idx, x, m_style, false );
+        }
+    };
+
+    size_t t_margin, b_margin, l_margin, r_margin;
+
+    if ( ( t_margin = getMargin( Direction::Top ) ) != 0 )
+    {
+        draw( getWinsizeWithMargin().first, t_margin, m_pos_x - 1, m_pos_y - t_margin );
+    }
+
+    if ( ( b_margin = getMargin( Direction::Bottom ) ) != 0 )
+    {
+        draw( getWinsizeWithMargin().first, b_margin, m_pos_x - 1, m_pos_y + getWinsize().first);
+    }
+
+    if ( ( l_margin = getMargin( Direction::Left ) ) != 0 )
+    {
+        draw( l_margin, getWinsize().first, m_pos_x - l_margin, m_pos_y);
+    }
+
+    if ( ( r_margin = getMargin( Direction::Rigth ) ) != 0 )
+    {
+        draw( r_margin, getWinsize().first, m_pos_x + getWinsize().second, m_pos_y);
+    }
+}
+
 Widget::Widget(const std::string &id, size_t w, size_t h, size_t x, size_t y, bool leaf) 
     : m_name(id), m_hidden(false), m_leaf(leaf),
       m_parent(nullptr), m_pos_x( x ), m_pos_y( y )
@@ -92,6 +127,8 @@ void Widget::setBorderStyle(const BorderStyle &style)
 
 void Widget::setVisibility(bool visibility)
 {
+    if ( m_hidden == !visibility ) return;
+
     m_hidden = !visibility;
     
     // When changing the visibility of the widget, it also changes
@@ -315,6 +352,11 @@ size_t Widget::getY() const
     return m_pos_y + getPadding( Direction::Top ) + m_border.getBorderWcwidth();
 }
 
+void Widget::setBorderVisibility(bool value)
+{
+    m_border.Show( value );
+}
+
 bool Widget::hasContent() const
 {
     return false;
@@ -332,4 +374,5 @@ void Widget::draw( ScreenBuffer& buffer ) const
 {
     if (!isVisible()) return; // Draw only if the current widget is visible
     drawBorder( buffer );
+    drawMargin( buffer );
 }

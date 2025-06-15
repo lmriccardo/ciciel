@@ -2,21 +2,32 @@
 
 using namespace ccl::cli::ui;
 
-PanelBase::PanelBase( const std::string &id, size_t w, size_t h,
-               size_t x, size_t y, bool leaf )
-    : Widget( id, w, h, x, y, leaf )
+void PanelBase::drawTitle(ScreenBuffer &buffer) const
 {
+    buffer.set( m_title, m_pos_y, m_pos_x + 3, m_title_style, false );
+}
 
+PanelBase::PanelBase(const std::string &id, size_t w, size_t h,
+                     size_t x, size_t y, bool leaf)
+    : Widget(id, w, h, x, y, leaf)
+{
+    m_title_style = DefaultTitleStyle();
 }
 
 void PanelBase::setRepacking( bool value )
 {
     m_needs_repacking = value;
+
     if ( m_needs_repacking && m_parent != nullptr )
     {
-        // Set the value to the parent widget (which
-        // is also a panel widget)
-        reinterpret_cast<PanelBase*>(m_parent)->setRepacking( value );
+        // Sets repacking also to children
+        auto panel_parent = reinterpret_cast<PanelBase*>(m_parent);
+        
+        if (!panel_parent->needsRepacking())
+        {
+            // Set the value to the parent widget (which is also a panel widget)
+            panel_parent->setRepacking( value );
+        }
     }
 }
 
@@ -30,12 +41,49 @@ void PanelBase::setHorizontalAlignment(HorizontalAlignment value)
     m_h_align = value;
 }
 
-VerticalAlignment ccl::cli::ui::PanelBase::getVerticalAlignment() const
+void PanelBase::setTitle(const std::u32string &title, const Style &style)
+{
+    m_title = title;
+    m_title_style = style;
+}
+
+void PanelBase::setTitle(const std::string &title, const Style &style)
+{
+    m_title = utf8to32(title);
+    m_title_style = style;
+}
+
+void PanelBase::setTitle(const std::u32string &title)
+{
+    setTitle( title, m_title_style );
+}
+
+void PanelBase::setTitle(const std::string &title)
+{
+    setTitle( title, m_title_style );
+}
+
+const std::u32string &PanelBase::getTitle() const
+{
+    return m_title;
+}
+
+Style &PanelBase::getTitleStyle()
+{
+    return m_title_style;
+}
+
+VerticalAlignment PanelBase::getVerticalAlignment() const
 {
     return m_v_align;
 }
 
-HorizontalAlignment ccl::cli::ui::PanelBase::getHorizontalAlignment() const
+HorizontalAlignment PanelBase::getHorizontalAlignment() const
 {
     return m_h_align;
+}
+
+bool PanelBase::needsRepacking() const
+{
+    return m_needs_repacking;
 }

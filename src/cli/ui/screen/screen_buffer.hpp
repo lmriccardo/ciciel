@@ -55,10 +55,10 @@ namespace ccl::cli::ui
          * does not fit into space, then a warning is raised and only a portion
          * of the string will be copied into the buffer.
          */
-        size_t set( const std::string& content, size_t x, size_t y, const Style& style, bool redraw );
-        size_t set( char32_t content, size_t x, size_t y, const Style& style, bool redraw );
+        size_t set( const std::string& content, size_t y, size_t x, const Style& style, bool redraw );
+        size_t set( char32_t content, size_t y, size_t x, const Style& style, bool redraw );
         size_t set( char32_t content, size_t pos, const Style& style, bool redraw );
-        size_t set( const std::u32string& content, size_t x, size_t y, const Style& style, bool redraw );
+        size_t set( const std::u32string& content, size_t y, size_t x, const Style& style, bool redraw );
 
         /**
          * Flush the content to the terminal. Only differences are written.

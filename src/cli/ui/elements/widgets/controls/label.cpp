@@ -43,6 +43,9 @@ Label::Label(const std::string &id, const std::u32string &text, size_t x, size_t
 
     // Sets preferred size and minimum size
     setMinimumSize( m_winsize.ws_col, m_winsize.ws_row );
+
+    // Hide the border
+    m_border.Show( false );
 }
 
 Label::Label(const std::string &id, const std::string &text, size_t x, size_t y)

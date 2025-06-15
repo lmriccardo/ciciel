@@ -69,6 +69,7 @@ namespace ccl::cli::ui
         virtual void drawBorder( ScreenBuffer& ) const;
         void drawRect( ScreenBuffer&, const char32_t*, size_t, size_t, const Style&) const;
         void forceParentRepack();
+        void drawMargin( ScreenBuffer& ) const;
     
     public:
         Widget( const std::string& id, size_t w, size_t h, size_t x, size_t y, bool leaf );
@@ -249,6 +250,8 @@ namespace ccl::cli::ui
         const BorderStyle& getBorderStyle() const;
         size_t getX() const;
         size_t getY() const;
+
+        void setBorderVisibility( bool value );
 
         /**
          * Check whether the input coordinates collides with the current object. 

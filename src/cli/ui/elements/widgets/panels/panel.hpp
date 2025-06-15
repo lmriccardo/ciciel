@@ -89,6 +89,7 @@ namespace ccl::cli::ui
         // Then call pack on all sub Panels of the current one
         for ( PanelBase* panel: m_container->template getChildrenByType<PanelBase>() )
         {
+            panel->setRepacking( true ); // Force repacking for children
             panel->pack();
         }
 
@@ -99,7 +100,8 @@ namespace ccl::cli::ui
     inline void PanelWidget<ContainerT, C>::draw(ScreenBuffer &buffer) const
     {
         if (!isVisible()) return;
-        this->PanelBase::draw( buffer );
+        this->PanelBase::draw( buffer ); // Draw the border
+        drawTitle( buffer ); // Draw the title
 
         // Draw all the children
         for ( size_t idx = 0; idx < m_container->getNofChildren(); ++idx )

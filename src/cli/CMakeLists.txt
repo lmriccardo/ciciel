@@ -16,6 +16,7 @@ add_library(ccl_Cli
     ui/elements/containers/hbox_container.cpp
     ui/elements/widgets/widget.cpp
     ui/elements/widgets/controls/label.cpp
+    ui/elements/widgets/controls/list.cpp
 
 )
 
