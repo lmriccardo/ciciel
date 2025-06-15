@@ -171,6 +171,14 @@ namespace ccl::cli::ui
         void setMinimumSize( size_t width, size_t height );
 
         /**
+         * Sets the minimum content size for the current widget.
+         * 
+         * @param width The minimum content width ( nof columns )
+         * @param height The minimum content height ( nof rows )
+         */
+        void setContentMinimumSize( size_t width, size_t height );
+
+        /**
          * Sets its grow factor.
          * @param factor The grow factor
          */

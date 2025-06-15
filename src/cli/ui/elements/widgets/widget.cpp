@@ -210,6 +210,13 @@ void Widget::setMinimumSize(size_t w, size_t h)
     m_min_size = { w, h };
 }
 
+void Widget::setContentMinimumSize(size_t width, size_t height)
+{
+    size_t b_size = static_cast<size_t>( m_border.getBorderWcwidth() );
+    m_min_size.first = width + 2 * b_size + m_padding[1] + m_padding[2];
+    m_min_size.second = height + 2 + m_padding[0] + m_padding[3];
+}
+
 void Widget::setGrowFactor(int factor)
 {
     if ( factor < 0 )

@@ -30,46 +30,61 @@ void List::drawPadding( ScreenBuffer& buffer ) const
     }
 }
 
-List::List(const std::string &id, const elem_t &elems, size_t x, size_t y)
-    : ContentWidget( id, 1, 1, x, y, true )
+List::List(const std::string &id, const elem_t &elems, size_t x, size_t y, size_t max_size)
+    : ContentWidget( id, 1, 1, x, y, true ), m_max_nof_elems( max_size )
 {
-    m_content = elems;
+    m_content_style.resize( max_size );
+    m_content.resize( max_size );
+    std::copy( elems.begin(), elems.end(), m_content.begin() );
 
     // Select the maximum element size to set the content size
     size_t max_elem_size = 0;
-    for ( auto element: elems )
+    size_t idx = 0;
+    for ( ; idx < elems.size(); ++idx )
     {
-        size_t curr_size = static_cast<size_t>(u32swidth(element));
+        size_t curr_size = static_cast<size_t>(u32swidth(elems[idx]));
         if ( curr_size > max_elem_size ) max_elem_size = curr_size;
-
-        m_content_style.push_back( DefaultStyle() );
+        m_content_style[idx] = DefaultStyle();
     }
 
+    m_curr_idx = idx;
+
     setContentWinsize( max_elem_size, elems.size() );
+    setContentMinimumSize( max_elem_size, elems.size() );
 
     m_content_alignment = TextAlignment::Left;
 }
 
-List::List(const std::string &id, size_t x, size_t y)
-    : List( id, {}, x, y )
+List::List(const std::string &id, size_t x, size_t y, size_t max_size)
+    : List( id, {}, x, y, max_size )
 {
 }
 
 List &List::addElement(const std::u32string &element, const Style &style)
 {
-    m_content.push_back( element );
-    m_content_style.push_back( style );
+    size_t content_idx = ( m_curr_idx + 1 ) % m_max_nof_elems;
+    m_content[content_idx] = element;
+    m_content_style[content_idx] = style;
 
     size_t content_w = getContentWinsize().first;
     size_t element_w;
+    bool w_changed = false;
 
     if ( (element_w = static_cast<size_t>(u32swidth(element))) > content_w )
     {
         content_w = element_w;
+        w_changed = true;
     }
 
-    setContentWinsize( content_w, getContentWinsize().second + 1 );
-    forceParentRepack(); // window size of the widget has changed
+    setContentWinsize( content_w, m_content.size() );
+    setContentMinimumSize( content_w, m_content.size() );
+
+    if ( m_curr_idx + 1 < m_max_nof_elems || w_changed )
+    {
+        forceParentRepack(); // window size of the widget has changed
+    }
+
+    m_curr_idx = ( m_curr_idx + 1 ) % m_max_nof_elems; // Step to the next insert position
 
     return *this;
 }
@@ -92,6 +107,11 @@ List &List::addElement(const std::string &element)
 void List::setTextAlignment(TextAlignment value)
 {
     m_content_alignment = value;
+}
+
+size_t List::getMaxNofElements() const
+{
+    return m_max_nof_elems;
 }
 
 void List::draw( ScreenBuffer& buffer ) const

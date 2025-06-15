@@ -30,7 +30,7 @@ int main()
                        .Bold( true )
                        .Italic( true );
 
-    List l1( "List1", 0, 0 );
+    List l1( "List1", 0, 0, 10 );
     l1.addElement( "Element 1" )
       .addElement( "Element 2 longer than 1" )
       .addElement( "Element 3 smaller" )
@@ -40,7 +40,7 @@ int main()
     l1.setMargin( 1, Direction::Left );
     l1.setMargin( 1, Direction::Rigth );
     l1.setGrowFactor( 0 );
-    l1.setTextAlignment( TextAlignment::Rigth );
+    l1.setTextAlignment( TextAlignment::Center );
     l1.setVisibility( false );
 
     HBoxPanel p1( "SubPanel1", 0, 0, 0, 0 );
@@ -72,11 +72,15 @@ int main()
     // Draw the UI
     screen.draw();
 
-    std::this_thread::sleep_for( std::chrono::seconds(1) );
-    l1.addElement( "Ciao io sono Ciao" );
+    for ( int i = 0; i < 20; ++i )
+    {
+        std::this_thread::sleep_for( std::chrono::milliseconds(500) );
 
-    // Draw the UI
-    screen.draw();
+        l1.addElement( "New Element " + std::to_string( i ) );
+
+        // Draw the UI
+        screen.draw();
+    }
 
     return 0;
 }
