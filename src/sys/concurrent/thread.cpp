@@ -23,7 +23,7 @@ bool Thread::isJoinable() const
     return m_thread != nullptr && m_thread->joinable() && !m_daemon;
 }
 
-bool Thread::isDeamon() const
+bool Thread::isDaemon() const
 {
     return m_daemon;
 }
@@ -60,9 +60,10 @@ std::thread::id Thread::getId() const
 
 void Thread::join()
 {
-    if ( !m_cancelled && isJoinable() )
+    if ( isJoinable() )
     {
         m_thread->join();
+        tearDown();
     }
 }
 
@@ -83,8 +84,8 @@ void Thread::start()
         m_id = m_thread->get_id();
         m_started.store(true);
 
-        // Detach if the thread is a deamon or not
-        if ( isDeamon() )
+        // Detach if the thread is a daemon or not
+        if ( isDaemon() )
         {
             detach();
         }
@@ -109,7 +110,6 @@ void Thread::stop()
 {
     cancel();
     join();
-    tearDown();
 }
 
 void Thread::setAffinity(int cpu)
