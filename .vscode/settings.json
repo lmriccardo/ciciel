@@ -59,6 +59,14 @@
         "semaphore": "cpp",
         "stop_token": "cpp",
         "thread": "cpp",
-        "locale": "cpp"
+        "locale": "cpp",
+        "any": "cpp",
+        "charconv": "cpp",
+        "chrono": "cpp",
+        "map": "cpp",
+        "set": "cpp",
+        "format": "cpp",
+        "span": "cpp",
+        "variant": "cpp"
     }
 }

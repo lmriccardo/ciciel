@@ -72,7 +72,7 @@ namespace ccl::sys::concurrent
         virtual ~Thread();
 
         bool isJoinable () const;
-        bool isDeamon   () const;
+        bool isDaemon   () const;
         bool isStarted  () const;
         bool isCancelled() const;
 

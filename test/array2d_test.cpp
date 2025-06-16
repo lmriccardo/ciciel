@@ -1,7 +1,24 @@
 #include <iostream>
+#include <iomanip>
 #include <data_structures/grids/array2d.hpp>
 
 using namespace ccl::ds::grids;
+
+template <size_t R, size_t C>
+void printOutGrid(Array2D<int, R, C>& grid)
+{
+    size_t col = grid.size(1);
+    std::cout << std::endl << "Array2D:" << std::endl;
+    for(size_t idx = 0; idx < grid.size(); ++idx)
+    {
+        if(idx % col == 0 && idx > 0)
+            std::cout << std::endl;
+
+        std::cout << std::setw(3) << grid[idx] << " ";
+    }
+
+    std::cout << std::endl;
+}
 
 int main()
 {
@@ -20,27 +37,15 @@ int main()
     for ( size_t i = 0; i < grid.size(); ++i )
         grid.set( static_cast<int>(i + 1), i );
 
-    auto it = grid.begin();
-
-    for ( ; it != grid.end(); ++it )
-    {
-        std::cout << "Element " << it.pos() << " : " << *it << std::endl;
-    }
-
+    printOutGrid(grid);
+    
     grid.transpose();
-
+    
+    printOutGrid(grid);
+    
     std::cout << std::endl;
-
-    it = grid.begin();
-
-    for ( ; it != grid.end(); ++it )
-    {
-        auto el = *it;
-        std::cout << "Element " << it.pos() << " : " << el << std::endl;
-    }
-
-    std::cout << "Nof Columns: " << grid.size( 1 ) << std::endl;
-    std::cout << "Nof Rows: " << grid.size( 0 ) << std::endl;
+    std::cout << "Nof Columns:\t" << grid.size( 1 ) << std::endl;
+    std::cout << "Nof Rows:\t" << grid.size( 0 ) << std::endl;
 
     try
     {
@@ -56,13 +61,7 @@ int main()
     grid.transpose();
     Array2D<int, 3, 4> grid_t = grid.deepTranspose();
 
-    auto it2 = grid_t.begin();
-
-    for ( ; it2 != grid_t.end(); ++it2 )
-    {
-        auto el = *it2;
-        std::cout << "Element " << it2.pos() << " : " << el << std::endl;
-    }
+    printOutGrid(grid_t);
 
     return 0;
 }

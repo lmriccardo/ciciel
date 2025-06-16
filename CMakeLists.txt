@@ -10,6 +10,7 @@ add_compile_options(-Wall -Wextra -pedantic -lrt -lpthread)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_compile_options(-O0)
+    # add_compile_options(-fdiagnostics-color=always)
 elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
     add_compile_options(-O3)
 endif()
