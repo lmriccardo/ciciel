@@ -140,8 +140,42 @@ void Widget::setVisibility(bool visibility)
 
 void Widget::setWinsize( size_t width, size_t height )
 {
+    // We need to maintain the minimum size
+    if ( width < getMinimumSize().first )
+    {
+        width = getMinimumSize().first;
+    }
+
+    if ( height < getMinimumSize().second )
+    {
+        height = getMinimumSize().second;
+    }
+
     m_winsize.ws_row = height;
     m_winsize.ws_col = width;
+    m_need_clear = true;
+}
+
+void Widget::setWidth(size_t w)
+{
+    if ( w < getMinimumSize().first )
+    {
+        w = getMinimumSize().first;
+    }
+
+    m_winsize.ws_col = w;
+    m_need_clear = true;
+}
+
+void Widget::setHeight(size_t h)
+{
+    if ( h < getMinimumSize().second )
+    {
+        h = getMinimumSize().second;
+    }
+
+    m_winsize.ws_row = h;
+    m_need_clear = true;
 }
 
 void Widget::setContentWinsize(size_t width, size_t height)
@@ -150,8 +184,18 @@ void Widget::setContentWinsize(size_t width, size_t height)
     size_t w_size = width + 2 * b_size + m_padding[1] + m_padding[2];
     size_t h_size = height + 2 + m_padding[0] + m_padding[3];
 
-    m_winsize.ws_row = h_size;
-    m_winsize.ws_col = w_size;
+    setWinsize( w_size, h_size );
+    m_need_clear = true;
+}
+
+void Widget::setContentWidth(size_t width)
+{
+    setContentWinsize( width, getContentWinsize().second );
+}
+
+void Widget::setContentHeight(size_t height)
+{
+    setContentWinsize( getContentWinsize().first, height );
 }
 
 void Widget::setStartPosition(size_t s_x, size_t s_y)
@@ -159,7 +203,6 @@ void Widget::setStartPosition(size_t s_x, size_t s_y)
     m_pos_x = s_x;
     m_pos_y = s_y;
 }
-
 
 void Widget::setPadding(const std::array<size_t, 4> &padding)
 {
@@ -185,6 +228,8 @@ void Widget::setPadding(size_t value, Direction direction)
     // We need to force the parent repacking because the
     // size of the current label has changed
     forceParentRepack();
+
+    m_need_clear = true;
 }
 
 void Widget::setMargin(const std::array<size_t, 4> &margin)
@@ -203,6 +248,8 @@ void Widget::setMargin(size_t value, Direction direction)
     // We need to force the parent repacking because the
     // size of the current label has changed
     forceParentRepack();
+
+    m_need_clear = true;
 }
 
 void Widget::setMinimumSize(size_t w, size_t h)
@@ -377,9 +424,29 @@ bool Widget::isColliding( size_t x, size_t y ) const
     return (( x >= x_s && x <= x_e ) && ( y >= y_s && y <= y_e ));
 }
 
-void Widget::draw( ScreenBuffer& buffer ) const
+void Widget::clear( ScreenBuffer& buffer )
+{
+    if (m_need_clear)
+    {
+        auto [ x_e, y_s ] = getVertexCoord( Vertex::TR );
+        auto [ x_s, y_e ] = getVertexCoord( Vertex::BL );
+
+        std::u32string content( x_e - x_s - 1, U' ' );
+        const Style& s = DefaultStyle();
+
+        for ( size_t y_idx = 0; y_idx < (y_e - y_s) - 1; ++y_idx )
+        {
+            buffer.set(content, m_pos_y + 1 + y_idx, m_pos_x + 1, s, false);
+        }
+
+        m_need_clear = false;
+    }
+}
+
+void Widget::draw( ScreenBuffer& buffer )
 {
     if (!isVisible()) return; // Draw only if the current widget is visible
     drawBorder( buffer );
     drawMargin( buffer );
+    clear( buffer );
 }

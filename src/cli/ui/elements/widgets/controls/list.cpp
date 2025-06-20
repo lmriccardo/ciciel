@@ -114,7 +114,7 @@ size_t List::getMaxNofElements() const
     return m_max_nof_elems;
 }
 
-void List::draw( ScreenBuffer& buffer ) const
+void List::draw( ScreenBuffer& buffer )
 {
     if (!isVisible()) return;
     this->ContentWidget<elem_t>::draw( buffer ); // Draw the border if visible

@@ -5,11 +5,7 @@
 
 namespace ccl::cli::ui
 {
-    // Vertical component alignment in a panel that uses HBox Layout management
-    enum class VerticalAlignment { Top, Center, Bottom, Stretch };
-
-    // Horizontal component alignment in a panel that uses VBox Layout management
-    enum class HorizontalAlignment { Left, Center, Right, Stretch };
+    enum class LayoutAlignment { Start, Center, End, Streatch };
 
     /**
      * Base class for all panels. It is used only for pointer
@@ -17,13 +13,20 @@ namespace ccl::cli::ui
      */
     class PanelBase : public Widget
     {
+    private:
+        constexpr static size_t TITLE_OFFSET = 3;    
+
     protected:
         std::unordered_map<std::string, Widget*> m_childIds;
+
         std::u32string m_title;
         Style          m_title_style;
+        size_t         m_parent_idx;
+        
+        int m_children_idx = -1;
 
-        VerticalAlignment   m_v_align = VerticalAlignment::Top;
-        HorizontalAlignment m_h_align = HorizontalAlignment::Left;
+        LayoutAlignment m_v_align = LayoutAlignment::Start;
+        LayoutAlignment m_h_align = LayoutAlignment::Start;
 
         bool m_needs_repacking = true;
 
@@ -36,6 +39,7 @@ namespace ccl::cli::ui
         virtual void addChild( Widget& widget ) = 0;
         virtual void removeChild( const std::string& id ) = 0;
         virtual void pack() = 0;
+        virtual void prepack() = 0;
 
         /**
          * If the current panel needs repacking. In case the given value
@@ -44,19 +48,23 @@ namespace ccl::cli::ui
          * @param value True if needs repacking, False otherwise
          */
         void setRepacking( bool value );
-        void setVerticalAlignment( VerticalAlignment value );
-        void setHorizontalAlignment( HorizontalAlignment value );
+        void setVerticalAlignment( LayoutAlignment value );
+        void setHorizontalAlignment( LayoutAlignment value );
 
         void setTitle( const std::u32string& title, const Style& style );
         void setTitle( const std::string& title, const Style& style );
         void setTitle( const std::u32string& title );
         void setTitle( const std::string& title );
 
+        void setParent( Widget& parent );
+
         const std::u32string& getTitle() const;
         Style& getTitleStyle();
 
-        VerticalAlignment getVerticalAlignment() const;
-        HorizontalAlignment getHorizontalAlignment() const;
+        LayoutAlignment getVerticalAlignment() const;
+        LayoutAlignment getHorizontalAlignment() const;
+
+        int getCurrentChildIndex() const;
 
         bool needsRepacking() const;
 

@@ -8,12 +8,12 @@ class A {};
 int main()
 {
     // Initialize the Screen. This also initializes the Terminal singleton.
-    Screen screen( Layout::HorizontalLayout );
+    Screen screen( Layout::VerticalLayout );
 
     // --- Step 1: Explicitly clear the screen ---
     // This ensures a clean canvas for your label.
     screen.clear();
-    screen.setVerticalAlignment( VerticalAlignment::Top );
+    screen.setVerticalAlignment( LayoutAlignment::Start );
 
     // Create and draw your Label
     Label l( "Label1", U"Ciao 👋", 0, 0 );

@@ -3,7 +3,8 @@
 #include <memory>
 #include <cstring>
 #include <cli/ui/elements/widgets/panels/panel_base.hpp>
-#include <cli/ui/elements/widgets/panels/panel.hpp>
+#include <cli/ui/elements/widgets/panels/hbox_panel.hpp>
+#include <cli/ui/elements/widgets/panels/vbox_panel.hpp>
 #include "terminal.hpp"
 #include "screen_buffer.hpp"
 
@@ -88,8 +89,8 @@ namespace ccl::cli::ui
         void setLayout( Layout layout );
         const Layout& getLayout() const;
 
-        void setVerticalAlignment( VerticalAlignment value );
-        void setHorizontalAlignment( HorizontalAlignment value );
+        void setVerticalAlignment( LayoutAlignment value );
+        void setHorizontalAlignment( LayoutAlignment value );
         
         /**
          * Move the cursor of the given offset.

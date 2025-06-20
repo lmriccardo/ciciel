@@ -61,8 +61,9 @@ namespace ccl::cli::ui
         std::array<size_t, 4> m_padding; // Internal space between content and border
         std::array<size_t, 4> m_margin;  // External space between widget and other objects
 
-        int m_flexGrow   = 0; // Flex grow factor ( 0 = can not grow )
-        int m_flexShrink = 0; // Flex shrink factor ( 0 = can not shrink )
+        int m_flexGrow    = 0; // Flex grow factor ( 0 = can not grow )
+        int m_flexShrink  = 0; // Flex shrink factor ( 0 = can not shrink )
+        bool m_need_clear = true; // The first time ever the widget is drawn it must be cleared
 
         std::pair<size_t, size_t> m_min_size; // Widget minimum size when shrinking
 
@@ -114,6 +115,9 @@ namespace ccl::cli::ui
          */
         void setWinsize( size_t width, size_t height );
 
+        void setWidth( size_t w );
+        void setHeight( size_t h );
+
         /**
          * Set the new content window size. Therefore, input values
          * must represent the two dimension of the content, not the
@@ -124,6 +128,18 @@ namespace ccl::cli::ui
          * @param height The size in lines/rows of the content window
          */
         void setContentWinsize( size_t width, size_t height );
+
+        /**
+         * Set the content width of the widget.
+         * @param width The width to set with no padding and border
+         */
+        void setContentWidth( size_t width );
+
+        /**
+         * Set the content height of the widget.
+         * @param height The height to set with no padding and border
+         */
+        void setContentHeight( size_t height );
 
         /**
          * Set the padding for all directions. In particular the input array
@@ -262,6 +278,11 @@ namespace ccl::cli::ui
         void setBorderVisibility( bool value );
 
         /**
+         * Clear the widget.
+         */
+        void clear( ScreenBuffer& buffer );
+
+        /**
          * Check whether the input coordinates collides with the current object. 
          * In particular if the are inside the bounds of the current render.
          * 
@@ -275,7 +296,7 @@ namespace ccl::cli::ui
         /**
          * Write the widget into the Screen Buffer
          */
-        virtual void draw( ScreenBuffer& ) const;
+        virtual void draw( ScreenBuffer& );
     };
 
     template <typename T>

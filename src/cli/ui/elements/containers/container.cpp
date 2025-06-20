@@ -2,8 +2,8 @@
 
 using namespace ccl::cli::ui;
 
-Container::Container( PanelBase* panelptr )
-    : m_panel( panelptr )
+Container::Container(PanelBase *panelptr)
+    : m_panel(panelptr)
 {
 }
 

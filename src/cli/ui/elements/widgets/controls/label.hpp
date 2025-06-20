@@ -33,6 +33,6 @@ namespace ccl::cli::ui
 
         Style& getContentStyle();
 
-        void draw( ScreenBuffer& buffer ) const override;
+        void draw( ScreenBuffer& buffer ) override;
     };
 }

@@ -6,6 +6,13 @@
 
 namespace ccl::cli::ui
 {
+    /**
+     * This widget represents a dynamic list of labels. None of the element is 
+     * focusable or clickable. It is dynamic since the list can have a variadic 
+     * number of elements. However, it is also possible to decide when constructing
+     * the maximum number of elements of the list and upon exceeding it acts like
+     * a circular buffer.
+     */
     class List : public ContentWidget<std::vector<std::u32string>>
     {
     private:
@@ -35,6 +42,6 @@ namespace ccl::cli::ui
         void setTextAlignment( TextAlignment value );
         size_t getMaxNofElements() const;
 
-        void draw( ScreenBuffer& buffer ) const override;
+        void draw( ScreenBuffer& buffer ) override;
     };
 }

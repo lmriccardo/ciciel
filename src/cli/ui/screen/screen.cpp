@@ -19,8 +19,9 @@ void Screen::layoutSelection(Layout layout)
     {
         case Layout::HorizontalLayout:
             m_panel = createPanel<HBoxPanel>(); break;
-        case Layout::GridLayout:
         case Layout::VerticalLayout:
+            m_panel = createPanel<VBoxPanel>(); break;
+        case Layout::GridLayout:
         case Layout::AbsoluteLayout:
         default:
             fallBack();
@@ -83,12 +84,12 @@ void Screen::setLayout(Layout layout)
     layoutSelection(layout);
 }
 
-void Screen::setVerticalAlignment( VerticalAlignment value )
+void Screen::setVerticalAlignment( LayoutAlignment value )
 {
     m_panel->setVerticalAlignment( value );
 }
 
-void Screen::setHorizontalAlignment( HorizontalAlignment value )
+void Screen::setHorizontalAlignment( LayoutAlignment value )
 {
     m_panel->setHorizontalAlignment( value );
 }

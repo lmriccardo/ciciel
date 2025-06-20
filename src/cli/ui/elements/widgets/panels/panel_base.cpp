@@ -4,7 +4,7 @@ using namespace ccl::cli::ui;
 
 void PanelBase::drawTitle(ScreenBuffer &buffer) const
 {
-    buffer.set( m_title, m_pos_y, m_pos_x + 3, m_title_style, false );
+    buffer.set( m_title, m_pos_y, m_pos_x + TITLE_OFFSET, m_title_style, false );
 }
 
 PanelBase::PanelBase(const std::string &id, size_t w, size_t h,
@@ -31,12 +31,12 @@ void PanelBase::setRepacking( bool value )
     }
 }
 
-void PanelBase::setVerticalAlignment(VerticalAlignment value)
+void PanelBase::setVerticalAlignment(LayoutAlignment value)
 {
     m_v_align = value;
 }
 
-void PanelBase::setHorizontalAlignment(HorizontalAlignment value)
+void PanelBase::setHorizontalAlignment(LayoutAlignment value)
 {
     m_h_align = value;
 }
@@ -45,12 +45,16 @@ void PanelBase::setTitle(const std::u32string &title, const Style &style)
 {
     m_title = title;
     m_title_style = style;
+
+    // When setting the title we should also change the minimum size
+    // for the panel width, otherwise it might go out of bound.
+    size_t titleSize = TITLE_OFFSET + u32swidth( title );
+    setMinimumSize( titleSize + TITLE_OFFSET, getMinimumSize().second );
 }
 
 void PanelBase::setTitle(const std::string &title, const Style &style)
 {
-    m_title = utf8to32(title);
-    m_title_style = style;
+    setTitle( utf8to32(title), style );
 }
 
 void PanelBase::setTitle(const std::u32string &title)
@@ -63,6 +67,13 @@ void PanelBase::setTitle(const std::string &title)
     setTitle( title, m_title_style );
 }
 
+void PanelBase::setParent( Widget& parent )
+{
+    this->Widget::setParent( parent );
+    auto ptr = static_cast<PanelBase*>( &parent );
+    m_parent_idx = ptr->getCurrentChildIndex();
+}
+
 const std::u32string &PanelBase::getTitle() const
 {
     return m_title;
@@ -73,14 +84,19 @@ Style &PanelBase::getTitleStyle()
     return m_title_style;
 }
 
-VerticalAlignment PanelBase::getVerticalAlignment() const
+LayoutAlignment PanelBase::getVerticalAlignment() const
 {
     return m_v_align;
 }
 
-HorizontalAlignment PanelBase::getHorizontalAlignment() const
+LayoutAlignment PanelBase::getHorizontalAlignment() const
 {
     return m_h_align;
+}
+
+int PanelBase::getCurrentChildIndex() const
+{
+    return m_children_idx;
 }
 
 bool PanelBase::needsRepacking() const

@@ -94,7 +94,7 @@ Style &Label::getContentStyle()
     return m_content_style;
 }
 
-void Label::draw( ScreenBuffer& buffer ) const
+void Label::draw( ScreenBuffer& buffer )
 {
     if (!isVisible()) return;
     this->ContentWidget<std::u32string>::draw( buffer ); // Draw the border if visible

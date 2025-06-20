@@ -4,7 +4,6 @@
 #include <unordered_map>
 #include <sstream>
 #include <cli/ui/elements/containers/container.hpp>
-#include <cli/ui/elements/containers/hbox_container.hpp>
 #include "panel_base.hpp"
 
 namespace ccl::cli::ui
@@ -39,7 +38,7 @@ namespace ccl::cli::ui
          * Draw the content of the panel and its children into the buffer
          * @param buffer The screen buffer
          */
-        void draw( ScreenBuffer& buffer ) const override;
+        void draw( ScreenBuffer& buffer ) override;
     };
 
     template <typename ContainerT, typename C>
@@ -64,9 +63,15 @@ namespace ccl::cli::ui
             throw std::runtime_error( ss.str() );
         }
 
-        w.setParent( *this ); // Set the parent for the given widget
+        if ( auto ptr = dynamic_cast<PanelBase*>( &w ) ) {
+            ptr->setParent( *this );
+        } else {
+            w.setParent( *this ); // Set the parent for the given widget
+        }
+
         m_childIds.insert( { w_name, &w } ); // Insert into the mapping
         m_container->addChild( &w ); // Add the child to the container
+        m_children_idx++;
     }
 
     template <typename ContainerT, typename C>
@@ -83,6 +88,8 @@ namespace ccl::cli::ui
     {
         if ( !m_needs_repacking ) return;
 
+        prepack(); // Prepare panel and subpanel for packing
+
         // Apply the layout to all its children
         m_container->layout();
 
@@ -97,7 +104,7 @@ namespace ccl::cli::ui
     }
 
     template <typename ContainerT, typename C>
-    inline void PanelWidget<ContainerT, C>::draw(ScreenBuffer &buffer) const
+    inline void PanelWidget<ContainerT, C>::draw(ScreenBuffer &buffer)
     {
         if (!isVisible()) return;
         this->PanelBase::draw( buffer ); // Draw the border
@@ -109,9 +116,4 @@ namespace ccl::cli::ui
             m_container->getChild(idx)->draw( buffer );
         }
     }
-
-    /**
-     * A Panel with HBox layout manager
-     */
-    using HBoxPanel = PanelWidget<HBoxContainer>;
 }
