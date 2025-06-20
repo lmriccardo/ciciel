@@ -1,38 +1,22 @@
 #pragma once
 
-#include <cli/ui/utils/string.hpp>
-#include <cli/ui/style/style.hpp>
-#include "../widget.hpp"
+#include <cli/ui/elements/widgets/base/string_content_widget.hpp>
 
 namespace ccl::cli::ui
 {
     /**
-     * A Label is a particular content widget that shows a static
-     * text that cannot be changed at runtime by the user using
-     * user input. It can change as side effects of other operations
-     * but does not accept user input. Its width and heigth are
-     * decided based on the current text content of the widget. 
+     * A Label is a particular content widget derived from StringContentWidget
+     * class. While in the base class the entire content, i.e., actual text +
+     * text style, is static, in this case at least the style can change. This
+     * is actually the only difference between this and its super class. 
      */
-    class Label : public ContentWidget<std::u32string>
+    class Label : public StringContentWidget
     {
-    private:
-        Style m_content_style; // The content style
-
-        void drawPadding( ScreenBuffer& ) const;
-
     public:
-        Label( const std::string& id, const std::u32string& content, size_t x, size_t y );
-        Label( const std::string& id, const std::string& content, size_t x, size_t y );
+        using StringContentWidget::StringContentWidget;
         virtual ~Label() = default;
 
         void setContentStyle( const Style& style );
-        void setContent     ( const std::string& content, const Style& style );
-        void setContent     ( const std::u32string& content, const Style& style );
-        void setContent     ( const std::string& content );
-        void setContent     ( const std::u32string& content );
-
         Style& getContentStyle();
-
-        void draw( ScreenBuffer& buffer ) override;
     };
 }

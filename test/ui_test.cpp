@@ -8,7 +8,7 @@ class A {};
 int main()
 {
     // Initialize the Screen. This also initializes the Terminal singleton.
-    Screen screen( Layout::VerticalLayout );
+    Screen screen( Layout::HorizontalLayout );
 
     // --- Step 1: Explicitly clear the screen ---
     // This ensures a clean canvas for your label.
@@ -50,12 +50,16 @@ int main()
     p1.setMargin( 1, Direction::Left );
     p1.setMargin( 1, Direction::Rigth );
 
-    Label l3( "Label3", "Hey!!!", 0, 0 );
-    l3.setMargin( { 0, 1, 1, 0 } );
-    l3.setGrowFactor( 1 );
-    l3.setShrinkFactor( 1 );
+    // Label l3( "Label3", "Hey!!!", 0, 0 );
+    // l3.setMargin( { 0, 1, 1, 0 } );
+    // l3.setGrowFactor( 1 );
+    // l3.setShrinkFactor( 1 );
 
-    p1.addChild( l3 );
+    // p1.addChild( l3 );
+
+    Button b( "Button1", "Click", 0, 0 );
+    b.setMargin( { 0, 1, 1, 0 } );
+    p1.addChild( b );
     
     // Add the label to the screen main panel
     screen.addWidget( l );

@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include <sstream>
 #include <cli/ui/elements/containers/container.hpp>
-#include "panel_base.hpp"
+#include <cli/ui/elements/widgets/base/panel_base.hpp>
 
 namespace ccl::cli::ui
 {

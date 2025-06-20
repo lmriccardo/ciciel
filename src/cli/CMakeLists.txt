@@ -10,18 +10,22 @@ add_library(ccl_Cli
     ui/utils/string.cpp
     ui/screen/terminal.cpp
     ui/screen/screen_buffer.cpp
-    ui/screen/screen.cpp
-    ui/elements/widgets/panels/panel_base.cpp
-    ui/elements/containers/container.cpp
-    ui/elements/containers/flow_container.cpp
-    ui/elements/containers/hbox_container.cpp
-    ui/elements/containers/vbox_container.cpp
     
-    ui/elements/widgets/widget.cpp
+    ui/elements/widgets/base/widget.cpp
+    ui/elements/widgets/base/panel_base.cpp
+    ui/elements/widgets/base/string_content_widget.cpp
     ui/elements/widgets/panels/hbox_panel.cpp
     ui/elements/widgets/panels/vbox_panel.cpp
     ui/elements/widgets/controls/label.cpp
     ui/elements/widgets/controls/list.cpp
+    ui/elements/widgets/controls/button.cpp
+
+    ui/elements/containers/container.cpp
+    ui/elements/containers/flow_container.cpp
+    ui/elements/containers/hbox_container.cpp
+    ui/elements/containers/vbox_container.cpp
+
+    ui/screen/screen.cpp
 )
 
 target_link_libraries( ccl_Cli PRIVATE 

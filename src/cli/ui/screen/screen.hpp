@@ -2,7 +2,7 @@
 
 #include <memory>
 #include <cstring>
-#include <cli/ui/elements/widgets/panels/panel_base.hpp>
+#include <cli/ui/elements/widgets/base/panel_base.hpp>
 #include <cli/ui/elements/widgets/panels/hbox_panel.hpp>
 #include <cli/ui/elements/widgets/panels/vbox_panel.hpp>
 #include "terminal.hpp"

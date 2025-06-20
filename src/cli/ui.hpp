@@ -5,3 +5,4 @@
 #include "ui/elements/widgets/panels/vbox_panel.hpp"
 #include "ui/elements/widgets/controls/label.hpp"
 #include "ui/elements/widgets/controls/list.hpp"
+#include "ui/elements/widgets/controls/button.hpp"

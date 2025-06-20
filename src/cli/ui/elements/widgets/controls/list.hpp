@@ -2,7 +2,7 @@
 
 #include <vector>
 #include <string>
-#include <cli/ui/elements/widgets/widget.hpp>
+#include <cli/ui/elements/widgets/base/widget.hpp>
 
 namespace ccl::cli::ui
 {

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <unordered_map>
-#include <cli/ui/elements/widgets/widget.hpp>
+#include "widget.hpp"
 
 namespace ccl::cli::ui
 {

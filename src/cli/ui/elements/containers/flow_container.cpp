@@ -1,5 +1,5 @@
 #include "flow_container.hpp"
-#include <cli/ui/elements/widgets/panels/panel_base.hpp>
+#include <cli/ui/elements/widgets/base/panel_base.hpp>
 
 using namespace ccl::cli::ui;
 
@@ -122,9 +122,9 @@ void FlowContainer::layout()
             // border of the panel.
             size_t margin_s = getMainMarginSizeEnd( *child );
             int overflow_space = (total_occupied_space + new_child_main_size + margin_s) - panel_available_main;
-            if ( overflow_space > 0 )
+            if ( overflow_space >= 0 )
             {
-                new_child_main_size = new_child_main_size - overflow_space;
+                new_child_main_size = new_child_main_size - overflow_space - margin_s;
             }
 
             // Ensure that, in case of shrink scenario the minimum main size for each

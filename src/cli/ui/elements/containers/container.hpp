@@ -3,8 +3,8 @@
 #include <vector>
 #include <memory>
 #include <type_traits>
-#include <cli/ui/elements/widgets/widget.hpp>
-#include <cli/ui/elements/widgets/panels/panel_base.hpp>
+#include <cli/ui/elements/widgets/base/widget.hpp>
+#include <cli/ui/elements/widgets/base/panel_base.hpp>
 
 namespace ccl::cli::ui
 {

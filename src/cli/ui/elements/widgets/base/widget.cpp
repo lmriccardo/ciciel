@@ -1,5 +1,5 @@
 #include "widget.hpp"
-#include <cli/ui/elements/widgets/panels/panel_base.hpp>
+#include "panel_base.hpp"
 
 using namespace ccl::cli::ui;
 
