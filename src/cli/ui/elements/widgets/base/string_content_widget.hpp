@@ -23,6 +23,10 @@ namespace ccl::cli::ui
     public:
         StringContentWidget( const std::string& id, const std::u32string& content, size_t x, size_t y );
         StringContentWidget( const std::string& id, const std::string& content, size_t x, size_t y );
+
+        StringContentWidget( const std::string& id, const std::u32string& content );
+        StringContentWidget( const std::string& id, const std::string& content );
+
         virtual ~StringContentWidget() = default;
 
         virtual void setContent( const std::string& content, const Style& style );

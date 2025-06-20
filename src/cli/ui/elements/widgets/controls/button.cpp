@@ -12,6 +12,16 @@ Button::Button(const std::string &id, const std::string &content, size_t x, size
 {
 }
 
+Button::Button(const std::string &id, const std::u32string &content)
+    : Button( id, content, 0, 0 )
+{
+}
+
+Button::Button(const std::string &id, const std::string &content)
+    : Button( id, content, 0, 0 )
+{
+}
+
 void Button::setContent(const std::u32string &text)
 {
     this->StringContentWidget::setContent( U"[ " + text + U" ]", DefaultStyle() );

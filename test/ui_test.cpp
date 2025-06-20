@@ -16,7 +16,7 @@ int main()
     screen.setVerticalAlignment( LayoutAlignment::Start );
 
     // Create and draw your Label
-    Label l( "Label1", U"Ciao 👋", 0, 0 );
+    Label l( "Label1", U"Ciao 👋" );
     l.setContentStyle( DefaultStyle() );
     l.setPadding( { 1, 1, 1, 1 } );
     l.setMargin( 1, Direction::Left );
@@ -30,7 +30,7 @@ int main()
                        .Bold( true )
                        .Italic( true );
 
-    List l1( "List1", 0, 0, 10 );
+    List l1( "List1", 10 );
     l1.addElement( "Element 1" )
       .addElement( "Element 2 longer than 1" )
       .addElement( "Element 3 smaller" )
@@ -57,7 +57,7 @@ int main()
 
     // p1.addChild( l3 );
 
-    Button b( "Button1", "Click", 0, 0 );
+    Button b( "Button1", "Click" );
     b.setMargin( { 0, 1, 1, 0 } );
     p1.addChild( b );
     

@@ -16,6 +16,8 @@ namespace ccl::cli::ui
     public:
         Button( const std::string& id, const std::u32string& content, size_t x, size_t y );
         Button( const std::string& id, const std::string& content, size_t x, size_t y );
+        Button( const std::string& id, const std::u32string& content );
+        Button( const std::string& id, const std::string& content );
         virtual ~Button() = default;
 
         void setContent( const std::u32string& text ) override;

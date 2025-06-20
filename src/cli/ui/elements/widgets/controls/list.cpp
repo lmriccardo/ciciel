@@ -30,12 +30,12 @@ void List::drawPadding( ScreenBuffer& buffer ) const
     }
 }
 
-List::List(const std::string &id, const elem_t &elems, size_t x, size_t y, size_t max_size)
-    : ContentWidget( id, 1, 1, x, y, true ), m_max_nof_elems( max_size )
+List::List(const std::string &id, const content_type &elems, size_t x, size_t y, size_t max_size)
+    : VectorContentWidget( id, elems, x, y ), m_max_nof_elems( max_size )
 {
-    m_content_style.resize( max_size );
     m_content.resize( max_size );
-    std::copy( elems.begin(), elems.end(), m_content.begin() );
+    m_content_style.resize( max_size );
+    m_content_alignment = TextAlignment::Left;
 
     // Select the maximum element size to set the content size
     size_t max_elem_size = 0;
@@ -47,16 +47,25 @@ List::List(const std::string &id, const elem_t &elems, size_t x, size_t y, size_
         m_content_style[idx] = DefaultStyle();
     }
 
-    m_curr_idx = idx;
-
-    setContentWinsize( max_elem_size, elems.size() );
-    setContentMinimumSize( max_elem_size, elems.size() );
-
-    m_content_alignment = TextAlignment::Left;
+    this->setContentWinsize( max_elem_size, elems.size() );
+    this->setContentMinimumSize( max_elem_size, elems.size() );
 }
 
 List::List(const std::string &id, size_t x, size_t y, size_t max_size)
-    : List( id, {}, x, y, max_size )
+    : VectorContentWidget( id, x, y ), m_max_nof_elems( max_size )
+{
+    m_content.resize( max_size );
+    m_content_style.resize( max_size );
+    m_content_alignment = TextAlignment::Left;
+}
+
+List::List(const std::string &id, const content_type &elems, size_t max_size)
+    : List( id, elems, 0, 0, max_size )
+{
+}
+
+List::List(const std::string &id, size_t max_size)
+    : List( id, 0, 0, max_size )
 {
 }
 
@@ -117,7 +126,7 @@ size_t List::getMaxNofElements() const
 void List::draw( ScreenBuffer& buffer )
 {
     if (!isVisible()) return;
-    this->ContentWidget<elem_t>::draw( buffer ); // Draw the border if visible
+    this->VectorContentWidget<std::u32string, List>::draw( buffer ); // Draw the border if visible
 
     size_t b_size = static_cast<size_t>( m_border.getBorderWcwidth() );
     size_t r_pad = getPadding( Direction::Rigth );
@@ -137,6 +146,4 @@ void List::draw( ScreenBuffer& buffer )
         buffer.set( padded_i, m_pos_y + t_pad + 1 + idx, 
             m_pos_x + b_size, style_i, false );
     }
-
-    drawPadding( buffer );
 }

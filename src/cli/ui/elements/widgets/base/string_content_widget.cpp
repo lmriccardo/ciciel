@@ -21,6 +21,16 @@ StringContentWidget::StringContentWidget(
 {
 }
 
+StringContentWidget::StringContentWidget(const std::string &id, const std::u32string &content)
+    : StringContentWidget( id, content, 0, 0 )
+{
+}
+
+StringContentWidget::StringContentWidget(const std::string &id, const std::string &content)
+    : StringContentWidget( id, content, 0, 0 )
+{
+}
+
 void StringContentWidget::setContent(const std::string &content, const Style &style)
 {
     std::u32string u32content;
