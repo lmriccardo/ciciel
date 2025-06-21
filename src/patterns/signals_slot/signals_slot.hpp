@@ -101,6 +101,7 @@ namespace ccl::dp::signals
         {
             slot_type callback;   // The actual callback
             lifetime_token token; // Manages the lifetime token
+            bool has_token;       // If the slot relies on a token
         };
 
         using conn_container = std::map<size_t, slot_info>;
@@ -227,7 +228,8 @@ namespace ccl::dp::signals
         std::lock_guard<std::mutex> _lock( m_mutex );
         size_t conn_id = nextConnectionId();
         (*m_connections).insert_or_assign( conn_id, 
-                slot_info{ std::move( callback ), lf_token } );
+                slot_info{ std::move( callback ), lf_token, lf_token != nullptr }
+            );
 
         return conn_type( conn_id, m_connections, lf_token != nullptr );
     }
@@ -244,8 +246,9 @@ namespace ccl::dp::signals
             auto conn_it = m_connections->begin();
             for ( ; conn_it != m_connections->end() ; )
             {
+                const bool has_token = conn_it->second.has_token;
                 const lifetime_token lf_token = conn_it->second.token;
-                if ( lf_token.expired() )
+                if ( has_token && lf_token.expired() )
                 {
                     // If the token has expired this means that the object
                     // pointed by the weak_pointer is no longer valid.
