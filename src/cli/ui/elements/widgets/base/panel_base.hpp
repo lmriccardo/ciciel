@@ -66,6 +66,19 @@ namespace ccl::cli::ui
 
         int getCurrentChildIndex() const;
 
+        /**
+         * Returns the first colliding widget to position (x, y) of the
+         * cursor. If the widget is a panel is search between its children.
+         * That is, on success, this function will always returns a valid
+         * pointer to leaf widget, otherwise nullptr.
+         * 
+         * @param x The X position of the cursor
+         * @param y The Y position of the cursor
+         * 
+         * @return A pointer to a leaf or null pointer.
+         */
+        Widget* getCollidingWidget( size_t x, size_t y ) const;
+
         bool needsRepacking() const;
 
         using Widget::draw;

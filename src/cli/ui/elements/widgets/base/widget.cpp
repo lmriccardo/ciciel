@@ -102,6 +102,21 @@ Widget::Widget(const std::string &id, size_t w, size_t h, size_t x, size_t y, bo
     m_margin.fill( 0 );
 }
 
+bool Widget::operator==(const Widget &other) const
+{
+    // To check if two widgets are actually the same widget we can
+    // just check their absolute identifier. If both absolute IDs
+    // point to the same node in the tree than they must be the same
+    // element, 'cause equals identifier in the same subtree are not
+    // accepted when connecting a widget to its parent.
+    return getAbsoluteId() == other.getAbsoluteId();
+}
+
+bool Widget::operator!=(const Widget &other) const
+{
+    return !(*this == other);
+}
+
 void Widget::setParent(Widget &parent)
 {
     // Check that the parent is convertible to ParentBase class
@@ -307,6 +322,17 @@ std::pair<size_t, size_t> Widget::getVertexCoord(Vertex v) const
     }
 }
 
+void Widget::setFocus(bool value)
+{
+    if ( isVisible() && value != m_has_focus )
+    {
+        m_has_focus = value;
+
+        if ( m_has_focus ) onMouseEnter.emit();
+        else onMouseExit.emit();
+    }
+}
+
 bool Widget::isVisible() const
 {
     return !m_hidden;
@@ -418,6 +444,8 @@ bool Widget::hasContent() const
 
 bool Widget::isColliding( size_t x, size_t y ) const
 {
+    if (!isVisible()) return false;
+    
     auto [ x_e, y_s ] = getVertexCoord( Vertex::TR );
     auto [ x_s, y_e ] = getVertexCoord( Vertex::BL );
  

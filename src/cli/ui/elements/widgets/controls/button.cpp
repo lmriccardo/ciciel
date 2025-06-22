@@ -2,9 +2,21 @@
 
 using namespace ccl::cli::ui;
 
-Button::Button(const std::string &id, const std::u32string &content, size_t x, size_t y)
-    : StringContentWidget( id, U"[ " + content + U" ]", x, y )
+void Button::onMouseEnterCallback()
 {
+    m_border.Show( true );
+}
+
+void Button::onMouseExitCallback()
+{
+    m_border.Show( false );
+}
+
+Button::Button(const std::string &id, const std::u32string &content, size_t x, size_t y)
+    : StringContentWidget(id, U"[ " + content + U" ]", x, y)
+{
+    onMouseEnter.connect( [this](void) { this->onMouseEnterCallback(); } );
+    onMouseExit.connect( [this](void){ this->onMouseExitCallback(); } );
 }
 
 Button::Button(const std::string &id, const std::string &content, size_t x, size_t y)

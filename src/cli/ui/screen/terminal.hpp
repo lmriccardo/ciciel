@@ -54,6 +54,9 @@ namespace ccl::cli::ui
         void setCursorPosition( size_t x, size_t y ) const;
 
         static void getWindowSize(struct winsize* ws);
+        static std::string getCap( const char* capname );
+        static void enableMouseEvents();
+        static void disableMouseEvents();
     };
 
     template <typename... _Args>

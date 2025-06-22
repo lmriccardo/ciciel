@@ -24,6 +24,7 @@ Terminal::Terminal()
 Terminal::~Terminal()
 {
     disableRawMode();
+    disableMouseEvents();
 }
 
 Terminal &Terminal::getInstance()
@@ -46,6 +47,8 @@ void Terminal::enableRawMode()
     // ~ICANON -> Set the terminal to non-canonical mode
     // ~ISIG   -> Prevents classical signals to be applied (like CTRL+C)
     raw_p.c_lflag &= ~( ECHO | ICANON | ISIG );
+    raw_p.c_cc[VMIN] = 0;
+    raw_p.c_cc[VTIME] = 1; // 100ms timeout
 
     if ( tcsetattr( STDIN_FILENO, TCSAFLUSH, &raw_p ) == -1 )
     {
@@ -129,4 +132,23 @@ void Terminal::getWindowSize(struct winsize* ws)
     {
         throw std::runtime_error( "Failed to get window size" );
     }
+}
+
+std::string Terminal::getCap(const char *capname)
+{
+    const char* cap = tigetstr( capname );
+    if ( !cap || cap == (char*)-1 ) return "";
+    return std::string( cap );
+}
+
+void Terminal::enableMouseEvents()
+{
+    printf("\033[?1002h\033[?1006h\n");
+    fflush( stdout );
+}
+
+void Terminal::disableMouseEvents()
+{
+    printf("\033[?1002l\033[?1006l\n");
+    fflush( stdout );
 }

@@ -7,8 +7,11 @@ class A {};
 
 int main()
 {
-    // Initialize the Screen. This also initializes the Terminal singleton.
-    Screen screen( Layout::HorizontalLayout );
+    UIApplication app( "Simple UI Application" );
+    
+    Screen& screen = app.getContentPanel();
+    screen.enableMouse(); // Enable mouse tracking
+    screen.setLayout( Layout::VerticalLayout );
 
     // --- Step 1: Explicitly clear the screen ---
     // This ensures a clean canvas for your label.
@@ -41,7 +44,7 @@ int main()
     l1.setMargin( 1, Direction::Rigth );
     l1.setGrowFactor( 0 );
     l1.setTextAlignment( TextAlignment::Center );
-    l1.setVisibility( false );
+    l1.setVisibility( true );
 
     HBoxPanel p1( "SubPanel1", 0, 0, 0, 0 );
     p1.setTitle( "New Panel" );
@@ -67,24 +70,26 @@ int main()
     screen.addWidget( p1 );
 
     // Draw the UI
-    screen.draw();
+    // screen.draw();
 
-    std::this_thread::sleep_for( std::chrono::seconds(1) );
+    // std::this_thread::sleep_for( std::chrono::seconds(1) );
 
-    l1.setVisibility( true );
+    // l1.setVisibility( true );
 
-    // Draw the UI
-    screen.draw();
+    // // Draw the UI
+    // screen.draw();
 
-    for ( int i = 0; i < 20; ++i )
-    {
-        std::this_thread::sleep_for( std::chrono::milliseconds(500) );
+    app.run();
 
-        l1.addElement( "New Element " + std::to_string( i ) );
+    // for ( int i = 0; i < 20; ++i )
+    // {
+    //     std::this_thread::sleep_for( std::chrono::milliseconds(500) );
 
-        // Draw the UI
-        screen.draw();
-    }
+    //     l1.addElement( "New Element " + std::to_string( i ) );
+
+    //     // Draw the UI
+    //     screen.draw();
+    // }
 
     return 0;
 }

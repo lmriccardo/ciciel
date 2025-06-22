@@ -11,16 +11,6 @@
 
 namespace ccl::dp::signals
 {
-    /**
-     * Generate a monotonic increasing connection unique identifiers
-     * for connections handling.
-     */
-    inline size_t nextConnectionId()
-    {
-        static size_t connection_id = 0;
-        return ++connection_id;
-    }
-
     // Trait to extract the class type from a member function pointer
     template <typename T>
     struct member_function_class;
@@ -83,7 +73,21 @@ namespace ccl::dp::signals
     // ---------- SIGNAL CLASS DECLARATION --------------
     // --------------------------------------------------
     /**
+     * This class represents a simple Thread-safe Signal. In the signals and slot design
+     * pattern a signal is represented by a function ( the actual emitted signal ) and
+     * a number of connections connecting the signal with a number of slots ( callback
+     * functions ) which must have the same signature of the signaling function. Valid
+     * connections are created using the `Signal::connect` method. When emitting the
+     * signal, before calling all the releated slot functions, it checks for invalid
+     * connections and in case they exists it disconnects them from itself, in some sense
+     * performing automatic-disconnection.
      * 
+     * Differently from the more generic Observer or Event Dispatching design pattern,
+     * the Signal and Slot pattern heavily relies on type safety, given that the signal
+     * and all connected slots must have the same function signature. This is obtained
+     * via its template parameter arguments.
+     * 
+     * @param Args The type of input parameters of the signal
      */
     template <typename... Args>
     class Signal
@@ -142,7 +146,18 @@ namespace ccl::dp::signals
     // ---------- CONNECTION CLASS DECLARATION ----------
     // --------------------------------------------------
     /**
+     * This class represents a single Connection to a Signal. Every connection must have a
+     * unique identifier and a weak pointer to the connection map of the Signal class to which 
+     * it is connected. Unique connection identifiers are generated incrementally when a new 
+     * connection is created. The weak pointer to the Signal connection map is used to avoid 
+     * dangling pointer and to ensure that operations are performed only if the object is still 
+     * valid. For a single connection there are two ways of disconnecting it from the signal.
      * 
+     * The first one is "manual disconnection", and involved calling the `Connection::disconnect`
+     * method manually. The other one, relies on a so-called lifetime token which is a weak
+     * pointer to a generic object and it is used to automatic manage connection lifetime. That
+     * is, if the weak pointer becomes invalid the connection is automatically disconnected
+     * and so also destructuted. 
      */
     template <typename... Args>
     class Connection
@@ -157,6 +172,16 @@ namespace ccl::dp::signals
         size_t m_conn_id;
         signal_slots_type m_weak_slots;
         bool m_has_token;
+
+        /**
+         * Generate a monotonic increasing connection unique identifiers
+         * for connections handling.
+         */
+        static size_t nextConnectionId()
+        {
+            static size_t connection_id = 0;
+            return ++connection_id;
+        }
 
         // Private constructor only accessible by the Signal class itself
         Connection( size_t id, signal_slots_type slots_wptr, bool token ) 
@@ -186,6 +211,7 @@ namespace ccl::dp::signals
     // --------------------------------------------------
     // ---------- CONNECTION CLASS DEFINITION -----------
     // --------------------------------------------------
+    
     template <typename... Args>
     inline void Connection<Args...>::disconnect()
     {
@@ -221,12 +247,13 @@ namespace ccl::dp::signals
     // --------------------------------------------------
     // ---------- SIGNAL CLASS DEFINITION ---------------
     // --------------------------------------------------
+
     template <typename... Args>
     inline Signal<Args...>::conn_type Signal<Args...>::connect(
         slot_type callback, lifetime_ptr lf_token)
     {
         std::lock_guard<std::mutex> _lock( m_mutex );
-        size_t conn_id = nextConnectionId();
+        size_t conn_id = conn_type::nextConnectionId();
         (*m_connections).insert_or_assign( conn_id, 
                 slot_info{ std::move( callback ), lf_token, lf_token != nullptr }
             );

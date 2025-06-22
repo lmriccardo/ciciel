@@ -26,10 +26,14 @@ add_library(ccl_Cli
     ui/elements/containers/vbox_container.cpp
 
     ui/screen/screen.cpp
+    ui/events/event.cpp
+    ui/ui_app.cpp
 )
 
 target_link_libraries( ccl_Cli PRIVATE 
-    ccl_DataStructures 
+    ccl_DataStructures
+    ccl_Patterns
+    ccl_System
     ${CURSES_TARGET_LIBRARIES} 
     utf8proc )
 

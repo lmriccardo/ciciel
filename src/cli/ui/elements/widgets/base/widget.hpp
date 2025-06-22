@@ -3,6 +3,8 @@
 #include <string>
 #include <unordered_map>
 #include <array>
+#include <memory>
+#include <patterns/signals_slot/signals_slot.hpp>
 #include <cli/ui/style/style.hpp>
 #include <cli/ui/screen/screen_buffer.hpp>
 
@@ -45,8 +47,12 @@ namespace ccl::cli::ui
      * it can shrink, a minimum size can be set to limit this behavior and keep
      * visualization consistent.
      */
-    class Widget
+    class Widget : public std::enable_shared_from_this<Widget>
     {
+    public: // Signal declarations
+        dp::signals::Signal<> onMouseEnter; // When the mouse enter the widget
+        dp::signals::Signal<> onMouseExit;  // When the mouse exit the widget
+
     protected:
         std::string m_name;    // The unique name identifier in the subtree
         BorderStyle m_border;  // The style of the widget border
@@ -64,6 +70,7 @@ namespace ccl::cli::ui
         int m_flexGrow    = 0; // Flex grow factor ( 0 = can not grow )
         int m_flexShrink  = 0; // Flex shrink factor ( 0 = can not shrink )
         bool m_need_clear = true; // The first time ever the widget is drawn it must be cleared
+        bool m_has_focus  = false; // If the current widget has the focus
 
         std::pair<size_t, size_t> m_min_size; // Widget minimum size when shrinking
 
@@ -75,6 +82,9 @@ namespace ccl::cli::ui
     public:
         Widget( const std::string& id, size_t w, size_t h, size_t x, size_t y, bool leaf );
         virtual ~Widget() = default;
+
+        bool operator==( const Widget& other ) const;
+        bool operator!=( const Widget& other ) const;
         
         /**
          * Set a parent for the current widget. The parent must be a PanelBase
@@ -205,6 +215,18 @@ namespace ccl::cli::ui
          * @param factor The shrink factor
          */
         void setShrinkFactor( int factor );
+
+        /**
+         * Set the has focus attribute of the Widget. Notice that true
+         * value is taken into account if and only if the widget is
+         * currently visible.
+         * 
+         * Emit onMouseEnter: if focus changed from False to True
+         * Emit onMouseExit : if focus changed from True to False
+         * 
+         * @param value True if focus, false otherwise.
+         */
+        void setFocus( bool value );
 
         bool isVisible  () const;
         bool isLeaf     () const;

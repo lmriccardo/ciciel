@@ -13,6 +13,7 @@ create_test( ccl_Vec2 vec2_test.cpp Vec2Test ccl_DataStructures )
 create_test( ccl_Color color_test.cpp ColorTest ccl_Cli )
 create_test( ccl_Ui ui_test.cpp UiTest ccl_Cli )
 create_test( ccl_Signal signal_test.cpp SignalTest ccl_Patterns )
+create_test( ccl_UserInput user_input.cpp UserInputTest ccl_Cli )
 
 
 # Try GTest framework

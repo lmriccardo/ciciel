@@ -52,6 +52,11 @@ Screen::~Screen()
     fallBack();
 }
 
+void Screen::enableMouse() const
+{
+    Terminal::enableMouseEvents();
+}
+
 void Screen::setCursorStyle(CursorStyle style)
 {
     std::cout << "\033[" << static_cast<int>(style) << " q";

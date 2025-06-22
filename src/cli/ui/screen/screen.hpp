@@ -67,6 +67,11 @@ namespace ccl::cli::ui
         Screen(Layout layout = Layout::AbsoluteLayout);
         ~Screen();
 
+        Screen( const Screen& other ) = delete;
+        Screen& operator=( const Screen& other ) = delete;
+
+        void enableMouse() const;
+
         /**
          * Sets the cursor style for the application. 
          * @param style The cursor style identifier

@@ -6,3 +6,4 @@
 #include "ui/elements/widgets/controls/label.hpp"
 #include "ui/elements/widgets/controls/list.hpp"
 #include "ui/elements/widgets/controls/button.hpp"
+#include "ui/ui_app.hpp"

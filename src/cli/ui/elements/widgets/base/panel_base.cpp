@@ -99,6 +99,28 @@ int PanelBase::getCurrentChildIndex() const
     return m_children_idx;
 }
 
+Widget *PanelBase::getCollidingWidget(size_t x, size_t y) const
+{
+    if ( !isColliding( x, y ) ) return nullptr;
+
+    for ( auto [_, child] : m_childIds )
+    {
+        if ( auto ptr = dynamic_cast<PanelBase*>(child) )
+        {
+            Widget* c_widget;
+            
+            if ( (c_widget = ptr->getCollidingWidget( x, y )) != nullptr)
+            {
+                return c_widget;
+            }
+        }
+
+        if ( child->isColliding( x, y ) ) return child;
+    }
+
+    return nullptr;
+}
+
 bool PanelBase::needsRepacking() const
 {
     return m_needs_repacking;
