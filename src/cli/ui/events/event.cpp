@@ -22,6 +22,22 @@ void EventHandler::run()
         return;
     }
 
+    if ( ( m_eint_fd = eventfd( 0, EFD_NONBLOCK ) ) < 0 )
+    {
+        std::cerr << std::strerror( errno ) << std::endl;
+        m_cancelled.store(true);
+        return;
+    }
+
+    event.data.fd = m_eint_fd;
+
+    if ( epoll_ctl( m_epoll_fd, EPOLL_CTL_ADD, m_eint_fd, &event ) < 0 )
+    {
+        std::cerr << std::strerror( errno ) << std::endl;
+        m_cancelled.store(true);
+        return;
+    }
+
     struct epoll_event event_;
     int n_events;
 
@@ -29,6 +45,7 @@ void EventHandler::run()
     {
         if ( ( n_events = epoll_wait( m_epoll_fd, &event_, 1, -1 ) ) < 0 )
         {
+            if ( errno == EINTR ) continue; // Do not handle INTERRUPT signal
             std::cerr << std::strerror( errno ) << std::endl;
             m_cancelled.store(true);
             break;
@@ -45,6 +62,12 @@ void EventHandler::run()
 
                 m_events.put( std::string(buff) );
             }
+
+            if ( event_.data.fd == m_eint_fd )
+            {
+                m_cancelled.store(true);
+                break;
+            }
         }
     }
 }
@@ -55,19 +78,28 @@ void EventHandler::tearDown()
     {
         close( m_epoll_fd );
     }
+
+    if ( m_eint_fd >= 0 )
+    {
+        close( m_eint_fd );
+    }
 }
 
 bool EventHandler::getEvent(Event& e)
 {
-    std::string event_sequence;
-    
-    if ( m_events.tryPopFront( event_sequence ) )
-    {
-        e = std::move( Event::from( event_sequence ) );
-        return true;
-    }
+    std::string event_sequence = m_events.popFront();
+    e = std::move( Event::from( event_sequence ) );
+    return true;
+}
 
-    return false;
+void EventHandler::sendInterrupt() const
+{
+    uint64_t value = 1;
+    
+    if ( write( m_eint_fd, &value, sizeof( value ) ) < 0 )
+    {
+        std::cerr << std::strerror( errno ) << std::endl;
+    }
 }
 
 Event Event::from(const std::string &sequence)

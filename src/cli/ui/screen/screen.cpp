@@ -84,6 +84,23 @@ void Screen::setCursorPosition(int x_pos, int y_pos)
     m_terminal.setCursorPosition( x_pos, y_pos );
 }
 
+void Screen::setCursorVisibility(bool value)
+{
+    if ( !value ) {
+        if ( m_terminal.callCap( TCapabilities::HIDE_CURSOR ) < 0 )
+        {
+            std::cerr << "Call HIDE_CURSOR capability failed" << std::endl;
+        }
+    } else {
+        if ( m_terminal.callCap( TCapabilities::SHOW_CURSOR ) < 0 )
+        {
+            std::cerr << "Call HIDE_CURSOR capability failed" << std::endl;
+        }
+    }
+
+    m_cinfo.m_hidden = !value;
+}
+
 void Screen::setLayout(Layout layout)
 {
     layoutSelection(layout);
@@ -120,9 +137,17 @@ void Screen::addWidget(Widget & widget)
     m_panel->addChild( widget );
 }
 
+Widget *Screen::getCollidingWidget(size_t x, size_t y) const
+{
+    return m_panel->getCollidingWidget( x, y );
+}
+
 void Screen::draw()
 {
     m_panel->pack();                // 1. Pack if necessary
     m_panel->draw( *m_buffer );     // 2. Draw into the buffer
     m_buffer->flush( m_terminal );  // 3. Flush to the terminal
+    
+    // Hide the cursor
+    setCursorVisibility( false );
 }

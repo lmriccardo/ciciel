@@ -88,6 +88,12 @@ namespace ccl::cli::ui
         void setCursorPosition( int x_pos, int y_pos );
 
         /**
+         * Set the cursor visibility, true for visible and false for hidden.
+         * @param value The visibility value
+         */
+        void setCursorVisibility( bool value );
+
+        /**
          * Set the layout of the main panel of the screen.
          * @param layout The chosen layout
          */
@@ -115,6 +121,14 @@ namespace ccl::cli::ui
          * @param widget The widget lvalue reference
          */
         void addWidget( Widget& widget );
+
+        /**
+         * Returns the leaf widget colliding with the input coordinates
+         * @param x The X position
+         * @param y The Y position
+         * @return The pointer to the colliding widget
+         */
+        Widget* getCollidingWidget( size_t x, size_t y ) const;
 
         /**
          * Draws the content of all widgets previously added to the

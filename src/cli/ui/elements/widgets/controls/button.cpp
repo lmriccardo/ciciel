@@ -9,7 +9,9 @@ void Button::onMouseEnterCallback()
 
 void Button::onMouseExitCallback()
 {
+    m_need_clear = true;
     m_border.Show( false );
+    onClick.emit( getAbsoluteId() );
 }
 
 Button::Button(const std::string &id, const std::u32string &content, size_t x, size_t y)
@@ -17,6 +19,7 @@ Button::Button(const std::string &id, const std::u32string &content, size_t x, s
 {
     onMouseEnter.connect( [this](void) { this->onMouseEnterCallback(); } );
     onMouseExit.connect( [this](void){ this->onMouseExitCallback(); } );
+    m_is_clickable = true;
 }
 
 Button::Button(const std::string &id, const std::string &content, size_t x, size_t y)

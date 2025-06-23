@@ -9,7 +9,7 @@ int main()
 {
     UIApplication app( "Simple UI Application" );
     
-    Screen& screen = app.getContentPanel();
+    Screen& screen = app.getScreen();
     screen.enableMouse(); // Enable mouse tracking
     screen.setLayout( Layout::VerticalLayout );
 
@@ -53,43 +53,18 @@ int main()
     p1.setMargin( 1, Direction::Left );
     p1.setMargin( 1, Direction::Rigth );
 
-    // Label l3( "Label3", "Hey!!!", 0, 0 );
-    // l3.setMargin( { 0, 1, 1, 0 } );
-    // l3.setGrowFactor( 1 );
-    // l3.setShrinkFactor( 1 );
-
-    // p1.addChild( l3 );
-
-    Button b( "Button1", "Click" );
+    Button b( "Button1", "Quit" );
     b.setMargin( { 0, 1, 1, 0 } );
     p1.addChild( b );
+
+    b.onClick.connect( std::bind( &UIApplication::quit, &app, std::placeholders::_1 ) );
     
     // Add the label to the screen main panel
     screen.addWidget( l );
     screen.addWidget( l1 );
     screen.addWidget( p1 );
 
-    // Draw the UI
-    // screen.draw();
-
-    // std::this_thread::sleep_for( std::chrono::seconds(1) );
-
-    // l1.setVisibility( true );
-
-    // // Draw the UI
-    // screen.draw();
-
     app.run();
-
-    // for ( int i = 0; i < 20; ++i )
-    // {
-    //     std::this_thread::sleep_for( std::chrono::milliseconds(500) );
-
-    //     l1.addElement( "New Element " + std::to_string( i ) );
-
-    //     // Draw the UI
-    //     screen.draw();
-    // }
 
     return 0;
 }

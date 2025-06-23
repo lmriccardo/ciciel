@@ -348,6 +348,11 @@ bool Widget::hasChildren() const
     return !isLeaf();
 }
 
+bool Widget::hasFocus() const
+{
+    return m_has_focus;
+}
+
 bool Widget::canGrow() const
 {
     return m_flexGrow > 0;
@@ -356,6 +361,11 @@ bool Widget::canGrow() const
 bool Widget::canShrink() const
 {
     return m_flexShrink > 0;
+}
+
+bool Widget::isClickable() const
+{
+    return m_is_clickable;
 }
 
 const std::string& Widget::getId() const
@@ -459,12 +469,12 @@ void Widget::clear( ScreenBuffer& buffer )
         auto [ x_e, y_s ] = getVertexCoord( Vertex::TR );
         auto [ x_s, y_e ] = getVertexCoord( Vertex::BL );
 
-        std::u32string content( x_e - x_s - 1, U' ' );
+        std::u32string content( x_e - x_s + 1, U' ' );
         const Style& s = DefaultStyle();
 
-        for ( size_t y_idx = 0; y_idx < (y_e - y_s) - 1; ++y_idx )
+        for ( size_t y_idx = 0; y_idx < (y_e - y_s) + 1; ++y_idx )
         {
-            buffer.set(content, m_pos_y + 1 + y_idx, m_pos_x + 1, s, false);
+            buffer.set(content, m_pos_y + y_idx, m_pos_x, s, false);
         }
 
         m_need_clear = false;
@@ -474,7 +484,7 @@ void Widget::clear( ScreenBuffer& buffer )
 void Widget::draw( ScreenBuffer& buffer )
 {
     if (!isVisible()) return; // Draw only if the current widget is visible
+    clear( buffer );
     drawBorder( buffer );
     drawMargin( buffer );
-    clear( buffer );
 }

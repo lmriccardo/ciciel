@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/epoll.h>
+#include <sys/eventfd.h>
 #include <sys/concurrent/thread.hpp>
 #include <sys/time/times_utils.hpp>
 #include <data_structures/buffers/concurrent_ring_buffer.hpp>
@@ -25,7 +26,7 @@ namespace ccl::cli::ui
 
     enum class MouseButton
     {
-        None, Left, Right, Middle, WheelUp, WheelDown
+        Left, Middle, Right, WheelUp, WheelDown, None
     };
 
     enum class MouseAction
@@ -71,7 +72,8 @@ namespace ccl::cli::ui
         using buffer_type = typename ds::buffers::ConcurrentRingBuffer<std::string>;
 
         buffer_type m_events; // The buffer of events
-        int m_epoll_fd = -1; // File descriptor used for epoll (-1 invalid)
+        int m_epoll_fd = -1;  // File descriptor used for epoll (-1 invalid)
+        int m_eint_fd = -1;   // File descriptor used for interrupts
     
     public:
         EventHandler() 
@@ -91,5 +93,10 @@ namespace ccl::cli::ui
          * Try to pop an event from the event ring buffer.
          */
         bool getEvent(Event& e);
+
+        /**
+         * Sends the interrupt signal to epoll
+         */
+        void sendInterrupt() const;
     };
 }

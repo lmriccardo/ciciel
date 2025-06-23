@@ -67,10 +67,11 @@ namespace ccl::cli::ui
         std::array<size_t, 4> m_padding; // Internal space between content and border
         std::array<size_t, 4> m_margin;  // External space between widget and other objects
 
-        int m_flexGrow    = 0; // Flex grow factor ( 0 = can not grow )
-        int m_flexShrink  = 0; // Flex shrink factor ( 0 = can not shrink )
-        bool m_need_clear = true; // The first time ever the widget is drawn it must be cleared
-        bool m_has_focus  = false; // If the current widget has the focus
+        int m_flexGrow      = 0; // Flex grow factor ( 0 = can not grow )
+        int m_flexShrink    = 0; // Flex shrink factor ( 0 = can not shrink )
+        bool m_need_clear   = true; // The first time ever the widget is drawn it must be cleared
+        bool m_has_focus    = false; // If the current widget has the focus
+        bool m_is_clickable = false; // If the widget is clickable (likely to have onClick signal)
 
         std::pair<size_t, size_t> m_min_size; // Widget minimum size when shrinking
 
@@ -231,8 +232,10 @@ namespace ccl::cli::ui
         bool isVisible  () const;
         bool isLeaf     () const;
         bool hasChildren() const;
+        bool hasFocus   () const;
         bool canGrow    () const;
         bool canShrink  () const;
+        bool isClickable() const;
 
         /**
          * Returns the overall window size, i.e., border +
