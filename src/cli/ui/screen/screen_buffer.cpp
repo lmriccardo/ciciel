@@ -126,7 +126,7 @@ void ScreenBuffer::flush(Terminal &t_out)
             const struct CellChar& elem = *this_it;
             size_t row_idx, col_idx;
             getRowCol( row_idx, col_idx, current_pos );
-            t_out.put( elem.m_char, row_idx, col_idx, elem.m_style );
+            t_out.put( elem.m_char, col_idx, row_idx, elem.m_style );
         }
     }
 

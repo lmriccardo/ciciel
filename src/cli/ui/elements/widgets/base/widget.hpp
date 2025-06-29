@@ -7,9 +7,31 @@
 #include <patterns/signals_slot/signals_slot.hpp>
 #include <cli/ui/style/style.hpp>
 #include <cli/ui/screen/screen_buffer.hpp>
+#include <data_structures/grids/vec2.hpp>
 
 namespace ccl::cli::ui
 {
+    /**
+     * Struct that contains cursor information like its style,
+     * if it is visible or not, and the current x and y position
+     */
+    struct CursorInfo
+    {
+        using pos_type = ds::grids::Vec2<size_t>;
+
+        const CursorStyle m_default_style = CursorStyle::SteadyBlock;
+
+        CursorStyle m_style  = m_default_style; // The style of the cursor
+        bool        m_hidden = true;            // Cursor visibility toggle
+        pos_type    m_pos    = pos_type(0, 0);  // Its current screen position
+
+        void setPosition( size_t x, size_t y )
+        {
+            m_pos.m_x = x;
+            m_pos.m_y = y;
+        }
+    };
+
     enum class Direction { Top, Left, Rigth, Bottom };
 
     enum class Vertex
@@ -49,9 +71,12 @@ namespace ccl::cli::ui
      */
     class Widget : public std::enable_shared_from_this<Widget>
     {
+        using pos_type = ds::grids::Vec2<size_t>;
+
     public: // Signal declarations
         dp::signals::Signal<> onMouseEnter; // When the mouse enter the widget
         dp::signals::Signal<> onMouseExit;  // When the mouse exit the widget
+        dp::signals::Signal<> onResize;     // When the content winsize has changed
 
     protected:
         std::string m_name;    // The unique name identifier in the subtree
@@ -60,9 +85,10 @@ namespace ccl::cli::ui
         bool        m_leaf;    // If the widget is a leaf in the tree or not
         Widget*     m_parent;  // The widget parent in the UI tree
 
-        size_t         m_pos_x;   // Top-left X position
-        size_t         m_pos_y;   // Top-left Y position
-        struct winsize m_winsize; // The size of the object
+        size_t         m_pos_x;      // Top-left X position
+        size_t         m_pos_y;      // Top-left Y position
+        struct winsize m_winsize;    // The size of the object
+        CursorInfo     m_cursor_info; // The current cursor position
 
         std::array<size_t, 4> m_padding; // Internal space between content and border
         std::array<size_t, 4> m_margin;  // External space between widget and other objects
@@ -77,6 +103,7 @@ namespace ccl::cli::ui
 
         virtual void drawBorder( ScreenBuffer& ) const;
         void drawRect( ScreenBuffer&, const char32_t*, size_t, size_t, const Style&) const;
+        void drawRect( ScreenBuffer&, const char32_t*, size_t, size_t, size_t, size_t, const Style& ) const;
         void forceParentRepack();
         void drawMargin( ScreenBuffer& ) const;
     
@@ -299,6 +326,18 @@ namespace ccl::cli::ui
         const BorderStyle& getBorderStyle() const;
         size_t getX() const;
         size_t getY() const;
+
+        /**
+         * Returns the cursor information of the current widget.
+         * @return constant reference to the cursor info
+         */
+        const CursorInfo& getCursorInfo() const;
+
+        /**
+         * Returns the current position of the cursor in the widget.
+         * @return The current cursor position
+         */
+        const pos_type& getCursorPosition() const; 
 
         void setBorderVisibility( bool value );
 

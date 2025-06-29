@@ -13,12 +13,14 @@ add_library(ccl_Cli
     
     ui/elements/widgets/base/widget.cpp
     ui/elements/widgets/base/panel_base.cpp
-    ui/elements/widgets/base/string_content_widget.cpp
+    ui/elements/widgets/base/content_widgets/string_content_widget.cpp
+    ui/elements/widgets/base/content_widgets/input_content_widget.cpp
     ui/elements/widgets/panels/hbox_panel.cpp
     ui/elements/widgets/panels/vbox_panel.cpp
     ui/elements/widgets/controls/label.cpp
     ui/elements/widgets/controls/list.cpp
     ui/elements/widgets/controls/button.cpp
+    ui/elements/widgets/controls/input_box.cpp
 
     ui/elements/containers/container.cpp
     ui/elements/containers/flow_container.cpp

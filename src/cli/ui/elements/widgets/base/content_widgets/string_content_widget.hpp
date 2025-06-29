@@ -2,7 +2,7 @@
 
 #include <cli/ui/utils/string.hpp>
 #include <cli/ui/style/style.hpp>
-#include "widget.hpp"
+#include "../widget.hpp"
 
 namespace ccl::cli::ui
 {

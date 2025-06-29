@@ -17,6 +17,14 @@ void Widget::drawBorder( ScreenBuffer& buffer ) const
 void Widget::drawRect(ScreenBuffer &buffer, const char32_t *charset, 
     size_t x_off, size_t y_off, const Style& style) const
 {
+    auto [ r, c ] = getWinsize();
+    drawRect( buffer, charset, r, c, x_off, y_off, style );
+}
+
+void Widget::drawRect(
+    ScreenBuffer &buffer, const char32_t *charset, size_t r, size_t c, 
+    size_t x_off, size_t y_off, const Style & style) const
+{
     if ( !is_codepoint_valid( charset + 5 ) )
     {
         throw std::runtime_error( "Not enough character to draw the rectangle!" );
@@ -24,8 +32,6 @@ void Widget::drawRect(ScreenBuffer &buffer, const char32_t *charset,
 
     size_t x_pos = m_pos_x + x_off;
     size_t y_pos = m_pos_y + y_off;
-
-    auto [ r, c ] = getWinsize();
 
     buffer.set( *(charset), y_pos, x_pos, style, false );
     buffer.set( *(charset + 2), y_pos, x_pos + c - 1, style, false );
@@ -169,28 +175,21 @@ void Widget::setWinsize( size_t width, size_t height )
     m_winsize.ws_row = height;
     m_winsize.ws_col = width;
     m_need_clear = true;
+
+    if ( onResize.getNofConnections() > 0 )
+    {
+        onResize.emit(); // Emit the resize signal
+    }
 }
 
 void Widget::setWidth(size_t w)
 {
-    if ( w < getMinimumSize().first )
-    {
-        w = getMinimumSize().first;
-    }
-
-    m_winsize.ws_col = w;
-    m_need_clear = true;
+    setWinsize( w, m_winsize.ws_row );
 }
 
 void Widget::setHeight(size_t h)
 {
-    if ( h < getMinimumSize().second )
-    {
-        h = getMinimumSize().second;
-    }
-
-    m_winsize.ws_row = h;
-    m_need_clear = true;
+    setWinsize( m_winsize.ws_col, h );
 }
 
 void Widget::setContentWinsize(size_t width, size_t height)
@@ -217,6 +216,8 @@ void Widget::setStartPosition(size_t s_x, size_t s_y)
 {
     m_pos_x = s_x;
     m_pos_y = s_y;
+    
+    m_cursor_info.setPosition( m_pos_x + 1, m_pos_y + 1 );
 }
 
 void Widget::setPadding(const std::array<size_t, 4> &padding)
@@ -440,6 +441,16 @@ size_t Widget::getX() const
 size_t Widget::getY() const
 {
     return m_pos_y + getPadding( Direction::Top ) + m_border.getBorderWcwidth();
+}
+
+const CursorInfo &ccl::cli::ui::Widget::getCursorInfo() const
+{
+    return m_cursor_info;
+}
+
+const Widget::pos_type &Widget::getCursorPosition() const
+{
+    return m_cursor_info.m_pos;
 }
 
 void Widget::setBorderVisibility(bool value)

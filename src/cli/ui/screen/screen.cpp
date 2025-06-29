@@ -79,8 +79,6 @@ void Screen::setCursorPosition(int x_pos, int y_pos)
         throw std::out_of_range( "setCursorPosition: Out of Bound position" );
     }
 
-    m_cinfo.m_xpos = static_cast<size_t>(x_pos);
-    m_cinfo.m_ypos = static_cast<size_t>(y_pos);
     m_terminal.setCursorPosition( x_pos, y_pos );
 }
 
@@ -97,8 +95,6 @@ void Screen::setCursorVisibility(bool value)
             std::cerr << "Call HIDE_CURSOR capability failed" << std::endl;
         }
     }
-
-    m_cinfo.m_hidden = !value;
 }
 
 void Screen::setLayout(Layout layout)
@@ -119,11 +115,6 @@ void Screen::setHorizontalAlignment( LayoutAlignment value )
 const Layout &Screen::getLayout() const
 {
     return m_layout;
-}
-
-void Screen::moveCursor(int x_off, int y_off)
-{
-    setCursorPosition( m_cinfo.m_xpos + x_off, m_cinfo.m_ypos + y_off );
 }
 
 void Screen::clear()
@@ -147,7 +138,4 @@ void Screen::draw()
     m_panel->pack();                // 1. Pack if necessary
     m_panel->draw( *m_buffer );     // 2. Draw into the buffer
     m_buffer->flush( m_terminal );  // 3. Flush to the terminal
-    
-    // Hide the cursor
-    setCursorVisibility( false );
 }

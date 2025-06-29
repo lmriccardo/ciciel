@@ -1,6 +1,6 @@
 #pragma once
 
-#include <cli/ui/elements/widgets/base/string_content_widget.hpp>
+#include <cli/ui/elements/widgets/base/content_widgets/string_content_widget.hpp>
 
 namespace ccl::cli::ui
 {

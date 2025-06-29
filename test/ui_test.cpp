@@ -46,7 +46,7 @@ int main()
     l1.setTextAlignment( TextAlignment::Center );
     l1.setVisibility( true );
 
-    HBoxPanel p1( "SubPanel1", 0, 0, 0, 0 );
+    VBoxPanel p1( "SubPanel1", 0, 0, 0, 0 );
     p1.setTitle( "New Panel" );
     p1.setGrowFactor( 1 );
     p1.setShrinkFactor( 1 );
@@ -58,6 +58,13 @@ int main()
     p1.addChild( b );
 
     b.onClick.connect( std::bind( &UIApplication::quit, &app, std::placeholders::_1 ) );
+
+    InputBox ib( "InputBox1", "Enter email" );
+    ib.setMaxLength( 20 );
+    ib.setLabel( U"✉ Email:" );
+    ib.setBorderVisibility( true );
+
+    p1.addChild( ib );
     
     // Add the label to the screen main panel
     screen.addWidget( l );

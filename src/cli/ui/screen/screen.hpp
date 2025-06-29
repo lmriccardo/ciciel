@@ -10,16 +10,6 @@
 
 namespace ccl::cli::ui
 {
-    struct CursorInfo
-    {
-        const CursorStyle m_default_style = CursorStyle::SteadyBlock;
-
-        CursorStyle m_style  = m_default_style;
-        bool        m_hidden = false;
-        size_t      m_xpos   = 0;
-        size_t      m_ypos   = 0;
-    };
-
     /**
      * Defines all different layouts for the screen
      */
@@ -102,14 +92,6 @@ namespace ccl::cli::ui
 
         void setVerticalAlignment( LayoutAlignment value );
         void setHorizontalAlignment( LayoutAlignment value );
-        
-        /**
-         * Move the cursor of the given offset.
-         * 
-         * @param x_off X axis Offset
-         * @param y_off Y axis Offset
-         */
-        void moveCursor( int x_off, int y_off );
 
         /**
          * Clear the screen.

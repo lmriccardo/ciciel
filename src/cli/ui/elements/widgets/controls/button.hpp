@@ -1,7 +1,7 @@
 #pragma once
 
 #include <patterns/signals_slot/signals_slot.hpp>
-#include <cli/ui/elements/widgets/base/string_content_widget.hpp>
+#include <cli/ui/elements/widgets/base/content_widgets/string_content_widget.hpp>
 
 namespace ccl::cli::ui
 {

@@ -120,7 +120,7 @@ void Terminal::setStyle(const Style& style) const
 
 void Terminal::setCursorPosition(size_t x_pos, size_t y_pos) const
 {
-    if ( callCap( TCapabilities::MOVE_CURSOR, x_pos, y_pos ) < 0 )
+    if ( callCap( TCapabilities::MOVE_CURSOR, y_pos, x_pos ) < 0 )
     {
         std::cerr << "Unable to set cursor position" << std::endl;
     }

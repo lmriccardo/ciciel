@@ -25,7 +25,6 @@ void UIApplication::tearDown()
     m_screen->clear();
     m_screen->setCursorPosition( 0, 0 );
     m_screen->setCursorVisibility( true );
-    std::cout << "CTRL+C Pressed: Application Exiting" << std::endl;
 }
 
 void UIApplication::handleKeyPressedEvent(const Event &event)
@@ -81,6 +80,9 @@ void UIApplication::run()
     m_screen->setCursorVisibility( false );
     m_running = true;
 
+    // Initialize the error string
+    const char* error_str = nullptr;
+
     while ( m_running )
     {
         // Check if the event handler is still alive. If no,
@@ -90,9 +92,30 @@ void UIApplication::run()
             break;
         }
 
-        // Refresh the screen content
-        m_screen->setCursorVisibility( false );
-        m_screen->draw();
+        try
+        {
+            // Refresh the screen content
+            m_screen->draw();
+
+            // Now we need to set the cursor position
+            if ( m_focused_widget != nullptr )
+            {
+                const auto& c_info = m_focused_widget->getCursorInfo();
+                const auto& c_pos  = c_info.m_pos;
+                m_screen->setCursorVisibility( !c_info.m_hidden );
+                m_screen->setCursorPosition( c_pos.m_x, c_pos.m_y );
+            }
+            else
+            {
+                // If nullptr the default cursor visibility is false
+                m_screen->setCursorVisibility( false );
+            }
+        }
+        catch ( const std::exception& e )
+        {
+            error_str = e.what();
+            break;
+        }
 
         // Get the escape sequence or normal sequence of chars of the
         // last input event received by the handler.
@@ -115,6 +138,17 @@ void UIApplication::run()
     }
 
     tearDown();
+
+    if ( error_str != nullptr )
+    {
+        std::cerr << "Application exited with error: "
+                  << error_str
+                  << std::endl;
+    }
+    else
+    {
+        std::cout << "Application exited successfully" << std::endl;
+    }
 }
 
 void UIApplication::quit( [[maybe_unused]] const std::string& )
