@@ -73,10 +73,16 @@ namespace ccl::cli::ui
     {
         using pos_type = ds::grids::Vec2<size_t>;
 
+        void connect();
+
     public: // Signal declarations
-        dp::signals::Signal<> onMouseEnter; // When the mouse enter the widget
-        dp::signals::Signal<> onMouseExit;  // When the mouse exit the widget
-        dp::signals::Signal<> onResize;     // When the content winsize has changed
+        dp::signals::Signal<>        onMouseEnter;   // When the mouse enter the widget
+        dp::signals::Signal<>        onMouseExit;    // When the mouse exit the widget
+        dp::signals::Signal<>        onResize;       // When the content winsize has changed
+        dp::signals::Signal<char>    onCharPressed;  // When a key is pressed
+        dp::signals::Signal<int,int> onArrowPressed; // When an arrow key is pressed
+        dp::signals::Signal<char>    onCtrlPressed;  // When a CTRL+<char> sequence is entered
+        dp::signals::Signal<char>    onNavKPressed;  // When a navigation key is pressed ( enter, backspace, canc, ... )
 
     protected:
         std::string m_name;    // The unique name identifier in the subtree
@@ -106,6 +112,12 @@ namespace ccl::cli::ui
         void drawRect( ScreenBuffer&, const char32_t*, size_t, size_t, size_t, size_t, const Style& ) const;
         void forceParentRepack();
         void drawMargin( ScreenBuffer& ) const;
+
+        virtual void handleNavKPressed( [[maybe_unused]] char ch ) {};
+        virtual void handleCtrlPressed( [[maybe_unused]] char ch ) {};
+        virtual void handleArrow( 
+            [[maybe_unused]] int v_direction, 
+            [[maybe_unused]] int h_direction ) {};
     
     public:
         Widget( const std::string& id, size_t w, size_t h, size_t x, size_t y, bool leaf );

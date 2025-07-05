@@ -47,7 +47,7 @@ namespace ccl::cli::ui
         void put( char32_t c, size_t x, size_t y, const Style& style );
 
         template <typename... _Args>
-        int callCap(const char* capname, _Args&&... args) const;
+        static int callCap(const char* capname, _Args&&... args);
 
         void reset() const;
         void setStyle(const Style& style) const;
@@ -60,7 +60,7 @@ namespace ccl::cli::ui
     };
 
     template <typename... _Args>
-    inline int Terminal::callCap(const char *capname, _Args &&...args) const
+    inline int Terminal::callCap(const char *capname, _Args &&...args)
     {
         const char* str = tigetstr(capname);
         if ( !str || str == (char*)-1 ) return -1;

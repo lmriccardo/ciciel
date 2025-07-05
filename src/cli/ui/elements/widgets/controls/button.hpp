@@ -6,8 +6,7 @@
 namespace ccl::cli::ui
 {
     /**
-     * This is the button widget. It is a StringContentWidget given that the text
-     * inside of a button if actually a string.
+     * This is the button widget. It can be clicked. That's it ...
      */
     class Button : public StringContentWidget
     {

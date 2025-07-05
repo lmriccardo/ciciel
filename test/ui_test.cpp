@@ -59,13 +59,12 @@ int main()
 
     b.onClick.connect( std::bind( &UIApplication::quit, &app, std::placeholders::_1 ) );
 
-    InputBox ib( "InputBox1", "Enter email" );
-    ib.setMaxLength( 20 );
-    ib.setLabel( U"✉ Email:" );
-    ib.setBorderVisibility( true );
+    auto email_ib = UsernameInputBox( "Email1" );
+    auto password_ib = PasswordInputBox( "Password1", '*' );
 
-    p1.addChild( ib );
-    
+    p1.addChild( *email_ib );
+    p1.addChild( *password_ib );
+
     // Add the label to the screen main panel
     screen.addWidget( l );
     screen.addWidget( l1 );

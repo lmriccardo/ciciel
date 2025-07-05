@@ -4,6 +4,8 @@
 #include <utf8proc.h>
 #include <algorithm>
 #include <stdexcept>
+#include <iostream>
+#include <iomanip>
 
 namespace ccl::cli::ui
 {
@@ -92,4 +94,26 @@ namespace ccl::cli::ui
      * @return A u32 string aligned wrt input parameters
      */
     std::u32string u32align( const std::u32string&, TextAlignment, size_t ) noexcept;
+
+    /**
+     * Inserts an element at a given position, shifting all the next characters,
+     * but preserving the original size of the string.
+     * 
+     * @param string The string where to insert the char
+     * @param pos The position
+     * @param ch The actual char to insert
+     */
+    void insert_shift( std::u32string& string, size_t pos, char32_t ch ) noexcept;
+
+    /**
+     * Removes the element at the given position, sifthing all remaining characters
+     * one position to the left and preserving the original size of the string.
+     * 
+     * @param string The string from which remove an element
+     * @param pos The position of the element to remove
+     * @param curr_size The actual size of the string (nof non-zero elements)
+     */
+    void remove_shift( std::u32string& string, size_t pos, size_t curr_size ) noexcept;
+
+    void print_bytes( const std::string& sequence );
 }

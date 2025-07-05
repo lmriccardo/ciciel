@@ -157,6 +157,18 @@ namespace ccl::cli::ui
 #define CCL_KEY_RIGHT 0x03
 #define CCL_KEY_LEFT  0x04
 
+inline void CCL_ARROW_DIRECTION( int k_code, int& vd, int& hd )
+{
+    switch ( k_code )
+    {
+        case CCL_KEY_UP:    vd = -1; break;
+        case CCL_KEY_DOWN:  vd =  1; break;
+        case CCL_KEY_RIGHT: hd =  1; break;
+        case CCL_KEY_LEFT:  hd = -1; break;
+        default: break;
+    };
+}
+
 inline const char* CCL_ESCAPE_KEY_FN( int kf_num )
 {
     char cap[8]; snprintf( cap, sizeof(cap), "kf%d", kf_num );

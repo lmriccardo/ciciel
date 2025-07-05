@@ -3,7 +3,14 @@
 
 using namespace ccl::cli::ui;
 
-void Widget::drawBorder( ScreenBuffer& buffer ) const
+void ccl::cli::ui::Widget::connect()
+{
+    onArrowPressed.connect( [this]( int v, int h ){ this->handleArrow(v, h); } );
+    onCtrlPressed.connect ( [this]( char c ){ this->handleCtrlPressed(c); } );
+    onNavKPressed.connect ( [this]( char c ){ this->handleNavKPressed(c); } );
+}
+
+void Widget::drawBorder(ScreenBuffer &buffer) const
 {
     if ( !m_border.m_show ) return;
 
@@ -106,6 +113,8 @@ Widget::Widget(const std::string &id, size_t w, size_t h, size_t x, size_t y, bo
 
     m_padding.fill( 0 );
     m_margin.fill( 0 );
+
+    connect(); // Connect all the signals
 }
 
 bool Widget::operator==(const Widget &other) const

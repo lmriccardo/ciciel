@@ -14,3 +14,6 @@
 #include "grids/vec_n.hpp"
 #include "grids/vec2.hpp"
 #include "grids/vec3.hpp"
+
+// LISTS
+#include "list/linked_list.hpp"

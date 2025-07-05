@@ -12,6 +12,11 @@ std::pair<size_t, size_t> InputBox::getStartCursorPosition() const
     return { m_pos_y + 1, x_pos };
 }
 
+std::pair<size_t, size_t> ccl::cli::ui::InputBox::getActualContentSize() const
+{
+    return { m_curr_length + 1, getContentWinsize().second };
+}
+
 void InputBox::drawBorder(ScreenBuffer &buffer) const
 {
     if ( !m_border.m_show ) return;
@@ -27,6 +32,35 @@ void InputBox::drawBorder(ScreenBuffer &buffer) const
     size_t h_size = getWinsize().first;
 
     drawRect( buffer, charset, h_size, w_size, x_off, 0, s );
+}
+
+void InputBox::addChar(char ch)
+{
+    if ( m_is_placeholder ) m_is_placeholder = false;
+    if ( m_curr_length >= m_max_length ) return;
+
+    char32_t ch32;
+    utf8to32c( &ch, &ch32 );
+
+    // Set the replacement value if provided
+    if ( m_has_replacement ) ch32 = m_replacement;
+    
+    // Get the current position
+    size_t start_x = getStartCursorPosition().second;
+    size_t x_pos = m_cursor_info.m_pos.m_x - start_x;
+    
+    if ( m_insert_toggle ) {
+        m_content[x_pos] = ch32;
+    } else {
+        insert_shift( m_content, x_pos, ch32 );
+    }
+
+    if ( ( m_insert_toggle && x_pos == m_curr_length ) || !m_insert_toggle )
+    {
+        m_curr_length++;
+    }
+    
+    m_cursor_info.m_pos.m_x++;
 }
 
 void InputBox::setMaxLength(size_t value)
@@ -52,6 +86,8 @@ void InputBox::setMaxLength(size_t value)
     // Set the new minimum content winsize
     setContentMinimumSize( w_size, 1 );
     setContentWidth( w_size );
+
+    m_max_length = value;
 }
 
 void InputBox::setLabel(const std::u32string &label, const Style &style)
@@ -85,6 +121,12 @@ void InputBox::setLabel(const std::string &label)
     setLabel( utf8to32( label ) );
 }
 
+void InputBox::setReplacement(char32_t value)
+{
+    m_has_replacement = true;
+    m_replacement = value;
+}
+
 void InputBox::draw(ScreenBuffer &buffer)
 {
     if (!isVisible()) return;
@@ -112,4 +154,39 @@ void InputBox::draw(ScreenBuffer &buffer)
         if ( c_elem == '\0' ) continue;
         buffer.set( c_elem, m_pos_y + 1, x_pos + idx, c_style, false );
     }
+}
+
+std::shared_ptr<InputBox> ccl::cli::ui::PasswordInputBox(
+    const std::string &id, char32_t mask, size_t p_length
+) {
+    auto password_ib = std::make_shared<InputBox>( id, "Enter password" );
+    
+    password_ib->setMaxLength( p_length );
+    password_ib->setReplacement( mask );
+    password_ib->setLabel( U"🔒 Password:" );
+    password_ib->setBorderVisibility( true );
+
+    return password_ib;
+}
+
+std::shared_ptr<InputBox> ccl::cli::ui::UsernameInputBox(const std::string &id, size_t size)
+{
+    auto username_ib = std::make_shared<InputBox>( id, "Enter username" );
+    
+    username_ib->setMaxLength( size );
+    username_ib->setLabel( U"👤 Username:" );
+    username_ib->setBorderVisibility( true );
+
+    return username_ib;
+}
+
+std::shared_ptr<InputBox> ccl::cli::ui::EmailInputBox(const std::string &id, size_t size)
+{
+    auto email_ib = std::make_shared<InputBox>( id, "Enter email" );
+    
+    email_ib->setMaxLength( size );
+    email_ib->setLabel( U"📧 Email:" );
+    email_ib->setBorderVisibility( true );
+    
+    return email_ib;
 }

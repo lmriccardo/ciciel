@@ -29,6 +29,33 @@ void UIApplication::tearDown()
 
 void UIApplication::handleKeyPressedEvent(const Event &event)
 {
+    if ( m_focused_widget == nullptr ) return;
+
+    if ( event.m_type == InputEventType::PrintableChar )
+    {
+        m_focused_widget->onCharPressed.emit( event.m_key );
+        return;
+    }
+
+    if ( event.m_type == InputEventType::ArrowKey )
+    {
+        int vd = 0, hd = 0; 
+        CCL_ARROW_DIRECTION( event.m_keyCode, vd, hd );
+        m_focused_widget->onArrowPressed.emit( vd, hd );
+        return;
+    }
+
+    if ( event.m_type == InputEventType::ControlChar )
+    {
+        m_focused_widget->onCtrlPressed.emit( event.m_key );
+        return;
+    }
+
+    if ( event.m_type == InputEventType::NavigationKey )
+    {
+        m_focused_widget->onNavKPressed.emit( event.m_keyCode );
+        return;
+    }
 }
 
 void UIApplication::handleMouseEvent(const Event &event)

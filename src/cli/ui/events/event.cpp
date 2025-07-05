@@ -60,6 +60,12 @@ void EventHandler::run()
                 if ( r <= 0 ) continue;
                 buff[r] = 0;
 
+                if (    ( r == 3 && buff[0] == 0x1B && buff[1] == 0x5B )
+                     && ( buff[2] >= 0x41 && buff[2] <= 0x44 ) )
+                {
+                    buff[1] = 0x4F;
+                }
+
                 m_events.put( std::string(buff) );
             }
 
@@ -123,6 +129,7 @@ Event Event::from(const std::string &sequence)
     if ( sequence.size() == 1 && sequence[0] != CCL_KEY_ESCAPE )
     {
         e.m_key = sequence[0];
+        
         if ( e.m_key >= CCL_KEY_SPACE && e.m_key <= CCL_KEY_TILDE )
         {
             e.m_type = InputEventType::PrintableChar;
@@ -158,6 +165,7 @@ Event Event::from(const std::string &sequence)
         }
 
         // Check for key up, down, left or right
+        // print_bytes( sequence );
         if (   sequence == CCL_ESCAPE_KEY_UP   || sequence == CCL_ESCAPE_KEY_DOWN
             || sequence == CCL_ESCAPE_KEY_LEFT || sequence == CCL_ESCAPE_KEY_RIGHT
         ) {

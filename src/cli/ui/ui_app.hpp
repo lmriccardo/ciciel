@@ -24,7 +24,7 @@ namespace ccl::cli::ui
         
         bool m_running = false;
 
-        virtual void handleUserDefinedEvents( const Event& event ) {};
+        virtual void handleUserDefinedEvents( [[maybe_unused]] const Event& event ) {};
     
     public:
         UIApplication( const std::string& name = "ccl_UI_Application" );
