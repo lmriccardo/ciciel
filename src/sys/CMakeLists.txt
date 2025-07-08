@@ -4,7 +4,8 @@ add_library( ccl_System
     concurrent/thread.cpp
 
     # IO module
-    io/file.cpp
+    io/base/io_handle.cpp
+    io/base/stream_io.cpp
 
     # Time module
     time/times_utils.cpp
