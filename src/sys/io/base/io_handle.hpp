@@ -117,12 +117,13 @@ namespace ccl::sys::io
             {
                 NativeHandleTrait<T>::close(m_handle);
             }
+
             m_handle = newHandle;
         }
 
         T release() noexcept
         {
-            return std::exchange(m_handle, NativeHandleTraits<T>::invalid_handle);
+            return std::exchange(m_handle, NativeHandleTrait<T>::invalid_handle);
         }
     };
 

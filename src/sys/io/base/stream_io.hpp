@@ -2,7 +2,10 @@
 
 #include <cstddef>
 #include <cstdlib>
+#include <sstream>
 #include "io_handle.hpp"
+
+#include <data_structures/buffers/byte_buffer.hpp>
 
 #ifdef _WIN32
     #include <windows.h>
@@ -49,18 +52,44 @@ namespace ccl::sys::io
         NativeHandleType getNativeHandle() const;
 
         /**
-         * Checks if the stream is open.
-         * @return true if the stream is open, false otherwise.
-         */
-        bool isOpen() const;
-
-        /**
          * Closes the stream and releases the associated handle.
          * After calling this method, the StreamIO object should not be used.
          */
         void close();
 
-        virtual ssize_t write( const char* buff, size_t nbytes ) const = 0;
-        virtual ssize_t read( char* dst, size_t rsize ) const = 0;
+        virtual ssize_t write( const char* buff, size_t nbytes ) = 0;
+        virtual ssize_t read( char* dst, size_t rsize ) = 0;
+        
+        /**
+         * Reads the input number of bytes into the destination string.
+         * Returns -1 on error, >= 0 otherwise.
+         * 
+         * @param dst The destination string
+         * @param rsize The number of bytes to read
+         * @return The actual number of read bytes
+         */
+        ssize_t read( std::string& dst, size_t rsize );
+
+        /**
+         * Reads the input number of bytes into the ByteBuffer. Returns -1
+         * on error, >= 0 otherwise. If the capacity of the input ByteBuffer
+         * is less than the number of bytes to read, then new space will be
+         * allocated. After the read, the pointer inside the ByteBuffer will
+         * points at a position after the read section.
+         * 
+         * @param buff The ByteBuffer destination
+         * @param rsize The number of bytes to read
+         * @return The total number of bytes read
+         */
+        ssize_t read( ds::buffers::ByteBuffer& buff, size_t rsize );
+
+        /**
+         * Writes the input string into the file and returns the total number of
+         * bytes actually written. Returns -1 for any error, >= 0 otherwise.
+         * 
+         * @param content The line to be written
+         * @return The total number of bytes written
+         */
+        ssize_t write( std::string& content );
     };
 }

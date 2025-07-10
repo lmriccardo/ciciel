@@ -14,6 +14,7 @@ create_test( ccl_Color color_test.cpp ColorTest ccl_Cli )
 create_test( ccl_Ui ui_test.cpp UiTest ccl_Cli )
 create_test( ccl_Signal signal_test.cpp SignalTest ccl_Patterns )
 create_test( ccl_UserInput user_input.cpp UserInputTest ccl_Cli )
+create_test( ccl_File io_file_test.cpp IoFileTest ccl_System )
 
 
 # Try GTest framework
