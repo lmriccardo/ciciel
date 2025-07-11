@@ -107,18 +107,42 @@ namespace ccl::sys::io
          */
         bool isOpen() const;
 
+        using StreamIO::read;
+
         virtual void seekg( OFF_T offset, iop position ) = 0;
         virtual void seekp( OFF_T offset, iop position ) = 0;
         virtual OFF_T tellp() const = 0;
         virtual OFF_T tellg() const = 0;
         virtual OFF_T getSize() const = 0;
-        virtual ssize_t readLine( std::string& line ) = 0;
 
         /**
          * Returns the total number of lines
          */
         size_t getNofLines();
+
+                /**
+         * Reads a single line from the file and returns the total number
+         * of bytes read. Returns -1 if any error, >= 0 otherwise.
+         * 
+         * @param line The destination where to save the line
+         * @return Total number of bytes read
+         */
+        ssize_t readLine( std::string& line );
+
+        /**
+         * Read the entire file content into the input string.
+         * @param dest The destination string for file content
+         */
+        void read( std::string& dest );
+        
+        friend std::ostream& operator<<( std::ostream& ostream, FileIOBase& stream );
     };
+
+    FileIOBase&   operator<<( FileIOBase& stream, const std::string& data );
+    FileIOBase&   operator<<( FileIOBase& stream, const char* data );
+    std::ostream& operator<<( std::ostream& ostream, FileIOBase& stream );
+    
+    std::string& operator>>( FileIOBase& stream, std::string& dest );
 
     /**
      * @brief Simple iterator class for File streams.
@@ -190,16 +214,22 @@ namespace ccl::sys::io
         End = SEEK_END,
     };
 
+    FLAG_T __make_flags( iom mode );
+    NativeHandleType __open_file( const std::string& path, iom mode );
+
 #else
 
 #endif
 
-    FLAG_T __make_flags( iom mode );
-
+    /**
+     * @brief 
+     */
     class FileIO : public FileIOIterable
     {
+        static const iom DEFAULT_OPEN_FLAGS;
+
     public:
-        FileIO( const std::string& path, iom flags );
+        FileIO( const std::string& path, iom flags = DEFAULT_OPEN_FLAGS );
         virtual ~FileIO() = default;
 
         FileIO( const FileIO& other ) = delete;
@@ -260,21 +290,6 @@ namespace ccl::sys::io
         ssize_t read( char* dst, size_t rsize ) override;
 
         /**
-         * Reads a single line from the file and returns the total number
-         * of bytes read. Returns -1 if any error, >= 0 otherwise.
-         * 
-         * @param line The destination where to save the line
-         * @return Total number of bytes read
-         */
-        ssize_t readLine( std::string& line ) override;
-
-        /**
-         * Read the entire file content into the input string.
-         * @param dest The destination string for file content
-         */
-        void read( std::string& dest );
-
-        /**
          * Writes nbytes into the file from the source input buffer.
          * It returns -1 on error (e.g., invalid handler), >= 0 otherwise.
          * 
@@ -285,13 +300,5 @@ namespace ccl::sys::io
         virtual ssize_t write( const char* src, size_t nbytes ) override;
 
         using StreamIO::write; // Take the write with string input
-
-        friend std::ostream& operator<<( std::ostream& ostream, FileIO& stream );
     };
-
-    FileIO&       operator<<( FileIO& stream, const std::string& data );
-    FileIO&       operator<<( FileIO& stream, const char* data );
-    std::ostream& operator<<( std::ostream& ostream, FileIO& stream );
-    
-    std::string& operator>>( FileIO& stream, std::string& dest );
 }

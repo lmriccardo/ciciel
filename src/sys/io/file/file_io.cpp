@@ -73,6 +73,76 @@ size_t FileIOBase::getNofLines()
     return nof_lines;
 }
 
+ssize_t FileIOBase::readLine(std::string &line)
+{
+    if ( m_handler.isValid() )
+    {
+        ssize_t total_bytes = 0; // Initialize the total bytes result
+        ssize_t curr_bytes; // The current number of bytes read
+        char curr_ch; // Current char
+        line.clear(); // Clear the destination before reading
+
+        do
+        {
+            // Read a single character from the current position and
+            // check for any potential error (-1 is returned).
+            if ( ( curr_bytes = read( &curr_ch, (size_t)1 ) ) < 0 )
+            {
+                line.clear();
+                return -1;
+            }
+
+            // Check for EOF (End Of File)
+            if ( curr_bytes == 0 ) break;
+            
+            // Updates the line and the total count
+            line += curr_ch;
+            total_bytes++;
+
+        } while (curr_ch != '\n');
+
+        return total_bytes;
+    }
+
+    return -1;
+}
+
+void FileIOBase::read(std::string &dest)
+{
+    seekg( 0, iop::Beg );
+    std::string line;
+    while ( readLine( line ) != 0 ) { dest += line; }
+}
+
+FileIOBase &ccl::sys::io::operator<<(FileIOBase &stream, const std::string &data)
+{
+    stream.write( data ); // Write the data into the stream
+    return stream;
+}
+
+FileIOBase &ccl::sys::io::operator<<(FileIOBase &stream, const char *data)
+{
+    stream.write( data, strlen(data) );
+    return stream;
+}
+
+std::ostream &ccl::sys::io::operator<<(std::ostream &ostream, FileIOBase &stream)
+{
+    // Get the entire content of the file
+    std::string content;
+    stream.read( content );
+
+    // Put the content into the output stream
+    ostream << content;
+    return ostream;
+}
+
+std::string &ccl::sys::io::operator>>(FileIOBase &stream, std::string &dest)
+{
+    stream.read( dest );
+    return dest;
+}
+
 file_iterator::file_iterator(FileIOBase *file_io, size_t size)
     : Base( file_io, size ), m_fileSize( size )
 {
@@ -126,11 +196,10 @@ FLAG_T ccl::sys::io::__make_flags(iom mode)
     return flags;
 }
 
-FileIO::FileIO(const std::string &path, iom flags)
-    : FileIOIterable( path, flags )
+NativeHandleType ccl::sys::io::__open_file(const std::string &path, iom mode)
 {
     // Create the correct list of flags and open the file
-    FLAG_T o_flags = __make_flags( flags );
+    FLAG_T o_flags = __make_flags( mode );
 
     NativeHandleType fd;
     if ( ( fd = open( path.c_str(), o_flags, 0644 ) ) < 0 )
@@ -142,8 +211,14 @@ FileIO::FileIO(const std::string &path, iom flags)
 
         throw std::runtime_error( ss.str() );
     }
-    
-    m_handler.reset( fd );
+
+    return fd;
+}
+
+FileIO::FileIO(const std::string &path, iom flags)
+    : FileIOIterable( path, flags )
+{
+    m_handler.reset( __open_file( path, flags ) );
 
     // Here we need to set the read and write index. The read index
     // always starts at the beginning of the file.
@@ -234,6 +309,8 @@ ssize_t FileIO::write(const char *src, size_t nbytes)
 
 #endif
 
+const iom FileIO::DEFAULT_OPEN_FLAGS = iom::Read | iom::Write | iom::App;
+
 OFF_T FileIO::tellp() const
 {
     return m_writeIdx;
@@ -244,72 +321,3 @@ OFF_T FileIO::tellg() const
     return m_readIdx;
 }
 
-ssize_t FileIO::readLine(std::string &line)
-{
-    if ( m_handler.isValid() )
-    {
-        ssize_t total_bytes = 0; // Initialize the total bytes result
-        ssize_t curr_bytes; // The current number of bytes read
-        char curr_ch; // Current char
-        line.clear(); // Clear the destination before reading
-
-        do
-        {
-            // Read a single character from the current position and
-            // check for any potential error (-1 is returned).
-            if ( ( curr_bytes = read( &curr_ch, 1 ) ) < 0 )
-            {
-                line.clear();
-                return -1;
-            }
-
-            // Check for EOF (End Of File)
-            if ( curr_bytes == 0 ) break;
-            
-            // Updates the line and the total count
-            line += curr_ch;
-            total_bytes++;
-
-        } while (curr_ch != '\n');
-
-        return total_bytes;
-    }
-
-    return -1;
-}
-
-void FileIO::read(std::string &dest)
-{
-    seekg( 0, iop::Beg );
-    std::string line;
-    while ( readLine( line ) != 0 ) { dest += line; }
-}
-
-FileIO &ccl::sys::io::operator<<(FileIO &stream, const std::string &data)
-{
-    stream.write( data ); // Write the data into the stream
-    return stream;
-}
-
-FileIO &ccl::sys::io::operator<<(FileIO &stream, const char *data)
-{
-    stream.write( data, strlen(data) );
-    return stream;
-}
-
-std::ostream &ccl::sys::io::operator<<(std::ostream &ostream, FileIO &stream)
-{
-    // Get the entire content of the file
-    std::string content;
-    stream.read( content );
-
-    // Put the content into the output stream
-    ostream << content;
-    return ostream;
-}
-
-std::string &ccl::sys::io::operator>>(FileIO &stream, std::string &dest)
-{
-    stream.read( dest );
-    return dest;
-}
