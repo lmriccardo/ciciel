@@ -90,6 +90,6 @@ namespace ccl::sys::io
          * @param content The line to be written
          * @return The total number of bytes written
          */
-        ssize_t write( std::string& content );
+        ssize_t write( const std::string& content );
     };
 }

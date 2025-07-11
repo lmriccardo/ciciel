@@ -60,6 +60,19 @@ bool FileIOBase::isOpen() const
     return m_handler.isValid();
 }
 
+size_t FileIOBase::getNofLines()
+{
+    // Compute the total number of lines
+    OFF_T prev_read_idx = m_readIdx;
+
+    std::string line;
+    size_t nof_lines = 0;
+    while ( readLine(line) != 0 ) { nof_lines++; }
+    
+    m_readIdx = prev_read_idx;
+    return nof_lines;
+}
+
 file_iterator::file_iterator(FileIOBase *file_io, size_t size)
     : Base( file_io, size ), m_fileSize( size )
 {
@@ -153,16 +166,6 @@ void FileIO::seekp(OFF_T offset, iop position)
     m_writeIdx = lseek( m_handler.get(), offset, static_cast<int>(position) );
 }
 
-OFF_T FileIO::tellp() const
-{
-    return m_writeIdx;
-}
-
-OFF_T FileIO::tellg() const
-{
-    return m_readIdx;
-}
-
 OFF_T FileIO::getSize() const
 {
     struct stat st;
@@ -225,6 +228,22 @@ ssize_t FileIO::write(const char *src, size_t nbytes)
     return -1;
 }
 
+#else
+
+// TODO: Do something for windows version
+
+#endif
+
+OFF_T FileIO::tellp() const
+{
+    return m_writeIdx;
+}
+
+OFF_T FileIO::tellg() const
+{
+    return m_readIdx;
+}
+
 ssize_t FileIO::readLine(std::string &line)
 {
     if ( m_handler.isValid() )
@@ -259,21 +278,38 @@ ssize_t FileIO::readLine(std::string &line)
     return -1;
 }
 
-size_t FileIOBase::getNofLines()
+void FileIO::read(std::string &dest)
 {
-    // Compute the total number of lines
-    OFF_T prev_read_idx = m_readIdx;
-
+    seekg( 0, iop::Beg );
     std::string line;
-    size_t nof_lines = 0;
-    while ( readLine(line) != 0 ) { nof_lines++; }
-    
-    m_readIdx = prev_read_idx;
-    return nof_lines;
+    while ( readLine( line ) != 0 ) { dest += line; }
 }
 
-#else
+FileIO &ccl::sys::io::operator<<(FileIO &stream, const std::string &data)
+{
+    stream.write( data ); // Write the data into the stream
+    return stream;
+}
 
-// TODO: Do something for windows version
+FileIO &ccl::sys::io::operator<<(FileIO &stream, const char *data)
+{
+    stream.write( data, strlen(data) );
+    return stream;
+}
 
-#endif
+std::ostream &ccl::sys::io::operator<<(std::ostream &ostream, FileIO &stream)
+{
+    // Get the entire content of the file
+    std::string content;
+    stream.read( content );
+
+    // Put the content into the output stream
+    ostream << content;
+    return ostream;
+}
+
+std::string &ccl::sys::io::operator>>(FileIO &stream, std::string &dest)
+{
+    stream.read( dest );
+    return dest;
+}

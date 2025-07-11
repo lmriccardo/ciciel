@@ -10,11 +10,16 @@
 #undef OFF_T
 
 #ifndef _WIN32
+
+#include <sys/stat.h>
 #define FLAG_T int
 #define OFF_T  off_t
+
 #else
+
 #define FLAG_T DWORD
 #define OFF_T  int64_t
+
 #endif
 
 namespace ccl::sys::io
@@ -163,12 +168,20 @@ namespace ccl::sys::io
         using FileIOBase::FileIOBase;
         virtual ~FileIOIterable() = default;
 
+        FileIOIterable(FileIOIterable&& other)
+            : FileIOBase(std::move(other)) 
+        {}
+
+        FileIOIterable& operator=(FileIOIterable&& other) {
+            FileIOBase::operator=(std::move(other));
+            return *this;
+        }
+
         iterator begin();
         iterator end();
     };
 
 #ifndef _WIN32
-#include <sys/stat.h>
 
     enum class iop
     {
@@ -177,11 +190,12 @@ namespace ccl::sys::io
         End = SEEK_END,
     };
 
+#else
+
+#endif
+
     FLAG_T __make_flags( iom mode );
 
-    /**
-     * @brief Iterable POSIX File Stream Version
-     */
     class FileIO : public FileIOIterable
     {
     public:
@@ -190,6 +204,16 @@ namespace ccl::sys::io
 
         FileIO( const FileIO& other ) = delete;
         FileIO& operator=( const FileIO& other ) = delete;
+
+        FileIO( FileIO&& other )
+            : FileIOIterable( std::move(other) )
+        {}
+
+        FileIO& operator=( FileIO&& other )
+        {
+            FileIOIterable::operator=( std::move(other) );
+            return *this;
+        }
         
         /**
          * Moves the read pointer to the given offset starting from
@@ -245,6 +269,12 @@ namespace ccl::sys::io
         ssize_t readLine( std::string& line ) override;
 
         /**
+         * Read the entire file content into the input string.
+         * @param dest The destination string for file content
+         */
+        void read( std::string& dest );
+
+        /**
          * Writes nbytes into the file from the source input buffer.
          * It returns -1 on error (e.g., invalid handler), >= 0 otherwise.
          * 
@@ -252,13 +282,16 @@ namespace ccl::sys::io
          * @param nbytes The total number of bytes to write
          * @return The total number of written bytes
          */
-        ssize_t write( const char* src, size_t nbytes ) override;
+        virtual ssize_t write( const char* src, size_t nbytes ) override;
+
+        using StreamIO::write; // Take the write with string input
+
+        friend std::ostream& operator<<( std::ostream& ostream, FileIO& stream );
     };
 
-#else
-
-    class WinFileIO : public FileIOIterable
-    {};
-
-#endif
+    FileIO&       operator<<( FileIO& stream, const std::string& data );
+    FileIO&       operator<<( FileIO& stream, const char* data );
+    std::ostream& operator<<( std::ostream& ostream, FileIO& stream );
+    
+    std::string& operator>>( FileIO& stream, std::string& dest );
 }

@@ -73,7 +73,7 @@ ssize_t StreamIO::read(ds::buffers::ByteBuffer &buff, size_t rsize)
     return nbytes;
 }
 
-ssize_t StreamIO::write(std::string &content)
+ssize_t StreamIO::write(const std::string &content)
 {
     // Take the underlying buffer and write its content
     return write( content.c_str(), content.size() );

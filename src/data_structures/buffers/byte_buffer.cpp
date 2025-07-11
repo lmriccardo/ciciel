@@ -128,6 +128,7 @@ void ByteBuffer::allocate(const size_t capacity)
         }
 
         m_buffer = tmpbuffer;
+        m_capacity = capacity;
     }
 }
 
