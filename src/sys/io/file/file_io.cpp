@@ -2,20 +2,6 @@
 
 using namespace ccl::sys::io;
 
-iom ccl::sys::io::operator|(iom a, iom b)
-{
-    unsigned a_u = static_cast<unsigned>(a);
-    unsigned b_u = static_cast<unsigned>(b);
-    return static_cast<iom>( a_u | b_u );
-}
-
-iom ccl::sys::io::operator&(iom a, iom b)
-{
-    unsigned a_u = static_cast<unsigned>(a);
-    unsigned b_u = static_cast<unsigned>(b);
-    return static_cast<iom>( a_u & b_u );
-}
-
 bool ccl::sys::io::iom2bool(iom a)
 {
     return a != iom::None;
@@ -112,6 +98,52 @@ void FileIOBase::read(std::string &dest)
     seekg( 0, iop::Beg );
     std::string line;
     while ( readLine( line ) != 0 ) { dest += line; }
+}
+
+OFF_T FileIOBase::getSize() const
+{
+    OFF_T fileSize = -1;
+
+#ifndef _WIN32
+
+    // First we need to take the entire file size
+    struct stat st;
+    if ( ::fstat( m_handler.get(), &st ) == 0 )
+    {
+        fileSize = static_cast<OFF_T>( st.st_size );
+    }
+
+#else
+
+    LARGE_INTEGER _filesize;
+    if (GetFileSizeEx( m_handler.get(), &_filesize ))
+    {
+        fileSize = static_cast<OFF_T>( _filesize.QuadPart );
+    }
+
+#endif
+
+    if ( fileSize == -1 )
+    {
+        std::stringstream ss;
+        ss << "Failed to get file size for " << m_filePath << " [Error]: " 
+           << get_last_error_string() 
+           << std::endl;
+
+        throw std::runtime_error( ss.str() );
+    }
+
+    return fileSize;
+}
+
+OFF_T FileIOBase::tellp() const
+{
+    return m_writeIdx;
+}
+
+OFF_T FileIOBase::tellg() const
+{
+    return m_readIdx;
 }
 
 FileIOBase &ccl::sys::io::operator<<(FileIOBase &stream, const std::string &data)
@@ -241,22 +273,6 @@ void FileIO::seekp(OFF_T offset, iop position)
     m_writeIdx = lseek( m_handler.get(), offset, static_cast<int>(position) );
 }
 
-OFF_T FileIO::getSize() const
-{
-    struct stat st;
-    if ( ::fstat( m_handler.get(), &st ) != 0 )
-    {
-        std::stringstream ss;
-        ss << "Failed to get file size for " << m_filePath
-           << " [Error]: " << std::strerror(errno)
-           << std::endl;
-
-        throw std::runtime_error( ss.str() );
-    }
-
-    return static_cast<OFF_T>(st.st_size);
-}
-
 ssize_t FileIO::read(char *dst, size_t rsize)
 {
     if ( m_handler.isValid() )
@@ -310,14 +326,4 @@ ssize_t FileIO::write(const char *src, size_t nbytes)
 #endif
 
 const iom FileIO::DEFAULT_OPEN_FLAGS = iom::Read | iom::Write | iom::App;
-
-OFF_T FileIO::tellp() const
-{
-    return m_writeIdx;
-}
-
-OFF_T FileIO::tellg() const
-{
-    return m_readIdx;
-}
 

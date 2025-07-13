@@ -17,6 +17,15 @@
 namespace ccl::sys::io
 {
     /**
+     * Retrieve a string representation of the last error raised by the application.
+     * It is cross-platform since implements both methods for POSIX and Windows
+     * operating systems.
+     * 
+     * @return The message string
+     */
+    std::string get_last_error_string();
+
+    /**
      * @brief A base class for stream-based IO operations.
      * This class provides a common interface for reading and writing to streams,
      * such as files or network sockets, using a native handle.

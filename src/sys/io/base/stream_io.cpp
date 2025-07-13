@@ -2,6 +2,44 @@
 
 using namespace ccl::sys::io;
 
+std::string ccl::sys::io::get_last_error_string()
+{
+#ifndef _WIN32
+
+    if ( errno == 0 ) return "No Error Message";
+    return std::strerror( errno );
+
+#else
+
+    DWORD err = GetLastError();
+    if ( err == 0 ) return "No Error Message";
+
+    // Otherwise construct the error string
+    LPVOID lpMsgBuf = nullptr;
+    FormatMessageA(
+        FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+        NULL,
+        err,
+        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+        (LPSTR)&lpMsgBuf,
+        0, NULL);
+
+    std::string message;
+    if ( lpMsgBuf )
+    {
+        message = static_cast<char*>( lpMsgBuf );
+        LocalFree( lpMsgBuf );
+    }
+    else
+    {
+        message = "Unknown Error Code: " + std::to_string(err);
+    }
+
+    return message;
+
+#endif
+}
+
 StreamIO::StreamIO(NativeHandleType handle)
     : m_handler(handle)
 {

@@ -68,13 +68,13 @@ ByteBuffer::ByteBuffer(ByteBuffer &&other) noexcept
 
 ByteBuffer::~ByteBuffer()
 {
-    delete[] m_buffer;
+    if ( m_has_ownership ) delete[] m_buffer;
 }
 
 ByteBuffer &ByteBuffer::operator=(const ByteBuffer &other)
 {
     // We need to delete the previous buffer
-    if (m_buffer != nullptr) delete[] m_buffer;
+    if (m_buffer != nullptr && m_has_ownership) delete[] m_buffer;
 
     // Copy initial simple values
     m_capacity = other.m_capacity;
@@ -92,7 +92,7 @@ ByteBuffer &ByteBuffer::operator=(const ByteBuffer &other)
 ByteBuffer &ByteBuffer::operator=(ByteBuffer &&other) noexcept
 {
     // We need to delete the previous buffer
-    if (m_buffer != nullptr) delete[] m_buffer;
+    if (m_buffer != nullptr && m_has_ownership) delete[] m_buffer;
 
     // Copy initial simple values
     m_capacity = other.m_capacity;
@@ -121,7 +121,7 @@ void ByteBuffer::allocate(const size_t capacity)
 
         // If the buffer is not empty we need to copy the current
         // content into the new buffer and then free the memory
-        if (!(m_buffer == nullptr))
+        if (!(m_buffer == nullptr) && m_has_ownership)
         {
             memcpy(tmpbuffer, m_buffer, m_capacity*sizeof(unsigned char));
             delete[] m_buffer;
@@ -146,6 +146,25 @@ void ByteBuffer::position(const size_t newpos)
 void ByteBuffer::setByteOrder(const ByteOrder &order)
 {
     m_order = order;
+}
+
+void ByteBuffer::setBuffer(unsigned char *buffer, size_t size, bool keep_size)
+{
+    // If a previous buffer exists, we need to delete it
+    if ( m_buffer != nullptr && m_has_ownership )
+    {
+        delete[] m_buffer;
+    }
+
+    m_capacity      = size;
+    m_buffer        = buffer;
+    m_has_ownership = false;
+
+    if ( !keep_size )
+    {
+        m_size     = size;
+        m_position = m_size;
+    }
 }
 
 const ccl::ds::ByteOrder &ByteBuffer::getByteOrder() const

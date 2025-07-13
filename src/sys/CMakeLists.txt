@@ -8,6 +8,7 @@ add_library( ccl_System
     io/base/stream_io.cpp
     io/file/file_io.cpp
     io/file/buffered_io.cpp
+    io/file/mmap_file_io.cpp
 
     # Time module
     time/times_utils.cpp

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <type_traits>
 #include <fstream>
 #include <string>
 #include <cstring>
@@ -24,6 +25,52 @@
 
 namespace ccl::sys::io
 {
+    /**
+     * Enables a given type E to have OR and AND bitwise operators.
+     */
+    template <typename E>
+    struct enable_bitmask_operator : std::false_type {};
+
+    template<typename E>
+    constexpr bool enable_bitmask_operator_v = enable_bitmask_operator<E>::value;
+
+    /**
+     * @brief OR Bitwise operator
+     */
+    template <typename E, typename U=std::underlying_type_t<E>>
+    constexpr typename std::enable_if_t<enable_bitmask_operator_v<E>, E>
+    operator|( E lhs, E rhs )
+    {
+        return static_cast<E>( static_cast<U>(lhs) | static_cast<U>(rhs) );
+    }
+
+    /**
+     * @brief AND Bitwise operator
+     */
+    template <typename E, typename U=std::underlying_type_t<E>>
+    constexpr typename std::enable_if_t<enable_bitmask_operator_v<E>, E>
+    operator&( E lhs, E rhs )
+    {
+        return static_cast<E>( static_cast<U>(lhs) & static_cast<U>(rhs) );
+    }
+
+    /**
+     * @brief NOT Bitwise operator
+     */
+    template <typename E, typename U=std::underlying_type_t<E>>
+    constexpr typename std::enable_if_t<enable_bitmask_operator_v<E>, E>
+    operator~( E val )
+    {
+        return static_cast<E>( ~static_cast<U>(val) );
+    }
+
+    template <typename E, typename U=std::underlying_type_t<E>>
+    constexpr typename std::enable_if_t<enable_bitmask_operator_v<E>, bool>
+    to_bool( E val )
+    {
+        return static_cast<U>(val) != 0;
+    }
+
     enum class iom : unsigned
     {
         None   = 0,
@@ -35,18 +82,7 @@ namespace ccl::sys::io
         Bin    = 1 << 5, // open the file for reading bytes
     };
 
-    /**
-     * Bitwise OR between two io open mode
-     * @param a The first open mode
-     * @param b The second open mode
-     * @return The Bitwise OR between a and b
-     */
-    iom operator|(iom a, iom b);
-
-    /**
-     * Overload the bitwise AND operator.
-     */
-    iom operator&(iom a, iom b);
+    template<> struct enable_bitmask_operator<iom> : std::true_type {};
 
     /**
      * Checks if the given mode is not None
@@ -111,9 +147,21 @@ namespace ccl::sys::io
 
         virtual void seekg( OFF_T offset, iop position ) = 0;
         virtual void seekp( OFF_T offset, iop position ) = 0;
-        virtual OFF_T tellp() const = 0;
-        virtual OFF_T tellg() const = 0;
-        virtual OFF_T getSize() const = 0;
+
+        /**
+         * Returns the size in bytes of the file
+         */
+        OFF_T getSize() const;
+        
+        /**
+         * Returns the write pointer 
+         */
+        OFF_T tellp() const;
+        
+        /**
+         * Returns the read pointer
+         */
+        OFF_T tellg() const;
 
         /**
          * Returns the total number of lines
@@ -262,21 +310,6 @@ namespace ccl::sys::io
          * @param position The actual position from which to compute the offset 
          */
         void seekp( OFF_T offset, iop position ) override;
-
-        /**
-         * Returns the write pointer 
-         */
-        OFF_T tellp() const override;
-
-        /**
-         * Returns the read pointer
-         */
-        OFF_T tellg() const override;
-
-        /**
-         * Returns the size in bytes of the file
-         */
-        OFF_T getSize() const override;
 
         /**
          * Read rsize bytes from the file and save them into the input
