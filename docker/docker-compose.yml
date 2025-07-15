@@ -1,0 +1,62 @@
+version: "3.8"
+name: jenkins
+
+services:
+  # Service used to run Docker Inside Docker containers
+  # DIND = Docker IN Docker
+  dind:
+    image: docker:dind
+    container_name: jenkins-docker-dind
+    privileged: true
+    restart: always
+    networks:
+      jenkins-net:
+        aliases:
+          - docker
+    
+    volumes:
+      - jenkins-docker-certs:/certs/client
+      - jenkins-data:/var/jenkins_home
+    
+    environment:
+      DOCKER_TLS_CERTDIR: /certs
+
+    ports:
+      - "2376:2376"
+
+  # Define the Jenkins service
+  jenkins:
+    build:
+      context: .
+      dockerfile: Dockerfile.jenkins
+
+    container_name: jenkins-blueocean
+    restart: always
+    depends_on:
+      - dind
+
+    networks:
+      - jenkins-net
+
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    
+    environment:
+      DOCKER_HOST: tcp://docker:2376
+      DOCKER_CERT_PATH: /certs/client
+      DOCKER_TLS_VERIFY: "1"
+    
+    volumes:
+      - jenkins-data:/var/jenkins_home
+      - jenkins-docker-certs:/certs/client:ro
+
+# Define volumes
+volumes:
+  jenkins-data:
+  jenkins-docker-certs:
+
+# Define the Network
+networks:
+  jenkins-net:
+    driver: bridge
