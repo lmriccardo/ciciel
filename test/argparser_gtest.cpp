@@ -26,7 +26,7 @@ TEST_F(ArgumentParserTest, AddAndParseBooleanArgument) {
 }
 
 TEST_F(ArgumentParserTest, AddAndParseStringArgument) {
-    parser.addArgument<std::string>({ "name", "n", "User name", true });
+    parser.addArgument<std::string>({ "name", "n", "User name", false });
     const char* argv[] = { "test_program", "--name", "Alice" };
     parser.parse(3, argv);
 
@@ -35,14 +35,14 @@ TEST_F(ArgumentParserTest, AddAndParseStringArgument) {
 
 TEST_F(ArgumentParserTest, AddAndParseIntArgument) {
     parser.addArgument<int>({ "age", "a", "User age", true });
-    const char* argv[] = { "test_program", "--age", "42" };
-    parser.parse(3, argv);
+    const char* argv[] = { "test_program", "42" };
+    parser.parse(2, argv);
 
     EXPECT_EQ(parser.getValue<int>("age"), 42);
 }
 
 TEST_F(ArgumentParserTest, AddAndParseDoubleArgument) {
-    parser.addArgument<double>({ "score", "s", "Score value", true });
+    parser.addArgument<double>({ "score", "s", "Score value", false });
     const char* argv[] = { "test_program", "--score", "98.6" };
     parser.parse(3, argv);
 
@@ -75,7 +75,7 @@ TEST_F(ArgumentParserTest, OverrideDefaultOptionalArgument) {
 }
 
 TEST_F(ArgumentParserTest, ShortAndLongArgumentNamesBothWork) {
-    parser.addArgument<std::string>({ "output", "o", "Output file", true });
+    parser.addArgument<std::string>({ "output", "o", "Output file", false });
 
     const char* argv1[] = { "test_program", "--output", "file.txt" };
     const char* argv2[] = { "test_program", "-o", "file.txt" };
@@ -90,8 +90,8 @@ TEST_F(ArgumentParserTest, ShortAndLongArgumentNamesBothWork) {
 
 TEST_F(ArgumentParserTest, GettingWrongTypeThrows) {
     parser.addArgument<int>({ "num", "n", "Number of items", true });
-    const char* argv[] = { "test_program", "--num", "100" };
-    parser.parse(3, argv);
+    const char* argv[] = { "test_program", "100" };
+    parser.parse(2, argv);
 
     // We added an int, now try getting it as a double
     EXPECT_THROW({
