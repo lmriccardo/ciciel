@@ -1,5 +1,6 @@
 {
     "files.associations": {
+        "*.h": "c",
         "*.tsv": "tsv",
         "*.i": "swig",
         "array": "cpp",
@@ -71,6 +72,9 @@
         "span": "cpp",
         "variant": "cpp",
         "codecvt": "cpp",
-        "list": "cpp"
+        "list": "cpp",
+        "csignal": "cpp",
+        "forward_list": "cpp",
+        "unordered_set": "cpp"
     }
 }

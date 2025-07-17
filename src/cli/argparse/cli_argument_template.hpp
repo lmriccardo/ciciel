@@ -59,7 +59,7 @@ namespace ccl::cli::argparse
     template <typename T>
     inline std::string TemplateCliArgument<T>::getPatternMatch() const
     {
-        if (isRequired()) return "";
+        // if (isRequired()) return "";
 
         std::string pattern;
         pattern = "--" + getName();

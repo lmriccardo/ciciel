@@ -42,14 +42,11 @@ IntegerArgument::IntegerArgument(const std::string &name, const std::string &sna
 
 std::string IntegerArgument::getPatternMatch() const
 {
-    if (!isRequired())
-    {
-        std::string pattern = TemplateCliArgument<int>::getPatternMatch();
-        pattern = pattern + "(?:=|\\s+)(\\d+)";
-        return "(?:" + pattern + ")?";
-    }
+    std::string pattern = TemplateCliArgument<int>::getPatternMatch();
+    pattern = pattern + "(?:=|\\s+)(\\d+)";
+    return "(?:" + pattern + ")?";
 
-    return "(\\d+)";
+    // return "(\\d+)";
 }
 
 void IntegerArgument::setValue(const std::string& value)
@@ -70,14 +67,11 @@ ccl::cli::argparse::StringArgument::StringArgument(const std::string &name, cons
 
 std::string StringArgument::getPatternMatch() const
 {
-    if (!isRequired())
-    {
-        std::string pattern = TemplateCliArgument<std::string>::getPatternMatch();
-        pattern = pattern + "(?:=|\\s+)([\\w\\./_\\\\-]+)";
-        return "(?:" + pattern + ")?";
-    }
+    std::string pattern = TemplateCliArgument<std::string>::getPatternMatch();
+    pattern = pattern + "(?:=|\\s+)([\\w\\./_\\\\-]+)";
+    return "(?:" + pattern + ")?";
 
-    return "([\\w\\./_\\\\-]+)";
+    // return "([\\w\\./_\\\\-]+)";
 }
 
 void StringArgument::setValue(const std::string& value)
@@ -98,14 +92,11 @@ ccl::cli::argparse::DoubleArgument::DoubleArgument(const std::string &name, cons
 
 std::string DoubleArgument::getPatternMatch() const
 {
-    if (!isRequired())
-    {
-        std::string pattern = TemplateCliArgument<double>::getPatternMatch();
-        pattern = pattern + "(?:=|\\s+)(\\d+\\.\\d+)";
-        return "(?:" + pattern + ")?";
-    }
+    std::string pattern = TemplateCliArgument<double>::getPatternMatch();
+    pattern = pattern + "(?:=|\\s+)(\\d+\\.\\d+)";
+    return "(?:" + pattern + ")?";
 
-    return "(\\d+\\.{1}\\d+)";
+    // return "(\\d+\\.{1}\\d+)";
 }
 
 void DoubleArgument::setValue(const std::string& value) 

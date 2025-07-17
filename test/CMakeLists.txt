@@ -4,7 +4,6 @@ function(create_test exe_name cpp_file test_name)
     add_test( NAME ${test_name} COMMAND ${exe_name} )
 endfunction()
 
-create_test( ccl_Argparser argparser.cpp ArgparserTest ccl_Cli )
 create_test( ccl_RingBuffer ring_buffer_test.cpp RingBufferTest ccl_DataStructures )
 create_test( ccl_Array2D array2d_test.cpp Array2DTest ccl_DataStructures )
 create_test( ccl_DynArray2D dyn_array2d_test.cpp DynArray2DTest ccl_DataStructures )
@@ -35,3 +34,4 @@ endfunction()
 
 # Create GTest tests
 create_gtest_test( ccl_ThreadUnitTest thread_gtest.cpp ccl_System )
+create_gtest_test( ccl_ArgparserUnitTest argparser_gtest.cpp ccl_Cli )
