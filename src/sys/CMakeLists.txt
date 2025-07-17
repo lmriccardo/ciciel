@@ -15,4 +15,4 @@ add_library( ccl_System
 )
 
 target_link_libraries( ccl_System PRIVATE ccl_DataStructures )
-target_include_directories( ccl_System PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/.. )
+target_include_directories( ccl_System PUBLIC ${CMAKE_SOURCE_DIR}/src )

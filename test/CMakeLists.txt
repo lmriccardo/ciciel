@@ -17,21 +17,21 @@ create_test( ccl_UserInput user_input.cpp UserInputTest ccl_Cli )
 create_test( ccl_File io_file_test.cpp IoFileTest ccl_System )
 create_test( ccl_MapFile mmap_io_file_test.cpp MapIoFileTest ccl_System )
 
+set(UNIT_TEST_OUTPUT_DIR "${CMAKE_SOURCE_DIR}/bin/test/unittest")
+include(GoogleTest)
 
-# Try GTest framework
-find_package(GTest CONFIG REQUIRED)
-include(GoogleTest) 
+function(create_gtest_test test_name cpp_file)
+    add_executable( ${test_name} ${cpp_file})
+    target_link_libraries( ${test_name} PRIVATE ${ARGN} GTest::gtest_main )
 
-add_executable(thread_unit_tests thread_gtest.cpp)
-target_link_libraries(thread_unit_tests
-    PRIVATE
-        ccl_System
-        GTest::gtest_main
-)
+    set_target_properties( ${test_name} 
+        PROPERTIES 
+            RUNTIME_OUTPUT_DIRECTORY "${UNIT_TEST_OUTPUT_DIR}" )
+    
+    gtest_discover_tests( ${test_name} 
+        TEST_PREFIX "${test_name}." 
+        WORKING_DIRECTORY ${UNIT_TEST_OUTPUT_DIR} )
+endfunction()
 
-# Set include directories for the test executable to find thread.h
-target_include_directories(thread_unit_tests PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/../src/sys/concurrent # Path to your thread.h
-)
-
-gtest_discover_tests(thread_unit_tests)
+# Create GTest tests
+create_gtest_test( ccl_ThreadUnitTest thread_gtest.cpp ccl_System )

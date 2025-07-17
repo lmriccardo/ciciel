@@ -12,13 +12,3 @@ RUN locale-gen en_US.UTF-8
 RUN update-locale LANG=en_US.UTF-8
 ENV LANG=en_US.UTF-8
 ENV LC_ALL=en_US.UTF-8
-
-
-RUN apt install -y libgtest-dev
-RUN cd /usr/src/gtest && \
-    cmake . && \
-    make -j$(nproc) && \
-    mkdir -p /usr/local/lib && \
-    cp lib/libgtest.a /usr/local/lib/ && \
-    cp lib/libgtest_main.a /usr/local/lib/ && \
-    cp -r include/gtest /usr/local/include/
