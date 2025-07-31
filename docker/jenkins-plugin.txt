@@ -1,9 +1,0 @@
-blueocean
-docker-workflow
-json-path-api
-github
-git
-github-branch-source
-pipeline-github-lib
-workflow-multibranch
-credentials
