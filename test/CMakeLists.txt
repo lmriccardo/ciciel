@@ -1,14 +1,3 @@
-function(create_test exe_name cpp_file test_name)
-    add_executable( ${exe_name} ${cpp_file})
-    target_link_libraries( ${exe_name} PRIVATE ${ARGN} )
-    add_test( NAME ${test_name} COMMAND ${exe_name} )
-endfunction()
-
-create_test( ccl_RingBuffer ring_buffer_test.cpp RingBufferTest ccl_DataStructures )
-create_test( ccl_Array2D array2d_test.cpp Array2DTest ccl_DataStructures )
-create_test( ccl_DynArray2D dyn_array2d_test.cpp DynArray2DTest ccl_DataStructures )
-create_test( ccl_Vec2 vec2_test.cpp Vec2Test ccl_DataStructures )
-
 # Simple executable
 add_executable( ccl_Ui ui_test.cpp)
 target_link_libraries( ccl_Ui PRIVATE ccl_Cli )
@@ -40,6 +29,13 @@ function(create_gtest_test test_name cpp_file)
 endfunction()
 
 # Create GTest tests
-create_gtest_test( ccl_ThreadUnitTest thread_gtest.cpp ccl_System )
-create_gtest_test( ccl_ArgparserUnitTest argparser_gtest.cpp ccl_Cli )
-create_gtest_test( ccl_SignalSlotUnitTest signal_and_slot_gtest.cpp ccl_Patterns )
+create_gtest_test( ccl_ThreadUnitTest unittest/thread_gtest.cpp ccl_System )
+create_gtest_test( ccl_ArgparserUnitTest unittest/argparser_gtest.cpp ccl_Cli )
+create_gtest_test( ccl_SignalSlotUnitTest unittest/signal_and_slot_gtest.cpp ccl_Patterns )
+create_gtest_test( ccl_Array2DTest unittest/array2d_gtest.cpp ccl_DataStructures )
+create_gtest_test( ccl_DynArray2DTest unittest/dyn_array2d_gtest.cpp ccl_DataStructures )
+create_gtest_test( ccl_VecNTest unittest/vecn_gtest.cpp ccl_DataStructures )
+create_gtest_test( ccl_RingBufferTest unittest/ring_buffer_gtest.cpp ccl_DataStructures )
+create_gtest_test( ccl_ConcurrentRingBufferTest unittest/concurrent_ring_buffer_gtest.cpp ccl_DataStructures )
+create_gtest_test( ccl_ByteBufferTest unittest/byte_buffer_gtest.cpp ccl_DataStructures )
+create_gtest_test( ccl_CircularQueueTest unittest/circular_queue_gtest.cpp ccl_DataStructures )

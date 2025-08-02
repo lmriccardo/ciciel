@@ -21,6 +21,8 @@ namespace ccl::ds::grids
 
         template <typename U> VectorN& operator=(const VectorN<U,N>&);
         VectorN& operator=(const VectorN&);
+
+        constexpr size_t size() const override;
     };
 
     template <typename T, size_t N>
@@ -42,12 +44,10 @@ namespace ccl::ds::grids
     inline VectorN<T,N> &VectorN<T, N>::operator=(const VectorN<U,N> &other)
     {
         static_assert(std::is_convertible_v<U,T>, "Incompatible Types");
-
-        if (this != &other)
+        
+        for ( size_t idx = 0; idx < this->size(); idx++ )
         {
-            std::copy( other.m_container.begin(),
-                       other.m_container.end(),
-                       m_container.begin() );
+            this->set( other.at( idx ), idx );
         }
 
         return *this;
@@ -56,7 +56,17 @@ namespace ccl::ds::grids
     template <typename T, size_t N>
     inline VectorN<T,N>& VectorN<T,N>::operator=(const VectorN& other)
     {
-        return this->operator=<T>(other);
+        if (this != &other) {
+            return this->operator=<T>(other);
+        }
+
+        return *this;
+    }
+
+    template <typename T, size_t N>
+    inline constexpr size_t VectorN<T, N>::size() const
+    {
+        return N;
     }
 
     template <typename T>
@@ -88,16 +98,15 @@ namespace ccl::ds::grids
     {
         static_assert(std::is_convertible_v<U,T>, "Incompatible Types");
 
-        if (this == &other) return *this;
-
         if (this->size() != other.size())
         {
-            m_container.resize();
+            m_container.resize( other.size() );
         }
 
-        std::copy( 
-            other.m_container.begin(), other.m_container.end(), 
-            m_container.begin() );
+        for ( size_t idx = 0; idx < this->size(); idx++ )
+        {
+            this->set( other.at( idx ), idx );
+        }
 
         return *this;
     }
@@ -105,6 +114,11 @@ namespace ccl::ds::grids
     template <typename T>
     inline DynamicVectorN<T> &DynamicVectorN<T>::operator=(const DynamicVectorN& other)
     {
-        return this->operator=<T>(other);
+        if ( this != &other )
+        {
+            return this->operator=<T>(other);
+        }
+
+        return *this;
     }
 }

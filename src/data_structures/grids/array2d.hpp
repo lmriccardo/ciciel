@@ -58,6 +58,7 @@ namespace ccl::ds::grids
 
     template <typename T, size_t _NR, size_t _NC>
     inline Array2D<T, _NR, _NC>::Array2D(const Array2D &other)
+        : Base(other)
     {
         m_policy = other.m_policy;
         std::copy(other.m_grid.begin(), other.m_grid.end(), m_grid.begin());
@@ -86,6 +87,7 @@ namespace ccl::ds::grids
             for ( size_t c_idx = 0; c_idx < _NC; ++c_idx )
             {
                 set( vec.at(vec_idx), r_idx, c_idx );
+                vec_idx++;
             }
         }
     }

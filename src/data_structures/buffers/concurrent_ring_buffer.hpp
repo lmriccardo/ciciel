@@ -24,8 +24,8 @@ namespace ccl::ds::buffers
     {
     private:
         std::vector<T> m_buffer;
-        size_t         m_capacity;
         
+        size_t              m_capacity  = 0;
         std::atomic<size_t> m_size      = 0;
         size_t              m_front_idx = 0;
         size_t              m_back_idx  = 0;
@@ -106,8 +106,8 @@ namespace ccl::ds::buffers
     template <typename T>
     inline constexpr T ConcurrentRingBuffer<T>::_popBack()
     {
-        T value = std::move( m_buffer[m_back_idx] );
         m_back_idx = (m_back_idx + m_capacity - 1) % m_capacity;
+        T value = std::move( m_buffer[m_back_idx] );
         --m_size;
         return value;
     }
@@ -126,8 +126,10 @@ namespace ccl::ds::buffers
 
     template <typename T>
     inline ConcurrentRingBuffer<T>::ConcurrentRingBuffer(std::vector<T> && data)
-        : m_buffer( std::move( data ) ), m_capacity( data.size() ), m_size( m_capacity )
     {
+        m_capacity = data.size();
+        m_size = m_capacity;
+        m_buffer = std::move( data );
     }
 
     template <typename T>

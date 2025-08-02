@@ -72,6 +72,7 @@ namespace ccl::ds::grids
 
     template <typename T, typename ContainerT>
     inline DynamicArray2D<T, ContainerT>::DynamicArray2D(const DynamicArray2D &other)
+        : Base( other )
     {
         m_rows = other.m_rows;
         m_cols = other.m_cols;

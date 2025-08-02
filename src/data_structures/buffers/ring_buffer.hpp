@@ -24,8 +24,8 @@ namespace ccl::ds::buffers
     {
     private:
         std::vector<T> m_buffer;
-        size_t         m_capacity;
         
+        size_t m_capacity  = 0;
         size_t m_size      = 0;
         size_t m_front_idx = 0;
         size_t m_back_idx  = 0;
@@ -197,8 +197,8 @@ namespace ccl::ds::buffers
     inline constexpr T RingBuffer<T>::popBack()
     {
         if ( empty() ) throw std::runtime_error( "RingBuffer is empty!" );
-        T value = std::move( m_buffer[m_back_idx] );
         m_back_idx = (m_back_idx + m_capacity - 1) % m_capacity;
+        T value = std::move( m_buffer[m_back_idx] );
         --m_size;
         return value;
     }

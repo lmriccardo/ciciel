@@ -31,8 +31,9 @@ namespace ccl::ds::queue
         CircularQueue( size_t capacity, LossPolicy policy = LossPolicy::ERROR );
         CircularQueue( const CircularQueue& ) = default;
         CircularQueue( CircularQueue&& ) = default;
+        explicit CircularQueue( ds::buffers::RingBuffer<T>&& );
 
-        template <typename U> explicit CircularQueue( U&& );
+        CircularQueue& operator=( const CircularQueue<T>& );
 
         virtual ~CircularQueue() = default;
 
@@ -59,21 +60,29 @@ namespace ccl::ds::queue
     };
 
     template <typename T>
-    inline CircularQueue<T>::CircularQueue(size_t capacity, LossPolicy policy)
+    inline CircularQueue<T>::CircularQueue(size_t capacity, const LossPolicy policy)
         : m_buffer( capacity ), m_policy( policy )
     {
-        static_assert( m_policy != LossPolicy::BLOCK, 
-            "BLOCK Loss policy is available only for concurrect queue!" );
+        if (policy == LossPolicy::BLOCK)
+            throw std::invalid_argument("BLOCK Loss policy is available only for concurrent queue!");
     }
 
     template <typename T>
-    template <typename U>
-    inline CircularQueue<T>::CircularQueue(U &&buffer)
-        : m_buffer( std::forward<U>(buffer) )
+    inline CircularQueue<T> &CircularQueue<T>::operator=(const CircularQueue<T> &other)
     {
-        static_assert( std::is_same_v<std::remove_cvref_t<U>, ds::buffers::RingBuffer<T>>,
-            "Constructor requires a RingBuffer<T> argument.");
+        if ( this != &other )
+        {
+            m_buffer = other.m_buffer;
+            m_policy = other.m_policy;
+        }
+
+        return *this;
     }
+
+    template <typename T>
+    inline CircularQueue<T>::CircularQueue(ds::buffers::RingBuffer<T>&& buffer)
+        : m_buffer( std::forward<ds::buffers::RingBuffer<T>>(buffer) )
+    {}
 
     template <typename T>
     inline size_t CircularQueue<T>::size() const
@@ -158,7 +167,7 @@ namespace ccl::ds::queue
     inline T CircularQueue<T>::pop()
     {
         try {
-            m_buffer.popFront();
+            return m_buffer.popFront();
         } catch ( std::exception& e ) {
             throw std::out_of_range( "CircularQueue is empty!" );
         }
