@@ -11,6 +11,9 @@ target_link_libraries( ccl_File PRIVATE ccl_Io )
 add_executable( ccl_MapFile mmap_io_file_test.cpp)
 target_link_libraries( ccl_MapFile PRIVATE ccl_Io )
 
+add_executable( ccl_MetricsTest metrics_test.cpp )
+target_link_libraries( ccl_MetricsTest PRIVATE ccl_Metrics )
+
 # Google Automatic Test
 set(UNIT_TEST_OUTPUT_DIR "${CMAKE_SOURCE_DIR}/bin/test/unittest")
 include(GoogleTest)
