@@ -93,6 +93,24 @@ void MappedFileIO::remap( OFF_T size, bool keep_size )
 {
     // Close the previous allocated memory map
     free();
+
+    int result = 0;
+
+#ifndef _WIN32
+    // First, we need to resize the file
+    result = ftruncate( m_handler.get(), size );
+#else
+    // Do the same for Windows
+#endif
+
+    if ( result < 0 )
+    {
+        std::cerr << "Unable to resize the file " << m_filePath << " [Error]: "
+                    << get_last_error_string()
+                    << std::endl;
+        
+        return;
+    }
     
     // Creates a new map
     // Get the actual flags using the overload function, platform specific
@@ -228,28 +246,6 @@ ssize_t MappedFileIO::write(const char *src, size_t nbytes)
     if ( m_writeIdx + nbytes > m_mapBuffer.getBufferCapacity() )
     {
         size_t nsize = m_mapBuffer.getBufferCapacity() * m_growFactor;
-        int result = 0;
-
-#ifndef _WIN32
-
-        // First, we need to resize the file
-        result = ftruncate( m_handler.get(), nsize );
-
-#else
-
-        // Do the same for Windows
-
-#endif
-
-        if ( result < 0 )
-        {
-            std::cerr << "Unable to resize the file " << m_filePath << " [Error]: "
-                      << get_last_error_string()
-                      << std::endl;
-            
-            return -1;
-        }
-
         remap( nsize, true );
     }
 

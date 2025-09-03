@@ -4,7 +4,7 @@
 #include <fstream>
 #include <string>
 #include <cstring>
-#include <sys/io/base/stream_io.hpp>
+#include <io/base/stream_io.hpp>
 #include <data_structures/base/iterators.hpp>
 
 #undef FLAG_T
