@@ -9,10 +9,22 @@
 
 namespace ccl::metrics
 {
+    struct MetricNode
+    {
+        std::string m_f_name;  // The function name
+        TID_t       m_tid;     // The Thread ID of the collected metrics
+        Metrics     m_metrics; // Collected metrics
+
+        std::vector<std::shared_ptr<MetricNode>> m_children;
+        
+        MetricNode() = default;
+        MetricNode( const std::string& name, TID_t tid, Metrics&& metrics );
+    };
+
     /**
      * @class MetricsLogger
      */
-    class MetricsLogger
+    class MetricsStack
     {
         friend class MetricsCollector;
 
@@ -41,11 +53,11 @@ namespace ccl::metrics
         std::vector<collector_life_t>& getCollectorsByTid( int tid );
 
     public:
-        MetricsLogger() = default;
+        MetricsStack() = default;
 
-        MetricsLogger( const MetricsLogger& ) = delete;
-        MetricsLogger& operator=( const MetricsLogger& ) = delete;
+        MetricsStack( const MetricsStack& ) = delete;
+        MetricsStack& operator=( const MetricsStack& ) = delete;
 
-        static MetricsLogger& getInstance();
+        static MetricsStack& getInstance();
     };
 }
