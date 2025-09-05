@@ -1,3 +1,7 @@
 add_subdirectory( cli )
+add_subdirectory( patterns )
 add_subdirectory( data_structures )
-add_subdirectory( sys )
+add_subdirectory( io )
+add_subdirectory( concurrent )
+add_subdirectory( time )
+add_subdirectory( metrics )

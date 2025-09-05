@@ -14,7 +14,13 @@ namespace ccl::ds::grids
 
         Vec3();
         Vec3( T x, T y, T z );
+        Vec3(const Vec3&) = default;
+        Vec3(Vec3&&) = default;
+
         virtual ~Vec3() = default;
+
+        template <typename U> Vec3& operator=(const Vec3<U>&);
+        Vec3& operator=(const Vec3&);
 
         using VectorN<T,3>::set;
         using VectorN<T,3>::at;
@@ -39,5 +45,19 @@ namespace ccl::ds::grids
     {
         os << "[ " << vec.m_x << ", " << vec.m_y << ", " << vec.m_z << " ]";
         return os;
+    }
+
+    template <typename T>
+    template <typename U>
+    inline Vec3<T> &Vec3<T>::operator=(const Vec3<U> &other)
+    {
+        this->template VectorN<T,3>::template operator=<U>(other);
+        return *this;
+    }
+
+    template <typename T>
+    inline Vec3<T>& Vec3<T>::operator=(const Vec3& other)
+    {
+        return this->operator=<T>(other);
     }
 }

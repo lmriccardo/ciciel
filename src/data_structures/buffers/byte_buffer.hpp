@@ -36,6 +36,8 @@ namespace ccl::ds::buffers
         void position(const size_t newpos);   // Sets the new position
 
         void setByteOrder(const ByteOrder &order); // Set the byte order
+        void setBuffer( unsigned char* buffer, size_t size, bool kee_size ); // Set the current buffer
+
         const ByteOrder &getByteOrder() const;     // Returns current byte order
         size_t getBufferCapacity() const;          // Returns the buffer capacity
         size_t getBufferSize() const;              // Returns the current buffer size
@@ -87,6 +89,8 @@ namespace ccl::ds::buffers
         size_t         m_position; // The current position into the buffer
         size_t         m_size;     // The total number of elements into the buffer
         ByteOrder      m_order;    // The byte order (host or network-order)
+
+        bool m_has_ownership = true; // It has the ownership of the buffer
     };
 
     typedef std::shared_ptr<ByteBuffer> ByteBuffer_ptr;

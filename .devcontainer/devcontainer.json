@@ -1,5 +1,5 @@
 {
-    "name": "MineLib Development Container",
+    "name": "CCL Development Container",
     "build" : {
         "dockerfile": "../docker/Dockerfile",
         "context" : "../"

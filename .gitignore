@@ -2,3 +2,4 @@ build/
 log/
 bin/
 lib/
+test/simple_file*

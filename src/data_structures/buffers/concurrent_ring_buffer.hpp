@@ -20,18 +20,18 @@ namespace ccl::ds::buffers
      * @tparam T The type of values inside the container
      */
     template <typename T>
-    class ConcurrentRingBuffer : public IndexableInterface<T>
+    class ConcurrentRingBuffer : public ds::base::IndexableInterface<T>
     {
     private:
         std::vector<T> m_buffer;
-        size_t         m_capacity;
         
+        size_t              m_capacity  = 0;
         std::atomic<size_t> m_size      = 0;
         size_t              m_front_idx = 0;
         size_t              m_back_idx  = 0;
 
-        std::mutex              m_mutex; // Shared mutex for reading data
-        std::condition_variable m_cv;    // Condition variable on wait for emptiness
+        mutable std::mutex m_mutex; // Shared mutex for reading data
+        std::condition_variable m_cv; // Condition variable on wait for emptiness
 
         constexpr void boundCheck( size_t ) const;
         constexpr T    _popFront ();
@@ -106,8 +106,8 @@ namespace ccl::ds::buffers
     template <typename T>
     inline constexpr T ConcurrentRingBuffer<T>::_popBack()
     {
-        T value = std::move( m_buffer[m_back_idx] );
         m_back_idx = (m_back_idx + m_capacity - 1) % m_capacity;
+        T value = std::move( m_buffer[m_back_idx] );
         --m_size;
         return value;
     }
@@ -126,8 +126,10 @@ namespace ccl::ds::buffers
 
     template <typename T>
     inline ConcurrentRingBuffer<T>::ConcurrentRingBuffer(std::vector<T> && data)
-        : m_buffer( std::move( data ) ), m_capacity( data.size() ), m_size( m_capacity )
     {
+        m_capacity = data.size();
+        m_size = m_capacity;
+        m_buffer = std::move( data );
     }
 
     template <typename T>
@@ -140,7 +142,7 @@ namespace ccl::ds::buffers
         std::copy( buffer.begin(), buffer.end(), std::back_inserter(m_buffer) );
 
         m_front_idx = m_size % m_capacity;
-        m_back_idx  = m_size == 0 ? m_size : (m_size + m_capacity - 1) % m_capacity;
+        m_back_idx  = m_size == 0 ? m_size.load() : (m_size + m_capacity - 1) % m_capacity;
     }
 
     template <typename T>
@@ -158,7 +160,7 @@ namespace ccl::ds::buffers
         }
 
         m_front_idx = m_size % m_capacity;
-        m_back_idx  = m_size == 0 ? m_size : (m_size + m_capacity - 1) % m_capacity;
+        m_back_idx  = m_size == 0 ? m_size.load() : (m_size + m_capacity - 1) % m_capacity;
     }
 
     template <typename T>
@@ -184,7 +186,7 @@ namespace ccl::ds::buffers
     {
         boundCheck( pos );
 
-        std::unique_lock lock(m_mutex);
+        std::lock_guard<std::mutex> lock(m_mutex);
         return m_buffer[(m_front_idx + pos) % m_capacity];
     }
 
@@ -196,7 +198,7 @@ namespace ccl::ds::buffers
     {
         boundCheck( pos );
 
-        std::unique_lock lock(m_mutex);
+        std::lock_guard<std::mutex> lock(m_mutex);
         return m_buffer[(m_front_idx + pos) % m_capacity];
     }
 
@@ -277,7 +279,7 @@ namespace ccl::ds::buffers
     {
         if ( empty() ) return false;
         
-        std::unique_lock lock(m_mutex);
+        std::lock_guard<std::mutex> lock(m_mutex);
         dst = _popFront();
         return true;
     }
@@ -287,7 +289,7 @@ namespace ccl::ds::buffers
     {
         if ( empty() ) return false;
         
-        std::unique_lock lock(m_mutex);
+        std::lock_guard<std::mutex> lock(m_mutex);
         dst = _popBack();
         return true;
     }

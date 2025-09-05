@@ -7,7 +7,7 @@
 
 namespace ccl::ds::base
 {
-    template <typename T, typename C, typename = is_container<T, C>>
+    template <typename T, typename C, typename Check = is_container<T, C>>
     class AbstractVectorContainer : public IterableContainer<T>
     {
     protected:

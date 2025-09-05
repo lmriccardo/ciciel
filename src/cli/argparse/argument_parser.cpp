@@ -167,7 +167,7 @@ void ArgumentParser::printUsage() const
 
 void ArgumentParser::parse(int argc, const char **argv)
 {
-    if (argc < 2)
+    if (argc < 1)
     {
         printUsage();
         exit(EXIT_FAILURE);

@@ -17,11 +17,11 @@ namespace ccl::ds::grids
      * (i.e., it is an iterable container), .at(), .size(), therefore a number of
      * methods coming from the std::vector container.
      */
-    template <typename T, typename Container = std::vector<T>>
-    class DynamicArray2D : public base::AbstractGridContainer<T, Container>
+    template <typename T, typename ContainerT = std::vector<T>>
+    class DynamicArray2D : public base::AbstractGridContainer<T, ContainerT>
     {
     private:
-        using Base = base::AbstractGridContainer<T, Container>;
+        using Base = base::AbstractGridContainer<T, ContainerT>;
         using Base::m_grid;
         using Base::m_policy;
 
@@ -57,21 +57,22 @@ namespace ccl::ds::grids
         void extend( size_t );
     };
 
-    template <typename T, typename Container>
-    inline DynamicArray2D<T, Container>::DynamicArray2D(size_t rows, size_t cols, Ordering2DPolicy p)
+    template <typename T, typename ContainerT>
+    inline DynamicArray2D<T, ContainerT>::DynamicArray2D(size_t rows, size_t cols, Ordering2DPolicy p)
         : Base( p ), m_rows( rows ), m_cols( cols )
     {
         m_grid.resize( m_rows * m_cols );
     }
 
-    template <typename T, typename Container>
-    inline DynamicArray2D<T, Container>::DynamicArray2D(size_t size, Ordering2DPolicy p)
+    template <typename T, typename ContainerT>
+    inline DynamicArray2D<T, ContainerT>::DynamicArray2D(size_t size, Ordering2DPolicy p)
         : DynamicArray2D( size, size, p )
     {
     }
 
-    template <typename T, typename Container>
-    inline DynamicArray2D<T, Container>::DynamicArray2D(const DynamicArray2D &other)
+    template <typename T, typename ContainerT>
+    inline DynamicArray2D<T, ContainerT>::DynamicArray2D(const DynamicArray2D &other)
+        : Base( other )
     {
         m_rows = other.m_rows;
         m_cols = other.m_cols;
@@ -83,8 +84,8 @@ namespace ccl::ds::grids
             m_grid.begin() );
     }
 
-    template <typename T, typename Container>
-    inline DynamicArray2D<T, Container>::DynamicArray2D(DynamicArray2D &&other)
+    template <typename T, typename ContainerT>
+    inline DynamicArray2D<T, ContainerT>::DynamicArray2D(DynamicArray2D &&other)
     {
         m_grid = std::move( other.m_grid );
         m_rows = other.m_rows;
@@ -95,9 +96,9 @@ namespace ccl::ds::grids
         other.m_rows = 0;
     }
 
-    template <typename T, typename Container>
+    template <typename T, typename ContainerT>
     template <typename U, typename>
-    inline DynamicArray2D<T, Container>::DynamicArray2D(U &&input, size_t rows, size_t cols)
+    inline DynamicArray2D<T, ContainerT>::DynamicArray2D(U &&input, size_t rows, size_t cols)
         : Base(), m_rows( rows ), m_cols( cols )
     {
         if ( input.size() != size() ) throw std::invalid_argument( "Size mismatch" );
@@ -115,15 +116,15 @@ namespace ccl::ds::grids
         }
     }
 
-    template <typename T, typename Container>
+    template <typename T, typename ContainerT>
     template <typename U, typename>
-    inline DynamicArray2D<T, Container>::DynamicArray2D(U &&input, size_t size)
-        : DynamicArray2D<T, Container>( std::forward<U>(input), size, size )
+    inline DynamicArray2D<T, ContainerT>::DynamicArray2D(U &&input, size_t size)
+        : DynamicArray2D<T, ContainerT>( std::forward<U>(input), size, size )
     {
     }
 
-    template <typename T, typename Container>
-    inline DynamicArray2D<T, Container> &DynamicArray2D<T, Container>::operator=(const DynamicArray2D &other)
+    template <typename T, typename ContainerT>
+    inline DynamicArray2D<T, ContainerT> &DynamicArray2D<T, ContainerT>::operator=(const DynamicArray2D &other)
     {
         if ( this != &other )
         {
@@ -138,8 +139,8 @@ namespace ccl::ds::grids
         return *this;
     }
 
-    template <typename T, typename Container>
-    inline DynamicArray2D<T, Container> &DynamicArray2D<T, Container>::operator=(DynamicArray2D &&other)
+    template <typename T, typename ContainerT>
+    inline DynamicArray2D<T, ContainerT> &DynamicArray2D<T, ContainerT>::operator=(DynamicArray2D &&other)
     {
         m_grid = std::move( other.m_grid );
         m_rows = other.m_rows;
@@ -152,14 +153,14 @@ namespace ccl::ds::grids
         return *this;
     }
 
-    template <typename T, typename Container>
-    inline constexpr size_t DynamicArray2D<T, Container>::size() const
+    template <typename T, typename ContainerT>
+    inline constexpr size_t DynamicArray2D<T, ContainerT>::size() const
     {
         return m_cols * m_rows;
     }
 
-    template <typename T, typename Container>
-    inline constexpr size_t DynamicArray2D<T,Container>::size(size_t dim) const
+    template <typename T, typename ContainerT>
+    inline constexpr size_t DynamicArray2D<T,ContainerT>::size(size_t dim) const
     {
         if ( dim != (size_t)Selector2D::ROWS && dim != (size_t)Selector2D::COLUMNS )
             throw std::invalid_argument( "Array2D has only 2 dimensions" );
@@ -174,8 +175,8 @@ namespace ccl::ds::grids
      * set and .at or operator[] will appear to be transposed, as well as iterating
      * through out the entire container.
      */
-    template <typename T, typename Container>
-    inline void DynamicArray2D<T,Container>::transpose()
+    template <typename T, typename ContainerT>
+    inline void DynamicArray2D<T,ContainerT>::transpose()
     {
         this->Base::transpose();
         std::swap( m_rows, m_cols );
@@ -185,8 +186,8 @@ namespace ccl::ds::grids
      * Extend the given dimension with the input padding size. Notice, that this
      * is an expensive operations given heap allocation and vector resizing.
      */
-    template <typename T, typename Container>
-    inline void DynamicArray2D<T,Container>::extend(Selector2D dim, size_t pad_size)
+    template <typename T, typename ContainerT>
+    inline void DynamicArray2D<T,ContainerT>::extend(Selector2D dim, size_t pad_size)
     {
         // If the selected dimension is the row dimension, then it is
         // sufficient to update the total number of rows, and then
@@ -216,8 +217,8 @@ namespace ccl::ds::grids
      * that this is an expensive operations given heap allocation 
      * and vector resizing.
      */
-    template <typename T, typename Container>
-    inline void DynamicArray2D<T,Container>::extend(size_t r_pad_size, size_t c_pad_size)
+    template <typename T, typename ContainerT>
+    inline void DynamicArray2D<T,ContainerT>::extend(size_t r_pad_size, size_t c_pad_size)
     {
         extend( Selector2D::ROWS, r_pad_size );
         extend( Selector2D::COLUMNS, c_pad_size );
@@ -227,8 +228,8 @@ namespace ccl::ds::grids
      * Extend both dimensions of the given padding size. Notice, that this
      * is an expensive operations given heap allocation and vector resizing.
      */
-    template <typename T, typename Container>
-    inline void DynamicArray2D<T,Container>::extend(size_t pad_size)
+    template <typename T, typename ContainerT>
+    inline void DynamicArray2D<T,ContainerT>::extend(size_t pad_size)
     {
         extend( pad_size, pad_size );
     }
