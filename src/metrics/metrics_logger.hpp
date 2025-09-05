@@ -7,7 +7,7 @@
 
 namespace ccl::metrics
 {
-    struct MetricElement
+    struct MetricEvent
     {
         std::string m_parent_func_name;
         std::string m_func_name;
@@ -18,7 +18,7 @@ namespace ccl::metrics
     class AbstractMetricsLogger : ccl::sys::concurrent::Thread
     {
     protected:
-        ccl::ds::queue::ConcurrentCQueue<MetricElement> m_queue;
+        ccl::ds::queue::ConcurrentCQueue<MetricEvent> m_queue;
 
         using Thread::isCancelled;
 

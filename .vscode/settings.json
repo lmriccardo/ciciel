@@ -1,8 +1,8 @@
 {
     "files.associations": {
+        "*.h": "c",
         "*.tsv": "tsv",
         "*.i": "swig",
-        "*.h": "c",
         "array": "cpp",
         "bit": "cpp",
         "cctype": "cpp",
@@ -76,6 +76,7 @@
         "csignal": "cpp",
         "forward_list": "cpp",
         "unordered_set": "cpp",
-        "future": "cpp"
+        "future": "cpp",
+        "typeindex": "cpp"
     }
 }

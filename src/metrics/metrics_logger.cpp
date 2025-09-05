@@ -19,13 +19,13 @@ void ccl::metrics::TreeMetricsLogger::run()
 {
     while ( !isCancelled() )
     {
-        MetricElement elem = m_queue.pop();
+        MetricEvent elem = m_queue.pop();
     }
 }
 
 void TreeMetricsLogger::push(MetricsCollector &collector)
 {
-    MetricElement element;
+    MetricEvent element;
 
     element.m_func_name = collector.getFuncName();
     element.m_metrics = collector.getCollectedMetrics();

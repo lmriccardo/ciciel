@@ -2,10 +2,6 @@
 
 using namespace ccl::metrics;
 
-MetricNode::MetricNode(const std::string &name, TID_t tid, Metrics &&metrics)
-: m_f_name( name ), m_tid( tid ), m_metrics( std::move(metrics) )
-{}
-
 MetricsStack& MetricsStack::getInstance()
 {
     static std::unique_ptr<MetricsStack> ptr{ new MetricsStack() };
