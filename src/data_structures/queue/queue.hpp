@@ -165,7 +165,7 @@ namespace ccl::ds::queue
     inline bool Queue<T>::tryPop(T &dest)
     {
         if ( empty() ) return false;
-        dest = m_queue.front();
+        pop(dest);
         return true;
     }
 

@@ -35,7 +35,8 @@ add_library(ccl_Cli
 target_link_libraries( ccl_Cli PRIVATE 
     ccl_DataStructures
     ccl_Patterns
-    ccl_System
+    ccl_Concurrent
+    ccl_Time
     ${CURSES_TARGET_LIBRARIES} 
     utf8proc )
 

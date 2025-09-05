@@ -5,8 +5,8 @@
 #include <fcntl.h>
 #include <sys/epoll.h>
 #include <sys/eventfd.h>
-#include <sys/concurrent/thread.hpp>
-#include <sys/time/times_utils.hpp>
+#include <concurrent/thread.hpp>
+#include <time/times_utils.hpp>
 #include <data_structures/buffers/concurrent_ring_buffer.hpp>
 #include <cli/ui/utils/string.hpp>
 #include "keys.hpp"
