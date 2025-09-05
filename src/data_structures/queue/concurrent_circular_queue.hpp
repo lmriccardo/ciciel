@@ -8,7 +8,7 @@ namespace ccl::ds::queue
 {
     // TODO: To be extended with more features
     /**
-     * @class ConcurrentCQueue
+     * @class ConcurrentCircQueue
      * 
      * @brief Concurrent Circular Queue class. It is just a Circular Queue
      * implemented thread-safetiness features. It is based on the Concurrent
@@ -17,7 +17,7 @@ namespace ccl::ds::queue
      * @tparam T The type of data belonging to the queue
      */
     template <typename T>
-    class ConcurrentCQueue : public QueueInterface<T>
+    class ConcurrentCircQueue : public QueueInterface<T>
     {
     private:
         ds::buffers::ConcurrentRingBuffer<T> m_queue;
@@ -27,8 +27,8 @@ namespace ccl::ds::queue
         std::condition_variable m_full_cv; // Conditional variable for full check
 
     public:
-        ConcurrentCQueue() = default;
-        ConcurrentCQueue(size_t capacity, LossPolicy policy=LossPolicy::BLOCK);
+        ConcurrentCircQueue() = default;
+        ConcurrentCircQueue(size_t capacity, LossPolicy policy=LossPolicy::BLOCK);
 
         size_t size    () const override;
         bool   empty   () const override;
@@ -47,36 +47,36 @@ namespace ccl::ds::queue
     };
 
     template <typename T>
-    inline ConcurrentCQueue<T>::ConcurrentCQueue(size_t capacity, LossPolicy policy)
+    inline ConcurrentCircQueue<T>::ConcurrentCircQueue(size_t capacity, LossPolicy policy)
     : m_queue( capacity ), m_policy( policy )
     {}
 
     template <typename T>
-    inline size_t ConcurrentCQueue<T>::size() const
+    inline size_t ConcurrentCircQueue<T>::size() const
     {
         return m_queue.size();
     }
 
     template <typename T>
-    inline bool ConcurrentCQueue<T>::empty() const
+    inline bool ConcurrentCircQueue<T>::empty() const
     {
         return m_queue.empty();
     }
 
     template <typename T>
-    inline size_t ConcurrentCQueue<T>::capacity() const
+    inline size_t ConcurrentCircQueue<T>::capacity() const
     {
         return m_queue.capacity();
     }
 
     template <typename T>
-    inline bool ConcurrentCQueue<T>::full() const
+    inline bool ConcurrentCircQueue<T>::full() const
     {
         return size() == capacity();
     }
 
     template <typename T>
-    inline void ConcurrentCQueue<T>::push(const T &data)
+    inline void ConcurrentCircQueue<T>::push(const T &data)
     {
         if ( full() && m_policy == LossPolicy::ERROR )
         {
@@ -86,14 +86,14 @@ namespace ccl::ds::queue
         if ( full() && m_policy == LossPolicy::BLOCK )
         {
             std::unique_lock _l( m_mutex );
-            m_full_cv.wait_for( _l, [this](){ return !full(); } );
+            m_full_cv.wait( _l, [this](){ return !full(); } );
         }
 
         m_queue.put( data );
     }
 
     template <typename T>
-    inline void ConcurrentCQueue<T>::push(T &&data)
+    inline void ConcurrentCircQueue<T>::push(T &&data)
     {
         if ( full() && m_policy == LossPolicy::ERROR )
         {
@@ -103,50 +103,45 @@ namespace ccl::ds::queue
         if ( full() && m_policy == LossPolicy::BLOCK )
         {
             std::unique_lock _l( m_mutex );
-            m_full_cv.wait_for( _l, [this](){ return !full(); } );
+            m_full_cv.wait( _l, [this](){ return !full(); } );
         }
 
         m_queue.put( std::move(data) );
     }
 
     template <typename T>
-    inline bool ConcurrentCQueue<T>::tryPush(const T &data)
+    inline bool ConcurrentCircQueue<T>::tryPush(const T &data)
     {
-        if ( full() && ( m_policy != LossPolicy::ERROR ) )
-        {
-            return false;
-        }
-
+        if ( full()) return false;
         push( data );
         return true;
     }
 
     template <typename T>
-    inline bool ConcurrentCQueue<T>::tryPush(T &&data)
+    inline bool ConcurrentCircQueue<T>::tryPush(T &&data)
     {
-        if ( full() && ( m_policy != LossPolicy::ERROR ) )
-        {
-            return false;
-        }
-
+        if ( full()) return false;
         push( std::move(data) );
         return true;
     }
 
     template <typename T>
-    inline T ConcurrentCQueue<T>::pop()
+    inline T ConcurrentCircQueue<T>::pop()
     {
-        return m_queue.popFront();
+        T elem = m_queue.popFront();
+        m_full_cv.notify_one();
+        return elem;
     }
 
     template <typename T>
-    inline void ConcurrentCQueue<T>::pop(T &dst)
+    inline void ConcurrentCircQueue<T>::pop(T &dst)
     {
         dst = m_queue.popFront();
+        m_full_cv.notify_one();
     }
 
     template <typename T>
-    inline bool ConcurrentCQueue<T>::tryPop(T &dst)
+    inline bool ConcurrentCircQueue<T>::tryPop(T &dst)
     {
         if ( empty() ) return false;
         pop(dst);
@@ -154,7 +149,7 @@ namespace ccl::ds::queue
     }
 
     template <typename T>
-    inline bool ConcurrentCQueue<T>::peek(T &dst) const
+    inline bool ConcurrentCircQueue<T>::peek(T &dst) const
     {
         return m_queue.tryFront( dst );
     }

@@ -43,3 +43,4 @@ create_gtest_test( ccl_ConcurrentRingBufferTest unittest/concurrent_ring_buffer_
 create_gtest_test( ccl_ByteBufferTest unittest/byte_buffer_gtest.cpp ccl_DataStructures )
 create_gtest_test( ccl_CircularQueueTest unittest/circular_queue_gtest.cpp ccl_DataStructures )
 create_gtest_test( ccl_PubSubTest unittest/pubsub_gtest.cpp ccl_Patterns )
+create_gtest_test( ccl_ConcurrentCircQueueTest unittest/conc_circ_queue_gtest.cpp ccl_DataStructures )
