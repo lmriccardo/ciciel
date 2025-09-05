@@ -1,42 +1,44 @@
 #pragma once
 
-#include <concurrent/thread.hpp>
-#include <metrics/metrics_stack.hpp>
-#include <data_structures/queue/concurrent_circular_queue.hpp>
+#include <metrics/metrics_broker.hpp>
+#include <patterns/pub_sub/event.hpp>
+#include <patterns/pub_sub/subscriber.hpp>
 #include <unordered_map>
 
 namespace ccl::metrics
 {
-    struct MetricEvent
+    /**
+     * @class AbstractMetricsLogger
+     *
+     * @brief Abstract base class for asynchronous metrics loggers in the Pub-Sub system.
+     *
+     * This class extends AsyncSubscriber to consume metric events asynchronously.
+     * It provides an interface for logging or processing function-level metrics
+     * delivered via MetricEvent instances.
+     */
+    class AbstractMetricsLogger : public ccl::dp::pub_sub::AsyncSubscriber
     {
-        std::string m_parent_func_name;
-        std::string m_func_name;
-        Metrics     m_metrics;
-        TID_t       m_thread_id;
-    };
-
-    class AbstractMetricsLogger : ccl::sys::concurrent::Thread
-    {
-    protected:
-        ccl::ds::queue::ConcurrentCQueue<MetricEvent> m_queue;
-
-        using Thread::isCancelled;
-
     public:
-        AbstractMetricsLogger( const std::string& name );
-        
-        virtual void run() override = 0;
-        virtual void push( MetricsCollector& collector ) = 0;
-    };
+        AbstractMetricsLogger( const std::string& name )
+        : AsyncSubscriber( name )
+        {}
 
+        virtual ~AbstractMetricsLogger() = default;
+
+        virtual void consume(event_ptr event) = 0;
+    };
+    
     class TreeMetricsLogger : public AbstractMetricsLogger
     {
     private:
+        // TODO: Add metrics tree
         
     public:
         TreeMetricsLogger();
         
-        void run() override;
-        void push( MetricsCollector& collector );
+        virtual ~TreeMetricsLogger() 
+        { AsyncSubscriber::stop(); }
+        
+        void consume(event_ptr event) override;
     };
 };

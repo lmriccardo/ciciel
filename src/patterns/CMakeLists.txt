@@ -5,7 +5,7 @@ add_library( ccl_Patterns
     # PubSub Design Pattern
     pub_sub/subscriber.cpp
     pub_sub/publisher.cpp
-    pub_sub/pub_sub_broker.cpp
+    pub_sub/broker.cpp
 )
 
 target_include_directories( ccl_Patterns INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/.. )

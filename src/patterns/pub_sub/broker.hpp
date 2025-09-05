@@ -11,6 +11,26 @@
 
 namespace ccl::dp::pub_sub
 {
+    /**
+     * @class PubSubBroker
+     *
+     * @brief Central broker in a publish-subscribe system.
+     *
+     * The PubSubBroker manages the subscription of subscribers to specific event types
+     * and delivers events to the appropriate subscribers when published.
+     *
+     * Key responsibilities:
+     * - Maintain a thread-safe mapping from event types to subscribers using weak pointers.
+     * - Allow subscribers to subscribe/unsubscribe to one or multiple event types via variadic templates.
+     * - Notify all subscribers of a given event when published.
+     * - Automatically clean up expired subscribers (weak pointers that are no longer valid).
+     *
+     * Thread-safety:
+     * - All public operations (subscribe, unsubscribe, notifySubscribers) are protected by a mutex.
+     *
+     * Type-based dispatch:
+     * - Events are delivered only to subscribers that registered for the runtime type of the event.
+     */
     class PubSubBroker
     {
     protected:

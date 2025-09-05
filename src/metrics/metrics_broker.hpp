@@ -1,18 +1,20 @@
 #pragma once
 
 #include <metrics/metrics_gather.hpp>
+#include <patterns/pub_sub/broker.hpp>
 #include <memory>
 #include <vector>
 #include <unordered_map>
 #include <thread>
 #include <mutex>
+#include <iterator>
 
 namespace ccl::metrics
 {
     /**
-     * @class MetricsStack
+     * @class MetricsBroker
      */
-    class MetricsStack
+    class MetricsBroker : public ccl::dp::pub_sub::PubSubBroker
     {
         friend class MetricsCollector;
 
@@ -22,11 +24,6 @@ namespace ccl::metrics
         
         std::unordered_map<int, std::vector<collector_life_t>> m_metrics_map;
         std::mutex m_mutex;
-
-        /**
-         * @brief Gather the metrics from the last collector of the input TID
-         */
-        void gather( const MetricsCollector& collector );
 
         /**
          * @brief Add a new metric collector on the stack
@@ -41,11 +38,15 @@ namespace ccl::metrics
         std::vector<collector_life_t>& getCollectorsByTid( int tid );
 
     public:
-        MetricsStack() = default;
+        MetricsBroker() = default;
 
-        MetricsStack( const MetricsStack& ) = delete;
-        MetricsStack& operator=( const MetricsStack& ) = delete;
+        MetricsBroker( const MetricsBroker& ) = delete;
+        MetricsBroker& operator=( const MetricsBroker& ) = delete;
 
-        static MetricsStack& getInstance();
+        /**
+         * @brief Create a unique instance of the MetricsBroker object
+         * and returns a reference to it.
+         */
+        static std::shared_ptr<MetricsBroker> getInstance();
     };
 }

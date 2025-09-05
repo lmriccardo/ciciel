@@ -1,4 +1,5 @@
 #include <metrics/metrics_gather.hpp>
+#include <metrics/metrics_logger.hpp>
 #include <thread>
 #include <array>
 #include <vector>
@@ -51,6 +52,11 @@ namespace prova
 
 int main()
 {
+    auto logger = std::make_shared<TreeMetricsLogger>();
+    logger->start();
+
+    MetricsBroker::getInstance()->subscribe<MetricEvent>( logger );
+
     prova::perform_task();
 
     return 0;

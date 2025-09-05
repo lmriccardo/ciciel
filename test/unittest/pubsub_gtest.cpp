@@ -1,5 +1,5 @@
-#include <patterns/pub_sub/pub_sub_broker.hpp>
-#include <patterns/pub_sub/pub_sub_event.hpp>
+#include <patterns/pub_sub/broker.hpp>
+#include <patterns/pub_sub/event.hpp>
 #include <patterns/pub_sub/publisher.hpp>
 #include <patterns/pub_sub/subscriber.hpp>
 #include <gtest/gtest.h>

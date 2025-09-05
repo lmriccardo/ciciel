@@ -1,6 +1,8 @@
 #pragma once
 
 #include <metrics/metrics_utils.hpp>
+#include <patterns/pub_sub/publisher.hpp>
+#include <patterns/pub_sub/event.hpp>
 #include <fstream>
 #include <string>
 #include <chrono>
@@ -16,7 +18,7 @@
 
 namespace ccl::metrics
 {
-    class MetricsStack; // Forward declaration of MetricsStack
+    class MetricsBroker; // Forward declaration of MetricsBroker
     class AbstractMetricsLogger; // Forward declaration of MetricsLogger
 
     /**
@@ -40,15 +42,45 @@ namespace ccl::metrics
     };
 
     /**
+     * @class MetricEvent
+     *
+     * @brief Represents a metrics-related event in the Pub-Sub system.
+     *
+     * This event is intended to carry function-level performance or resource
+     * metrics, such as CPU usage, RAM consumption, execution time, and thread ID.
+     * Typically published by a MetricsCollector to a PubSubBroker for consumption
+     * by subscribers interested in performance monitoring or logging.
+     */
+    class MetricEvent : public ccl::dp::pub_sub::PubSubEvent
+    {
+    public:
+        std::string m_parent_func_name; // Parent function name
+        std::string m_func_name;        // Metric function name
+        Metrics     m_metrics;          // Collection of Metrics (CPU time, RAM ...)
+        TID_t       m_thread_id;        // Thread ID of the Collector
+
+        MetricEvent( const std::string& parent, const std::string& f_name,
+                     Metrics metrics, TID_t thread_id )
+        : m_parent_func_name(parent), m_func_name(f_name),
+          m_metrics(metrics), m_thread_id(thread_id)
+        {}
+
+        inline std::string name() const override
+        {
+            return "MetricEvent(" + m_func_name + ")";
+        }
+    };
+
+    /**
      * @class MetricsCollector
      * 
      * @brief Collect metrics for a single function call, where the object
      * is constructed. It follows the RAII principle, meaning that metrics
      * are collected once the function is entered and exited.
      */
-    class MetricsCollector : std::enable_shared_from_this<MetricsCollector>
+    class MetricsCollector : public ccl::dp::pub_sub::Publisher
     {
-        friend class MetricsStack;
+        friend class MetricsBroker;
         friend class AbstractMetricsLogger;
 
     private:

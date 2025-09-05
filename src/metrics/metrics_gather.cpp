@@ -1,7 +1,9 @@
 #include "metrics_gather.hpp"
-#include <metrics/metrics_stack.hpp>
+#include <metrics/metrics_broker.hpp>
 
 using namespace ccl::metrics;
+
+namespace ps = ccl::dp::pub_sub;
 
 MetricsCollector::MetricsCollector(const std::string &func_name)
     : m_function_name(func_name), m_thread_id( syscall(SYS_gettid) )
@@ -21,8 +23,12 @@ ccl::metrics::MetricsCollector::~MetricsCollector()
     long final_heap_res = get_heap_usage();
     m_metrics.m_heap_res = final_heap_res - m_metrics.m_heap_res;
 
-    // Now the logger has a copy of the metrics for this collector
-    MetricsStack::getInstance().gather( *this );
+    // Now it has to publish the metrics event to the broker
+    auto metrics_ev = std::make_shared<const MetricEvent>(m_parent, m_function_name, 
+        m_metrics, m_thread_id);
+
+    std::shared_ptr<const ps::PubSubEvent> base_ref = metrics_ev;
+    publish( base_ref );
 }
 
 TID_t MetricsCollector::getThreadId() const
@@ -70,6 +76,8 @@ void MetricsCollector::collect()
 std::shared_ptr<MetricsCollector> MetricsCollector::create(const std::string &f_name)
 {
     auto collector = std::shared_ptr<MetricsCollector>( new MetricsCollector( f_name ) );
-    MetricsStack::getInstance().addMetricsCollector( collector );
+    auto broker = MetricsBroker::getInstance();
+    broker->addMetricsCollector( collector );
+    collector->setBroker( broker ); // Set the broker
     return collector;
 }

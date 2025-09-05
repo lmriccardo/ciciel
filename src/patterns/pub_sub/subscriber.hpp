@@ -2,7 +2,7 @@
 
 #include <concurrent/thread.hpp>
 #include <data_structures/queue/concurrent_queue.hpp>
-#include <patterns/pub_sub/pub_sub_event.hpp>
+#include <patterns/pub_sub/event.hpp>
 #include <string>
 #include <memory>
 
@@ -35,7 +35,11 @@ namespace ccl::dp::pub_sub
      * @class AsyncSubscriber
      * 
      * @brief Asynchronous Subscriber in which events are pushed into a
-     * concurrent queue and then asynchronously consumed.
+     * concurrent queue and then asynchronously consumed. On cancellation
+     * it injects a nullptr event to break the infinite running loop. Notice
+     * that the subscriber will stop running once all elements left in the
+     * queue are processed. That is why, the thread cancellation policy is
+     * DEFERRED.
      */
     class AsyncSubscriber : public Subscriber, private ccl::sys::concurrent::Thread
     {
@@ -49,19 +53,23 @@ namespace ccl::dp::pub_sub
         virtual void consume( event_ptr event ) = 0;
     
     public:
-        AsyncSubscriber() 
-        : Thread( __FUNCTION__, false, 
-            ccl::sys::concurrent::CancellationPolicy::AT_CONDITION_CHECK )
+        AsyncSubscriber(const std::string& name) 
+        : Thread( name, false, 
+            ccl::sys::concurrent::CancellationPolicy::DEFERRED )
         {}
+
+        AsyncSubscriber()
+        : AsyncSubscriber( __FUNCTION__ )
+        {}
+
+        virtual ~AsyncSubscriber() = default;
 
         // Imports some methods from the Thread class
         using Thread::join;
-        using Thread::stop;
         using Thread::start;
         
         void cancel(); // Custom cancel method for the AsyncSubscriber
-
-        virtual ~AsyncSubscriber() = default;
+        void stop();   // Custom stop method for AsyncSubscriber
 
         void run() override;
     };

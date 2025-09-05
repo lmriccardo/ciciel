@@ -2,35 +2,24 @@
 
 using namespace ccl::metrics;
 
-namespace concurrent = ccl::sys::concurrent;
-namespace queue = ccl::ds::queue;
+namespace ps = ccl::dp::pub_sub;
 
-AbstractMetricsLogger::AbstractMetricsLogger( const std::string& name )
-: Thread( name ), m_queue( 100 )
-{
-    setCancellationPolicy( concurrent::CancellationPolicy::AT_CONDITION_CHECK );
-}
-
-ccl::metrics::TreeMetricsLogger::TreeMetricsLogger()
-: AbstractMetricsLogger( "TreeMetricsLogger" )
+TreeMetricsLogger::TreeMetricsLogger()
+: AbstractMetricsLogger(__FUNCTION__)
 {}
 
-void ccl::metrics::TreeMetricsLogger::run()
+void TreeMetricsLogger::consume(event_ptr event)
 {
-    while ( !isCancelled() )
-    {
-        MetricEvent elem = m_queue.pop();
-    }
-}
+    auto metric_ev = std::static_pointer_cast<const MetricEvent>(event);
+    
+    std::cout << "----------------------------------------------------" << std::endl;
+    std::cout << "( " << metric_ev->m_func_name << " ) "
+              << "Total Duration: " << metric_ev->m_metrics.m_duration    << " [us] "
+              << "CPU Time: "       << metric_ev->m_metrics.m_cpu_time    << " [us] "
+              << "Stack Usage: "    << metric_ev->m_metrics.m_stack_usage << " [KB] "
+              << "Heap Usage: "     << metric_ev->m_metrics.m_heap_usage  << " [KB] "
+              << "Residual Mem: "   << metric_ev->m_metrics.m_heap_res    << " [KB]"
+              << std::endl;
 
-void TreeMetricsLogger::push(MetricsCollector &collector)
-{
-    MetricEvent element;
-
-    element.m_func_name = collector.getFuncName();
-    element.m_metrics = collector.getCollectedMetrics();
-    element.m_parent_func_name = collector.getParentName();
-    element.m_thread_id = collector.getThreadId();
-
-    m_queue.push( std::move(element) );
+    std::cout << "----------------------------------------------------" << std::endl;
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <patterns/pub_sub/pub_sub_event.hpp>
+#include <patterns/pub_sub/event.hpp>
 #include <memory>
 
 namespace ccl::dp::pub_sub

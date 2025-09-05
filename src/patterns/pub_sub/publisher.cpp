@@ -1,5 +1,5 @@
 #include "publisher.hpp"
-#include <patterns/pub_sub/pub_sub_broker.hpp>
+#include <patterns/pub_sub/broker.hpp>
 
 using namespace ccl::dp::pub_sub;
 

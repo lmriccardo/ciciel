@@ -86,7 +86,7 @@ namespace ccl::ds::queue
         if ( full() && m_policy == LossPolicy::BLOCK )
         {
             std::unique_lock _l( m_mutex );
-            m_full_cv.wait_for( _l, [this](){ return !full(); } )
+            m_full_cv.wait_for( _l, [this](){ return !full(); } );
         }
 
         m_queue.put( data );
@@ -103,7 +103,7 @@ namespace ccl::ds::queue
         if ( full() && m_policy == LossPolicy::BLOCK )
         {
             std::unique_lock _l( m_mutex );
-            m_full_cv.wait_for( _l, [this](){ return !full(); } )
+            m_full_cv.wait_for( _l, [this](){ return !full(); } );
         }
 
         m_queue.put( std::move(data) );

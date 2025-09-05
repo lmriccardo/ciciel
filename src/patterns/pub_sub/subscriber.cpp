@@ -13,9 +13,15 @@ void AsyncSubscriber::cancel()
     m_events.push( nullptr );
 }
 
+void AsyncSubscriber::stop()
+{
+    cancel();
+    join();
+}
+
 void AsyncSubscriber::run()
 {
-    while ( !isCancelled() )
+    while ( true )
     {
         event_ptr event = m_events.pop();
         if (!event) break;
