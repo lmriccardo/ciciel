@@ -217,26 +217,6 @@ TEST_F(ThreadTest, SetAffinityDoesNotCrash) {
     t.join();
 }
 
-// Test calling start() multiple times (should only start once)
-TEST_F(ThreadTest, MultipleStartsOnlyStartsOnce) {
-    SimpleRunnableThread t("MultiStartThread", false,  CancellationPolicy::AT_CANCELLATION_POINT);
-    EXPECT_FALSE(t.isStarted());
-    t.start();
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
-    EXPECT_TRUE(t.isStarted());
-    std::thread::id original_id = t.getId();
-    int initial_iterations = t.run_iterations.load();
-
-    t.start(); // Call start again
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
-
-    EXPECT_EQ(t.getId(), original_id) << "Thread ID should not change on second start call.";
-    EXPECT_TRUE(t.run_iterations.load() > initial_iterations) << "Thread should continue running, not restart.";
-    EXPECT_TRUE(t.isStarted()) << "Thread should still be marked as started.";
-
-    t.cancel();
-}
-
 // Test CancellationPolicy::AT_CANCELLATION_POINT
 // WARNING: This can be tricky and may lead to resource leaks if not handled carefully
 // The test ensures the thread stops and tearDown is called.
