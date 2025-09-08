@@ -1,0 +1,38 @@
+name: CTest on Push
+
+on:
+  push:
+    branches:
+      - test/generic
+      - master
+
+  pull_request:
+    branches:
+      - dev
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+      
+      - name: Install dependencies
+        uses: |
+            sudo apt-get update
+            sudo apt-get install -y build-essential cmake
+      
+      - name: Create build folder
+        uses: mkdir build
+
+      - name: Configure CMake
+        uses: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build all targets
+        uses: cmake --build build
+      
+      - name: Run CTests
+        uses: |
+          cd build
+          ctest --output-on-failure
